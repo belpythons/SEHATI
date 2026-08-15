@@ -1,0 +1,89 @@
+datasource db {  
+  provider = "postgresql"  
+}
+
+generator client {  
+  provider = "prisma-client-js"  
+}
+
+enum DataSourceType {  
+  PWA_DIRECT_USER  
+  RISKESDAS_KEMENKES  
+  SURVEY_CSV_UPLOAD  
+  EXTERNAL_HEALTH_API  
+}
+
+model AnonymousSession {  
+  id               String            @id @default(uuid())  
+  clientToken      String            @unique  
+  persona          String            @default("ORANG_TUA")  
+  createdAt        DateTime          @default(now())  
+  updatedAt        DateTime          @updatedAt  
+  screenings       ScreeningRecord[]
+
+  @@index([clientToken])  
+}
+
+model ScreeningRecord {  
+  id               String            @id @default(uuid())  
+  shareHash        String            @unique @default(nanoid(10))  
+  sessionId        String  
+  session          AnonymousSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)  
+  sourceType       DataSourceType    @default(PWA_DIRECT_USER)  
+  sourceBatchId    String?  
+  persona          String  
+  kelurahan        String  
+  ageMonths        Int  
+  gender           String  
+  weightKg         Float  
+  heightCm         Float  
+  zScore           Float             // Z-Score TB/U  
+  zScoreWAZ        Float?            // Z-Score BB/U  
+  zScoreWHZ        Float?            // Z-Score BB/TB  
+  statusGiziTBU    String?           // Severely Stunted, Stunted, Normal, Tinggi  
+  statusGiziBBU    String?           // Severely Underweight, Underweight, Normal, BB Lebih  
+  statusGiziBBTB   String?           // Severely Wasted, Wasted, Normal, Risk Overweight, Overweight  
+  exclusiveAsi     Boolean  
+  sanitationAccess Boolean  
+  cleanWaterAccess Boolean  
+  smokeExposure    Boolean  
+  economicQuintile Int  
+  diarrheaHistory  Boolean  
+  riskTier         String            // LOW, MODERATE, HIGH  
+  riskScore        Float             // 0.0 - 1.0  
+  dominantFactors  String[]  
+  rawMetadata      Json?  
+  createdAt        DateTime          @default(now())
+
+  @@index([sessionId])  
+  @@index([shareHash])  
+  @@index([kelurahan])  
+  @@index([riskTier])  
+}
+
+model HealthKnowledgeBase {  
+  id                    String    @id @default(uuid())  
+  topicTitle            String  
+  category              String  
+  targetAgeGroupMinMonths Int     @default(0)  
+  targetAgeGroupMaxMonths Int     @default(59)  
+  targetRiskTier        String  
+  tags                  String[]  
+  guidelineContent      String    @db.Text  
+  actionableSteps       String[]  
+  sourceReference       String  
+  createdAt             DateTime  @default(now())
+
+  @@index([category])  
+  @@index([targetRiskTier])  
+}
+
+model IngestionBatchLog {  
+  id           String         @id @default(uuid())  
+  sourceName   String  
+  sourceType   DataSourceType  
+  totalRecords Int  
+  successCount Int  
+  failedCount  Int  
+  importedAt   DateTime       @default(now())  
+}

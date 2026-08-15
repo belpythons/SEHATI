@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build & Output
+dist/
+build/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+env.txt
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Prisma / Database
+prisma/*.db
+prisma/*.sqlite
+prisma/*.sqlite-journal
+generated/prisma/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local tooling / AI metadata
+.agents/
+.claude/
+.windsurf/

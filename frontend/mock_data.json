@@ -1,0 +1,839 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "meta": {
+    "systemName": "SEHATI",
+    "systemFullName": "Sistem Edukasi Holistik dan Deteksi Stunting Terintegrasi",
+    "subSystem": "Client Layer PWA (Progressive Web App)",
+    "version": "1.0.0-PROD",
+    "locale": "id-ID",
+    "cityContext": "Kota Bontang, Kalimantan Timur",
+    "createdAt": "2026-08-15T22:55:00.000Z"
+  },
+
+  "appNavigation": {
+    "brand": {
+      "name": "SEHATI",
+      "tagline": "Sistem Edukasi & Deteksi Stunting Terintegrasi",
+      "logoUrl": "/assets/images/logo-sehati.svg",
+      "homeUrl": "/"
+    },
+    "navItems": [
+      { "id": "home", "label": "Beranda", "path": "/", "icon": "home" },
+      { "id": "screening", "label": "Mulai Skrining", "path": "/questionnaire", "icon": "clipboard-check" },
+      { "id": "analytics", "label": "Dashboard Analitik", "path": "/analytics", "icon": "chart-pie" }
+    ],
+    "pwaInstall": {
+      "buttonLabel": "Pasang Aplikasi",
+      "badgeLabel": "PWA Siap Offline",
+      "onlineStatusLabel": "Online",
+      "offlineStatusLabel": "Mode Offline (Tersimpan Lokal)"
+    }
+  },
+
+  "landingPage": {
+    "heroSection": {
+      "badge": "Inisiatif Kesehatan Anak Kota Bontang",
+      "title": "Deteksi Dini & Pencegahan Stunting Balita Secara Terintegrasi",
+      "subtitle": "Platform cerdas ramah keluarga untuk skrining antropometri WHO, kalkulasi risiko determinan Naïve Bayes, serta konsultasi gizi terpersonalisasi berbasis pangan lokal.",
+      "ctaPrimary": {
+        "label": "Mulai Skrining Sekarang",
+        "path": "/questionnaire",
+        "badge": "Gratis & Tanpa Login"
+      },
+      "ctaSecondary": {
+        "label": "Lihat Contoh Hasil Analisis",
+        "path": "/analytics/demo-sample"
+      },
+      "statsHighlights": [
+        { "label": "Standar Evaluasi", "value": "WHO 2006 (LMS)", "desc": "3 Indeks Baku Antropometri" },
+        { "label": "Akurasi Prediksi", "value": "Naïve Bayes", "desc": "Analisis Multi-Determinan" },
+        { "label": "Konsultasi AI", "value": "Gemini 2.5 Flash", "desc": "Streaming Panduan Gizi" },
+        { "label": "Kesiapan Sistem", "value": "100% PWA", "desc": "Bisa Digunakan Saat Offline" }
+      ]
+    },
+
+    "bontangHealthContext": {
+      "title": "Konteks Kesehatan & Urgensi Stunting Kota Bontang",
+      "subtitle": "Kondisi prevalensi stunting di Kota Bontang memerlukan aksi kolaboratif deteksi dini mulai dari tingkat keluarga hingga posyandu.",
+      "metrics": {
+        "stuntingPrevalence": 27.4,
+        "stuntingPrevalenceUnit": "%",
+        "targetPrevalence": 14.0,
+        "targetYear": "2026",
+        "totalSubdistricts": 15,
+        "totalDistricts": 3,
+        "urgencyText": "Prevalensi stunting di Kota Bontang berada pada angka 27,4%. Intervensi gizi pada 1.000 Hari Pertama Kehidupan (HPK) adalah kunci pencegahan permanen kegagalan tumbuh kembang anak."
+      },
+      "districtOverview": [
+        { "district": "Bontang Utara", "subdistrictCount": 6, "prevalenceLevel": "Tinggi" },
+        { "district": "Bontang Selatan", "subdistrictCount": 6, "prevalenceLevel": "Sedang-Tinggi" },
+        { "district": "Bontang Barat", "subdistrictCount": 3, "prevalenceLevel": "Sedang" }
+      ]
+    },
+
+    "featureCards": [
+      {
+        "id": "who-zscore",
+        "title": "Deteksi Otomatis Z-Score WHO",
+        "tag": "Antropometri 2006",
+        "description": "Perhitungan 3 indeks baku sekaligus: TB/U (Stunting), BB/U (Underweight), dan BB/TB (Wasting) menggunakan metode Box-Cox LMS.",
+        "icon": "activity",
+        "accentColor": "#2563EB",
+        "bgColor": "#EFF6FF"
+      },
+      {
+        "id": "naive-bayes-risk",
+        "title": "Prediksi Risiko Determinan Naïve Bayes",
+        "tag": "Machine Learning",
+        "description": "Menganalisis faktor risiko lingkungan, riwayat ASI eksklusif, sanitasi, dan ekonomi untuk mendiagnosis kerentanan balita.",
+        "icon": "shield-alert",
+        "accentColor": "#10B981",
+        "bgColor": "#ECFDF5"
+      },
+      {
+        "id": "gemini-ai-consultant",
+        "title": "Asisten Konsultasi AI Terpersonalisasi",
+        "tag": "Gemini AI Streaming",
+        "description": "Dukungan interaktif berbasis data balita Anda untuk menyusun menu makanan pendukung ASI (MPASI) dari pangan lokal Kota Bontang.",
+        "icon": "bot",
+        "accentColor": "#8B5CF6",
+        "bgColor": "#F5F3FF"
+      }
+    ],
+
+    "testimonialsOrPersonaBrief": [
+      {
+        "role": "ORANG_TUA",
+        "name": "Ibu Rahma",
+        "location": "Loktuan, Bontang Utara",
+        "comment": "Sangat mudah digunakan tanpa perlu login, langsung tahu posisi grafik tumbuh kembang anak saya dan rekomendasi ikannya."
+      },
+      {
+        "role": "KADER_POSYANDU",
+        "name": "Kader Posyandu Melati",
+        "location": "Tanjung Laut, Bontang Selatan",
+        "comment": "Membantu kami mencatat antropometri dan langsung memberikan kartu edukasi kepada ibu-ibu balita saat kunjungan posyandu."
+      }
+    ]
+  },
+
+  "questionnaire": {
+    "steps": [
+      {
+        "step": 1,
+        "key": "persona_domisili",
+        "title": "Seleksi Persona & Domisili",
+        "subtitle": "Tentukan peran Anda dan lokasi domisili kelurahan di Kota Bontang.",
+        "progressPercent": 33
+      },
+      {
+        "step": 2,
+        "key": "antropometri",
+        "title": "Data Fisik & Antropometri",
+        "subtitle": "Masukkan data pengukuran berat dan tinggi/panjang badan balita.",
+        "progressPercent": 66
+      },
+      {
+        "step": 3,
+        "key": "determinan",
+        "title": "Determinan Lingkungan & Pola Asuh",
+        "subtitle": "Lengkapi parameter kesehatan lingkungan untuk analisis risiko komprehensif.",
+        "progressPercent": 100
+      }
+    ],
+
+    "step1PersonaAndLocation": {
+      "personaOptions": [
+        {
+          "id": "ORANG_TUA",
+          "label": "Orang Tua / Wali",
+          "description": "Pengukuran mandiri di rumah untuk memantau tumbuh kembang balita Anda secara berkala.",
+          "badge": "Akses Cepat",
+          "icon": "user"
+        },
+        {
+          "id": "KADER_POSYANDU",
+          "label": "Kader Posyandu",
+          "description": "Pencatatan skrining posyandu bulanan untuk rujukan dan konseling keluarga.",
+          "badge": "Pemeriksaan Rutin",
+          "icon": "heart-handshake"
+        },
+        {
+          "id": "SURVEYOR",
+          "label": "Surveyor / Tenaga Kesehatan",
+          "description": "Pengumpulan data survei lapangan berkala untuk pemetaan stunting wilayah.",
+          "badge": "Survei Lapangan",
+          "icon": "clipboard-list"
+        }
+      ],
+      "bontangDistricts": [
+        {
+          "districtName": "Bontang Utara",
+          "subdistricts": [
+            { "id": "Api-Api", "name": "Api-Api", "postalCode": "75311" },
+            { "id": "Bontang Baru", "name": "Bontang Baru", "postalCode": "75311" },
+            { "id": "Bontang Kuala", "name": "Bontang Kuala", "postalCode": "75313" },
+            { "id": "Guntung", "name": "Guntung", "postalCode": "75312" },
+            { "id": "Gunung Elai", "name": "Gunung Elai", "postalCode": "75314" },
+            { "id": "Loktuan", "name": "Loktuan", "postalCode": "75315" }
+          ]
+        },
+        {
+          "districtName": "Bontang Selatan",
+          "subdistricts": [
+            { "id": "Berbas Pantai", "name": "Berbas Pantai", "postalCode": "75325" },
+            { "id": "Berbas Tengah", "name": "Berbas Tengah", "postalCode": "75324" },
+            { "id": "Bontang Lestari", "name": "Bontang Lestari", "postalCode": "75325" },
+            { "id": "Satimpo", "name": "Satimpo", "postalCode": "75321" },
+            { "id": "Tanjung Laut", "name": "Tanjung Laut", "postalCode": "75322" },
+            { "id": "Tanjung Laut Indah", "name": "Tanjung Laut Indah", "postalCode": "75323" }
+          ]
+        },
+        {
+          "districtName": "Bontang Barat",
+          "subdistricts": [
+            { "id": "Belimbing", "name": "Belimbing", "postalCode": "75331" },
+            { "id": "Gunung Telihan", "name": "Gunung Telihan", "postalCode": "75332" },
+            { "id": "Kanaan", "name": "Kanaan", "postalCode": "75333" }
+          ]
+        }
+      ],
+      "flatKelurahanList": [
+        "Api-Api",
+        "Belimbing",
+        "Berbas Pantai",
+        "Berbas Tengah",
+        "Bontang Baru",
+        "Bontang Kuala",
+        "Bontang Lestari",
+        "Guntung",
+        "Gunung Elai",
+        "Gunung Telihan",
+        "Kanaan",
+        "Loktuan",
+        "Satimpo",
+        "Tanjung Laut",
+        "Tanjung Laut Indah"
+      ]
+    },
+
+    "step2Anthropometrics": {
+      "genderOptions": [
+        { "id": "L", "label": "Laki-laki (Boy)", "icon": "male" },
+        { "id": "P", "label": "Perempuan (Girl)", "icon": "female" }
+      ],
+      "measurementPositionOptions": [
+        {
+          "id": "Terlentang",
+          "label": "Terlentang (Recumbent Length)",
+          "description": "Direkomendasikan untuk balita usia 0–23 bulan menggunakan infantometer."
+        },
+        {
+          "id": "Berdiri",
+          "label": "Berdiri (Standing Height)",
+          "description": "Direkomendasikan untuk anak usia 24–59 bulan menggunakan stadiometer."
+        }
+      ],
+      "fieldValidationRules": {
+        "ageMonths": {
+          "label": "Usia Balita",
+          "unit": "Bulan",
+          "min": 0,
+          "max": 59,
+          "step": 1,
+          "placeholder": "Contoh: 18",
+          "helperText": "Rentang usia sasaran skrining balita adalah 0 hingga 59 bulan."
+        },
+        "weightKg": {
+          "label": "Berat Badan",
+          "unit": "kg",
+          "min": 1.0,
+          "max": 30.0,
+          "step": 0.1,
+          "placeholder": "Contoh: 8.5",
+          "helperText": "Gunakan timbangan digital dengan ketelitian minimal 0.1 kg."
+        },
+        "heightCm": {
+          "label": "Tinggi / Panjang Badan",
+          "unit": "cm",
+          "min": 30.0,
+          "max": 130.0,
+          "step": 0.1,
+          "placeholder": "Contoh: 74.5",
+          "helperText": "Ukur panjang badan (0-23 bln) atau tinggi badan berdiri (24-59 bln)."
+        }
+      }
+    },
+
+    "step3Determinants": [
+      {
+        "id": "exclusiveAsi",
+        "field": "exclusiveAsi",
+        "title": "Pemberian ASI Eksklusif",
+        "question": "Apakah balita diberikan ASI Eksklusif selama 6 bulan pertama kehidupan?",
+        "description": "Hanya diberikan ASI tanpa makanan/minuman tambahan lain sejak lahir hingga usia 6 bulan.",
+        "category": "Pola Asuh & Nutrisi",
+        "options": [
+          { "value": true, "label": "Ya, Diberikan ASI Eksklusif", "isHealthy": true },
+          { "value": false, "label": "Tidak / Diberi Tambahan Lain", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "cleanWaterAccess",
+        "field": "cleanWaterAccess",
+        "title": "Akses Sumber Air Bersih",
+        "question": "Apakah rumah tangga memiliki akses sumber air bersih yang layak untuk minum dan masak?",
+        "description": "Sumber air terlindungi seperti PDAM, sumur bor terlindungi, atau air minum kemasan higienis.",
+        "category": "Sanitasi & Lingkungan",
+        "options": [
+          { "value": true, "label": "Ya, Sumber Air Bersih Layak", "isHealthy": true },
+          { "value": false, "label": "Tidak Layak / Tercemar", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "sanitationAccess",
+        "field": "sanitationAccess",
+        "title": "Akses Jamban Sehat",
+        "question": "Apakah rumah tangga memiliki dan menggunakan jamban sehat dengan tangki septik?",
+        "description": "Menggunakan jamban leher angsa bersaluran tangki septik tertutup (bukan sungai/pantai).",
+        "category": "Sanitasi & Lingkungan",
+        "options": [
+          { "value": true, "label": "Ya, Memiliki Jamban Sehat", "isHealthy": true },
+          { "value": false, "label": "Tidak / Jamban Cemplung / Terbuka", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "smokeExposure",
+        "field": "smokeExposure",
+        "title": "Paparan Asap Rokok di Rumah",
+        "question": "Apakah ada anggota keluarga yang merokok di dalam rumah atau dekat balita?",
+        "description": "Paparan residu nikotin dan asap rokok pasif mengganggu penyerapan gizi serta kesehatan paru balita.",
+        "category": "Kesehatan Lingkungan",
+        "options": [
+          { "value": false, "label": "Bebas Asap Rokok (Tidak Ada yang Merokok)", "isHealthy": true },
+          { "value": true, "label": "Ada Paparan Asap Rokok di Rumah", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "economicQuintile",
+        "field": "economicQuintile",
+        "title": "Tingkat Kuintil Ekonomi Keluarga",
+        "question": "Pilih kelompok estimasi pengeluaran / kesejahteraan ekonomi keluarga Anda:",
+        "description": "Kategori pembagian ekonomi 1 (termiskin) hingga 5 (terkaya) mengacu pada standar Riskesdas.",
+        "category": "Sosial Ekonomi",
+        "options": [
+          { "value": 1, "label": "Kuintil 1: Sangat Rendah (< Rp 1.5 Juta/bln)", "isHealthy": false },
+          { "value": 2, "label": "Kuintil 2: Rendah (Rp 1.5 - 2.5 Juta/bln)", "isHealthy": false },
+          { "value": 3, "label": "Kuintil 3: Menengah Bawah (Rp 2.5 - 4.0 Juta/bln)", "isHealthy": true },
+          { "value": 4, "label": "Kuintil 4: Menengah Atas (Rp 4.0 - 6.5 Juta/bln)", "isHealthy": true },
+          { "value": 5, "label": "Kuintil 5: Mampu / Sejahtera (> Rp 6.5 Juta/bln)", "isHealthy": true }
+        ]
+      },
+      {
+        "id": "motherEducation",
+        "field": "motherEducation",
+        "title": "Tingkat Pendidikan Ibu",
+        "question": "Apakah ibu balita menyelesaikan pendidikan minimal setingkat SMA / Sederajat?",
+        "description": "Pendidikan ibu berhubungan erat dengan literasi gizi, hygiene, dan pemanfaatan layanan kesehatan.",
+        "category": "Sosial Ekonomi",
+        "options": [
+          { "value": true, "label": "Ya, Tamat SMA / Diploma / Sarjana", "isHealthy": true },
+          { "value": false, "label": "Tidak (Tamat SMP / SD / Tidak Sekolah)", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "diarrheaHistory",
+        "field": "diarrheaHistory",
+        "title": "Riwayat Penyakit Diare Berulang",
+        "question": "Apakah balita mengalami sakit diare lebih dari 2 kali dalam kurun waktu 3 bulan terakhir?",
+        "description": "Infeksi berulang menguras mikronutrien penting dan menghambat pertambahan berat serta tinggi badan.",
+        "category": "Riwayat Kesehatan",
+        "options": [
+          { "value": false, "label": "Tidak Pernah / Jarang", "isHealthy": true },
+          { "value": true, "label": "Ya, Ada Riwayat Diare Berulang", "isHealthy": false }
+        ]
+      },
+      {
+        "id": "bblrHistory",
+        "field": "bblrHistory",
+        "title": "Riwayat Berat Badan Lahir Rendah (BBLR)",
+        "question": "Apakah berat badan balita saat lahir kurang dari 2.500 gram (BBLR)?",
+        "description": "Bayi dengan BBLR memiliki kerentanan lebih tinggi mengalami stunting jika tidak dikejar pertumbuhannya.",
+        "category": "Riwayat Kelahiran",
+        "options": [
+          { "value": false, "label": "Tidak (Berat Lahir >= 2.500 gram)", "isHealthy": true },
+          { "value": true, "label": "Ya (Berat Lahir < 2.500 gram / BBLR)", "isHealthy": false }
+        ]
+      }
+    ],
+
+    "validationErrorsDictionary": {
+      "personaTypeRequired": "Pilih peran Anda terlebih dahulu (Orang Tua, Kader, atau Surveyor).",
+      "kelurahanRequired": "Pilih kelurahan domisili di Kota Bontang.",
+      "genderRequired": "Pilih jenis kelamin balita (Laki-laki atau Perempuan).",
+      "ageMonthsRange": "Usia balita harus berupa angka bulat antara 0 hingga 59 bulan.",
+      "weightKgRange": "Berat badan tidak valid. Harap masukkan nilai antara 1.0 - 30.0 kg.",
+      "heightCmRange": "Tinggi/panjang badan tidak valid. Harap masukkan nilai antara 30.0 - 130.0 cm.",
+      "determinantRequired": "Mohon lengkapi semua pertanyaan determinan sebelum melihat hasil analisis."
+    },
+
+    "defaultInitialFormState": {
+      "persona": "ORANG_TUA",
+      "kelurahan": "Loktuan",
+      "gender": "L",
+      "ageMonths": 18,
+      "measurementPosition": "Terlentang",
+      "weightKg": 8.5,
+      "heightCm": 74.5,
+      "exclusiveAsi": true,
+      "cleanWaterAccess": true,
+      "sanitationAccess": false,
+      "smokeExposure": true,
+      "economicQuintile": 2,
+      "motherEducation": true,
+      "diarrheaHistory": false,
+      "bblrHistory": false
+    }
+  },
+
+  "analyticsDashboard": {
+    "sampleScreeningProfiles": [
+      {
+        "id": "rec-stunted-high-risk-001",
+        "shareHash": "bntg-8xK9pL",
+        "sessionId": "sess-bontang-001",
+        "clientToken": "tok-bntg-771122",
+        "sourceType": "PWA_DIRECT_USER",
+        "persona": "ORANG_TUA",
+        "kelurahan": "Loktuan",
+        "district": "Bontang Utara",
+        "createdAt": "2026-08-15T21:40:00.000Z",
+        "child": {
+          "gender": "L",
+          "genderLabel": "Laki-laki",
+          "ageMonths": 18,
+          "weightKg": 8.5,
+          "heightCm": 74.5,
+          "measurementPosition": "Terlentang"
+        },
+        "determinants": {
+          "exclusiveAsi": true,
+          "cleanWaterAccess": true,
+          "sanitationAccess": false,
+          "smokeExposure": true,
+          "economicQuintile": 2,
+          "motherEducation": true,
+          "diarrheaHistory": false,
+          "bblrHistory": false
+        },
+        "zScores": {
+          "zScoreTBU": -2.03,
+          "statusGiziTBU": "Stunted",
+          "statusGiziTBULabel": "Pendek (Stunted)",
+          "statusGiziTBUColor": "#EF4444",
+
+          "zScoreBBU": -1.85,
+          "statusGiziBBU": "Normal",
+          "statusGiziBBULabel": "Berat Badan Normal",
+          "statusGiziBBUColor": "#10B981",
+
+          "zScoreBBTB": -1.12,
+          "statusGiziBBTB": "Normal",
+          "statusGiziBBTBLabel": "Gizi Baik (Normal)",
+          "statusGiziBBTBColor": "#10B981"
+        },
+        "riskAssessment": {
+          "riskTier": "MODERATE",
+          "riskTierLabel": "Risiko Sedang (Perlu Perhatian)",
+          "riskScore": 0.68,
+          "riskScorePercentage": 68,
+          "riskColor": "#F59E0B",
+          "dominantFactors": [
+            {
+              "key": "AKSES_SANITASI_BURUK",
+              "label": "Akses Sanitasi / Jamban Belum Sehat",
+              "impactPercentage": 42,
+              "recommendation": "Gunakan jamban bersekat tertutup dan perbaiki pembuangan limbah keluarga untuk mencegah kontaminasi."
+            },
+            {
+              "key": "PAPARAN_ASAP_ROKOK",
+              "label": "Paparan Asap Rokok di Lingkungan Rumah",
+              "impactPercentage": 38,
+              "recommendation": "Ciptakan Rumah Bebas Asap Rokok. Jangan merokok di dalam rumah atau di dekat balita."
+            }
+          ]
+        },
+        "summaryMessage": "Balita berada pada kategori tinggi badan Stunted (Z-Score TB/U -2.03) dengan tingkat risiko determinan Sedang. Fokus intervensi diperlukan pada perbaikan higienitas sanitasi dan eliminasi asap rokok serta asupan protein hewani lokal."
+      },
+
+      {
+        "id": "rec-severely-stunted-high-risk-002",
+        "shareHash": "bntg-3wM7xQ",
+        "sessionId": "sess-bontang-002",
+        "clientToken": "tok-bntg-882233",
+        "sourceType": "PWA_DIRECT_USER",
+        "persona": "KADER_POSYANDU",
+        "kelurahan": "Tanjung Laut",
+        "district": "Bontang Selatan",
+        "createdAt": "2026-08-15T20:15:00.000Z",
+        "child": {
+          "gender": "P",
+          "genderLabel": "Perempuan",
+          "ageMonths": 24,
+          "weightKg": 8.0,
+          "heightCm": 76.0,
+          "measurementPosition": "Berdiri"
+        },
+        "determinants": {
+          "exclusiveAsi": false,
+          "cleanWaterAccess": false,
+          "sanitationAccess": false,
+          "smokeExposure": true,
+          "economicQuintile": 1,
+          "motherEducation": false,
+          "diarrheaHistory": true,
+          "bblrHistory": true
+        },
+        "zScores": {
+          "zScoreTBU": -3.25,
+          "statusGiziTBU": "Severely Stunted",
+          "statusGiziTBULabel": "Sangat Pendek (Severely Stunted)",
+          "statusGiziTBUColor": "#991B1B",
+
+          "zScoreBBU": -2.45,
+          "statusGiziBBU": "Underweight",
+          "statusGiziBBULabel": "Kurang (Underweight)",
+          "statusGiziBBUColor": "#F59E0B",
+
+          "zScoreBBTB": -2.10,
+          "statusGiziBBTB": "Wasted",
+          "statusGiziBBTBLabel": "Kurus (Wasted)",
+          "statusGiziBBTBColor": "#EF4444"
+        },
+        "riskAssessment": {
+          "riskTier": "HIGH",
+          "riskTierLabel": "Risiko Tinggi (Perlu Rujukan Puskesmas)",
+          "riskScore": 0.89,
+          "riskScorePercentage": 89,
+          "riskColor": "#EF4444",
+          "dominantFactors": [
+            {
+              "key": "SEJARAH_DIARE_BERULANG",
+              "label": "Riwayat Diare Berulang & Air Tidak Bersih",
+              "impactPercentage": 48,
+              "recommendation": "Segera konsultasikan ke Puskesmas Bontang Selatan dan pastikan air minum dimasak mendidih."
+            },
+            {
+              "key": "ASI_EKSKLUSIF_TIDAK_TERPENUHI",
+              "label": "Tidak Memperoleh ASI Eksklusif Penuh",
+              "impactPercentage": 35,
+              "recommendation": "Tingkatkan kepadatan gizi makanan pendamping ASI (MPASI) kaya asam amino dan zinc."
+            }
+          ]
+        },
+        "summaryMessage": "Kondisi balita memerlukan rujukan prioritas ke Puskesmas/Posyandu terdekat untuk penanganan gizi terpadu dan pemberian makanan tambahan (PMT) pemulihan."
+      },
+
+      {
+        "id": "rec-normal-low-risk-003",
+        "shareHash": "bntg-9yP2zV",
+        "sessionId": "sess-bontang-003",
+        "clientToken": "tok-bntg-993344",
+        "sourceType": "PWA_DIRECT_USER",
+        "persona": "ORANG_TUA",
+        "kelurahan": "Bontang Baru",
+        "district": "Bontang Utara",
+        "createdAt": "2026-08-15T19:00:00.000Z",
+        "child": {
+          "gender": "L",
+          "genderLabel": "Laki-laki",
+          "ageMonths": 12,
+          "weightKg": 9.6,
+          "heightCm": 75.8,
+          "measurementPosition": "Terlentang"
+        },
+        "determinants": {
+          "exclusiveAsi": true,
+          "cleanWaterAccess": true,
+          "sanitationAccess": true,
+          "smokeExposure": false,
+          "economicQuintile": 4,
+          "motherEducation": true,
+          "diarrheaHistory": false,
+          "bblrHistory": false
+        },
+        "zScores": {
+          "zScoreTBU": 0.15,
+          "statusGiziTBU": "Normal",
+          "statusGiziTBULabel": "Normal (Pertumbuhan Baik)",
+          "statusGiziTBUColor": "#10B981",
+
+          "zScoreBBU": 0.05,
+          "statusGiziBBU": "Normal",
+          "statusGiziBBULabel": "Normal",
+          "statusGiziBBUColor": "#10B981",
+
+          "zScoreBBTB": -0.10,
+          "statusGiziBBTB": "Normal",
+          "statusGiziBBTBLabel": "Gizi Baik (Normal)",
+          "statusGiziBBTBColor": "#10B981"
+        },
+        "riskAssessment": {
+          "riskTier": "LOW",
+          "riskTierLabel": "Risiko Rendah (Pertumbuhan Optimal)",
+          "riskScore": 0.12,
+          "riskScorePercentage": 12,
+          "riskColor": "#10B981",
+          "dominantFactors": [
+            {
+              "key": "LINGKUNGAN_SEHAT",
+              "label": "Sanitasi & Lingkungan Terjaga Baik",
+              "impactPercentage": 10,
+              "recommendation": "Pertahankan pola asuh gizi seimbang dan jadwal imunisasi rutin."
+            }
+          ]
+        },
+        "summaryMessage": "Tumbuh kembang balita berada pada jalur optimal sesuai standar WHO 2006. Lanjutkan pola makan gizi seimbang dan pantau setiap bulan di Posyandu."
+      }
+    ],
+
+    "widgets": {
+      "widget1_growthChart": {
+        "widgetId": "growth-chart-who",
+        "title": "Kurva Pertumbuhan Baku WHO (Standar Deviasi)",
+        "description": "Visualisasi plotting posisi panjang/tinggi badan balita terhadap kurva baku standar deviasi WHO 2006.",
+        "chartTypes": [
+          { "id": "tbu", "label": "Tinggi Badan menurut Usia (TB/U)" },
+          { "id": "bbu", "label": "Berat Badan menurut Usia (BB/U)" },
+          { "id": "bbtb", "label": "Berat menurut Tinggi Badan (BB/TB)" }
+        ],
+        "sdLegend": [
+          { "sd": "+3 SD", "label": "Tinggi / Overweight", "color": "#3B82F6", "strokeDash": "4 4" },
+          { "sd": "+2 SD", "label": "Batas Atas Normal", "color": "#10B981", "strokeDash": "2 2" },
+          { "sd": "0 SD (Median)", "label": "Median Standar WHO", "color": "#059669", "strokeDash": "0" },
+          { "sd": "-2 SD", "label": "Garis Batas Stunted (-2 SD)", "color": "#F59E0B", "strokeDash": "3 3" },
+          { "sd": "-3 SD", "label": "Garis Severely Stunted (-3 SD)", "color": "#EF4444", "strokeDash": "2 2" }
+        ],
+        "whoHeightForAgeBoysCurve": [
+          { "ageMonths": 0, "neg3SD": 44.2, "neg2SD": 46.1, "neg1SD": 48.0, "median": 49.9, "pos1SD": 51.8, "pos2SD": 53.7, "pos3SD": 55.6 },
+          { "ageMonths": 3, "neg3SD": 55.6, "neg2SD": 57.3, "neg1SD": 59.4, "median": 61.4, "pos1SD": 63.5, "pos2SD": 65.5, "pos3SD": 67.6 },
+          { "ageMonths": 6, "neg3SD": 61.2, "neg2SD": 63.3, "neg1SD": 65.5, "median": 67.6, "pos1SD": 69.8, "pos2SD": 71.9, "pos3SD": 74.0 },
+          { "ageMonths": 9, "neg3SD": 65.2, "neg2SD": 67.5, "neg1SD": 69.7, "median": 72.0, "pos1SD": 74.2, "pos2SD": 76.5, "pos3SD": 78.7 },
+          { "ageMonths": 12, "neg3SD": 68.6, "neg2SD": 71.0, "neg1SD": 73.4, "median": 75.7, "pos1SD": 78.1, "pos2SD": 80.5, "pos3SD": 82.9 },
+          { "ageMonths": 15, "neg3SD": 71.6, "neg2SD": 74.1, "neg1SD": 76.6, "median": 79.1, "pos1SD": 81.7, "pos2SD": 84.2, "pos3SD": 86.7 },
+          { "ageMonths": 18, "neg3SD": 74.2, "neg2SD": 76.9, "neg1SD": 79.6, "median": 82.3, "pos1SD": 85.0, "pos2SD": 87.7, "pos3SD": 90.4 },
+          { "ageMonths": 24, "neg3SD": 78.7, "neg2SD": 81.7, "neg1SD": 84.8, "median": 87.8, "pos1SD": 90.9, "pos2SD": 93.9, "pos3SD": 97.0 },
+          { "ageMonths": 30, "neg3SD": 82.7, "neg2SD": 86.0, "neg1SD": 89.2, "median": 92.5, "pos1SD": 95.8, "pos2SD": 99.1, "pos3SD": 102.4 },
+          { "ageMonths": 36, "neg3SD": 86.3, "neg2SD": 89.8, "neg1SD": 93.3, "median": 96.8, "pos1SD": 100.3, "pos2SD": 103.8, "pos3SD": 107.3 },
+          { "ageMonths": 48, "neg3SD": 92.7, "neg2SD": 96.7, "neg1SD": 100.7, "median": 104.7, "pos1SD": 108.7, "pos2SD": 112.7, "pos3SD": 116.7 },
+          { "ageMonths": 60, "neg3SD": 98.4, "neg2SD": 102.7, "neg1SD": 107.1, "median": 111.4, "pos1SD": 115.7, "pos2SD": 120.0, "pos3SD": 124.3 }
+        ],
+        "activeChildPoint": {
+          "ageMonths": 18,
+          "heightCm": 74.5,
+          "zScoreTBU": -2.03,
+          "markerLabel": "Posisi Balita (18 bln, 74.5 cm)",
+          "status": "Stunted"
+        }
+      },
+
+      "widget2_riskGauge": {
+        "widgetId": "risk-gauge-meter",
+        "title": "Tingkat Kerentanan Stunting (Naïve Bayes)",
+        "description": "Visualisasi probabilitas kerentanan stunting berdasarkan algoritma Naïve Bayes multivariat.",
+        "currentValue": 0.68,
+        "currentTier": "MODERATE",
+        "gaugeRanges": [
+          { "tier": "LOW", "min": 0.0, "max": 0.35, "color": "#10B981", "label": "Rendah (0.00 - 0.35)", "badgeText": "Aman" },
+          { "tier": "MODERATE", "min": 0.35, "max": 0.70, "color": "#F59E0B", "label": "Sedang (0.35 - 0.70)", "badgeText": "Waspada" },
+          { "tier": "HIGH", "min": 0.70, "max": 1.0, "color": "#EF4444", "label": "Tinggi (0.70 - 1.00)", "badgeText": "Bahaya" }
+        ],
+        "pointerColor": "#1E293B",
+        "unit": "Skor Probabilitas"
+      },
+
+      "widget3_determinantRadar": {
+        "widgetId": "determinant-radar-chart",
+        "title": "Diagram Radar Determinan Lingkungan",
+        "description": "Pemetaan 8 faktor penentu kesehatan balita dibandingkan dengan profil lingkungan ideal.",
+        "dimensions": [
+          { "key": "exclusiveAsi", "name": "ASI Eksklusif", "childValue": 90, "idealBenchmark": 100, "weight": "Tinggi" },
+          { "key": "cleanWaterAccess", "name": "Air Bersih", "childValue": 85, "idealBenchmark": 100, "weight": "Sangat Tinggi" },
+          { "key": "sanitationAccess", "name": "Sanitasi Jamban", "childValue": 20, "idealBenchmark": 100, "weight": "Kritis" },
+          { "key": "smokeExposure", "name": "Bebas Asap Rokok", "childValue": 25, "idealBenchmark": 100, "weight": "Kritis" },
+          { "key": "economicQuintile", "name": "Kuintil Ekonomi", "childValue": 40, "idealBenchmark": 80, "weight": "Sedang" },
+          { "key": "motherEducation", "name": "Pendidikan Ibu", "childValue": 75, "idealBenchmark": 80, "weight": "Sedang" },
+          { "key": "diarrheaHistory", "name": "Bebas Diare", "childValue": 90, "idealBenchmark": 100, "weight": "Tinggi" },
+          { "key": "bblrHistory", "name": "Berat Lahir Normal", "childValue": 85, "idealBenchmark": 100, "weight": "Tinggi" }
+        ]
+      },
+
+      "widget4_localNutritionTable": {
+        "widgetId": "local-nutrition-bontang",
+        "title": "Rekomendasi Pangan Lokal Kota Bontang",
+        "description": "Intervensi gizi terpersonalisasi memanfaatkan kekayaan hayati pesisir Kota Bontang untuk mengejar ketertinggalan pertumbuhan.",
+        "locationContext": "Komoditas Pesisir Kota Bontang",
+        "foodItems": [
+          {
+            "id": "ikan-bawis",
+            "name": "Ikan Bawis Segar Bontang",
+            "localName": "Ikan Bawis (Siganus canaliculatus)",
+            "foodGroup": "Protein Hewani Laut",
+            "portion": "50 gram / porsi (1-2 ekor sedang)",
+            "keyNutrients": "Protein 18.2g, Kalsium 120mg, Zinc 1.4mg, Omega-3 DHA",
+            "cookingMethod": "Kukus kuah kuning kunyit / Sup bening (Hindari goreng kering berulang)",
+            "stuntingBenefit": "Sangat tinggi asam amino esensial dan kalsium alami tulang lunak untuk percepatan pertumbuhan linier tulang panjang balita.",
+            "targetAgeRange": "9 - 59 Bulan",
+            "badge": "Unggulan Bontang"
+          },
+          {
+            "id": "ikan-kembung-kakap",
+            "name": "Ikan Kembung & Kakap Merah",
+            "localName": "Ikan Laut Segar Pasar Rawa Indah / Loktuan",
+            "foodGroup": "Protein Hewani & Asam Lemak Sehat",
+            "portion": "45 gram / porsi",
+            "keyNutrients": "Protein 19.5g, Omega-3 2.2g, Zat Besi 1.1mg",
+            "cookingMethod": "Tim cincang dengan kaldu sayur bening",
+            "stuntingBenefit": "Kandungan DHA dan EPA menstimulasi perkembangan kognitif otak dan sistem imun balita.",
+            "targetAgeRange": "6 - 59 Bulan",
+            "badge": "Kaya DHA"
+          },
+          {
+            "id": "telur-dan-hati-ayam",
+            "name": "Telur Ayam & Hati Ayam Segar",
+            "localName": "Hati Ayam & Telur Rebus",
+            "foodGroup": "Protein & Mikronutrien Padat",
+            "portion": "1 butir telur atau 30 gram hati",
+            "keyNutrients": "Protein 7.0g, Zat Besi Heme 4.5mg, Vitamin A 3000 IU, Folat",
+            "cookingMethod": "Rebus matang sempurna / Puree bubur",
+            "stuntingBenefit": "Mencegah anemia defisiensi besi yang merupakan salah satu penyebab utama anak gagal tumbuh (stunting).",
+            "targetAgeRange": "6 - 59 Bulan",
+            "badge": "Anti-Anemia"
+          },
+          {
+            "id": "rumput-laut-gammi-sehat",
+            "name": "Olahan Rumput Laut & Daun Kelor",
+            "localName": "Sup Daun Kelor & Rumput Laut Pesisir",
+            "foodGroup": "Sayuran & Serat Mikronutrien",
+            "portion": "1 mangkuk kecil (30 gram daun kelor)",
+            "keyNutrients": "Kalsium 185mg, Vitamin C 51mg, Seng (Zinc), Antioksidan",
+            "cookingMethod": "Sayur bening labu kuning dan daun kelor segar",
+            "stuntingBenefit": "Meningkatkan nafsu makan balita dan penyerapan zat besi hewani di usus halus.",
+            "targetAgeRange": "8 - 59 Bulan",
+            "badge": "Pangan Lokal"
+          }
+        ]
+      },
+
+      "widget5_shareableLink": {
+        "widgetId": "shareable-link-box",
+        "title": "Bagikan Tautan & Cetak Kartu Skrining",
+        "description": "Tautan publik dapat dibagikan kepada Tenaga Kesehatan, Dokter Puskesmas, atau Kader Posyandu untuk rujukan.",
+        "shareHash": "bntg-8xK9pL",
+        "publicUrl": "https://sehati.bontangkota.go.id/analytics/bntg-8xK9pL",
+        "qrCodePlaceholderUrl": "/assets/images/qr-mock-bntg-8xK9pL.svg",
+        "copyButtonLabel": "Salin Tautan Rujukan",
+        "downloadPdfButtonLabel": "Unduh Ringkasan PDF",
+        "shareChannels": [
+          { "id": "whatsapp", "name": "WhatsApp", "color": "#25D366" },
+          { "id": "telegram", "name": "Telegram", "color": "#0088CC" },
+          { "id": "copy", "name": "Salin URL", "color": "#64748B" }
+        ]
+      },
+
+      "widget6_floatingAiChatbot": {
+        "widgetId": "floating-ai-chatbot-drawer",
+        "title": "Konsultasi Asisten Gizi AI (Gemini 2.5)",
+        "description": "Tanyakan panduan menu MPASI, tips pola asuh, dan penanganan faktor risiko spesifik balita Anda.",
+        "assistantName": "Asisten SEHATI (Gemini AI)",
+        "assistantAvatar": "/assets/images/avatar-gemini.svg",
+        "connectionProtocol": "Server-Sent Events (SSE) Streaming",
+        "endpoint": "/api/v1/chat/stream",
+        "quickPrompts": [
+          {
+            "id": "qp-1",
+            "title": "Tips Menu Ikan Bawis",
+            "prompt": "Bagaimana cara terbaik mengolah ikan bawis untuk MPASI balita usia 18 bulan yang mengalami stunting?"
+          },
+          {
+            "id": "qp-2",
+            "title": "Mengatasi Risiko Asap Rokok",
+            "prompt": "Apa langkah konkret melindungi balita dari paparan asap rokok keluarga di rumah?"
+          },
+          {
+            "id": "qp-3",
+            "title": "Perbaikan Sanitasi Rumah",
+            "prompt": "Bagaimana standar jamban sehat dan cara menjaga kebersihan lantai balita yang sedang aktif bergerak?"
+          },
+          {
+            "id": "qp-4",
+            "title": "Kapan Harus ke Puskesmas?",
+            "prompt": "Kapan saya harus membawa balita dengan Z-score TB/U -2.03 untuk pemeriksaan lanjutan di Puskesmas Bontang?"
+          }
+        ],
+        "sampleConversationStream": [
+          {
+            "sender": "user",
+            "text": "Bagaimana cara mengejar ketertinggalan tinggi badan anak saya yang berusia 18 bulan dengan Z-Score -2.03 di Bontang?"
+          },
+          {
+            "sender": "assistant",
+            "isStreaming": false,
+            "text": "Halo Ayah/Ibu di Kelurahan Loktuan! Berdasarkan data skrining ananda (Usia 18 Bulan, Tinggi 74.5 cm, Z-Score TB/U -2.03):\n\n1. **Tingkatkan Protein Hewani Berkualitas Tinggi**:\n   * Berikan **Ikan Bawis Segar** atau **Ikan Kembung** khas perairan Bontang sebanyak 1-2 porsi sehari (kukus/sup kuning).\n   * Tambahkan **1 butir telur ayam** setiap hari sebagai sumber kolin dan asam amino lengkap.\n\n2. **Atasi 2 Faktor Risiko Dominan**:\n   * **Sanitasi**: Pastikan air minum selalu dimasak mendidih dan cuci tangan pakai sabun sebelum menyuapi balita.\n   * **Asap Rokok**: Minta anggota keluarga tidak merokok di dalam rumah atau mengganti pakaian sebelum menggendong balita.\n\n3. **Jadwal Posyandu**:\n   * Lakukan penimbangan dan pengukuran panjang badan rutin setiap bulan di Posyandu terdekat di Loktuan untuk memantau grafik kurva WHO."
+          }
+        ]
+      }
+    }
+  },
+
+  "healthKnowledgeBaseGuidelines": [
+    {
+      "id": "kb-001",
+      "topicTitle": "Panduan MPASI Protein Hewani Pesisir Kota Bontang",
+      "category": "NUTRISI_LOKAL",
+      "targetAgeGroupMinMonths": 6,
+      "targetAgeGroupMaxMonths": 24,
+      "targetRiskTier": "ALL",
+      "tags": ["ikan bawis", "mpasi", "protein hewani", "bontang"],
+      "guidelineContent": "Pemberian protein hewani laut seperti Ikan Bawis dan Ikan Kembung terbukti efektif mencegah stunting karena mengandung profil asam amino esensial lengkap serta asam lemak omega-3 yang mudah diserap saluran cerna balita.",
+      "actionableSteps": [
+        "Berikan minimal 1 jenis protein hewani setiap kali makan utama.",
+        "Gunakan cara memasak kuah bening atau tim lembut untuk balita baduta.",
+        "Variasikan dengan telur dan hati ayam 3 kali seminggu."
+      ],
+      "sourceReference": "Dinas Kesehatan Kota Bontang & Kemenkes RI 2024"
+    },
+    {
+      "id": "kb-002",
+      "topicTitle": "Intervensi Sanitasi Total Berbasis Masyarakat (STBM) Pesisir",
+      "category": "SANITASI_LINGKUNGAN",
+      "targetAgeGroupMinMonths": 0,
+      "targetAgeGroupMaxMonths": 59,
+      "targetRiskTier": "HIGH",
+      "tags": ["jamban sehat", "air bersih", "diare", "stbm"],
+      "guidelineContent": "Infeksi subklinis enteropati lingkungan akibat sanitasi buruk dan lantai rumah tercemar menyebabkan peradangan usus kronis, sehingga nutrisi makanan tidak dapat diserap sempurna oleh tubuh balita.",
+      "actionableSteps": [
+        "Gunakan jamban sehat leher angsa dengan tangki septik berjarak minimal 10 meter dari sumber air sumur.",
+        "Rutin mendisinfeksi lantai dan area bermain balita.",
+        "Pastikan air untuk minum dimasak hingga mendidih 100°C."
+      ],
+      "sourceReference": "Panduan STBM Kementerian Kesehatan RI"
+    },
+    {
+      "id": "kb-003",
+      "topicTitle": "Protokol Rumah Bebas Asap Rokok untuk Perlindungan Balita",
+      "category": "KESEHATAN_LINGKUNGAN",
+      "targetAgeGroupMinMonths": 0,
+      "targetAgeGroupMaxMonths": 59,
+      "targetRiskTier": "MODERATE",
+      "tags": ["asap rokok", "thirdhand smoke", "pernafasan"],
+      "guidelineContent": "Zat kimia beracun dari asap rokok menempel pada pakaian, perabot, dan kulit perokok (third-hand smoke). Racun ini mengganggu penyerapan vitamin A, C, dan kalsium serta memicu infeksi saluran pernapasan akut (ISPA).",
+      "actionableSteps": [
+        "Tetapkan aturan bebas rokok 100% di dalam rumah.",
+        "Anggota keluarga yang merokok wajib mandi dan berganti baju sebelum berinteraksi dengan balita.",
+        "Jangan biarkan siapapun merokok di sekitar balita."
+      ],
+      "sourceReference": "Pedoman Penanggulangan Stunting Nasional"
+    }
+  ]
+}

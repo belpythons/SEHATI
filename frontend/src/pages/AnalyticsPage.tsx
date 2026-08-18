@@ -16,7 +16,6 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import {
-  Activity,
   ArrowLeft,
   Calendar,
   MapPin,
@@ -222,9 +221,11 @@ export const AnalyticsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2 font-bold text-lg text-blue-600">
-              <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-xs">
-                <Activity className="w-4 h-4" />
-              </span>
+              <img
+                src="/icons/sehati-simbol-navbar.png"
+                alt="SEHATI"
+                className="w-7 h-7 object-contain"
+              />
               <span>SEHATI</span>
             </Link>
             <span className="text-xs text-slate-400 hidden sm:inline">|</span>

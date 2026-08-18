@@ -10,7 +10,16 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: [
+        'robots.txt',
+        'icons/favicon-16x16.png',
+        'icons/favicon-32x32.png',
+        'icons/apple-touch-icon.png',
+        'icons/icon-192x192.png',
+        'icons/icon-512x512.png',
+        'icons/icon-maskable-192x192.png',
+        'icons/icon-maskable-512x512.png',
+      ],
       manifest: {
         name: 'SEHATI — Sistem Edukasi & Analisis Holistik Anak Terintegrasi Indonesia',
         short_name: 'SEHATI',
@@ -25,17 +34,25 @@ export default defineConfig({
         categories: ['health', 'medical'],
         icons: [
           {
-            src: '/icons/pwa-192x192.png',
+            src: '/icons/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: '/icons/pwa-512x512.png',
+            src: '/icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: '/icons/pwa-512x512.png',
+            src: '/icons/icon-maskable-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: '/icons/icon-maskable-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',

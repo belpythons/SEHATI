@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ShieldCheck, Heart, MapPin, ExternalLink } from 'lucide-react'
+import { ShieldCheck, Heart, MapPin, ExternalLink } from 'lucide-react'
 import mockData from '../../data/mockData'
 
 export const FooterSection: React.FC = () => {
@@ -11,9 +11,11 @@ export const FooterSection: React.FC = () => {
           {/* Brand & Mission */}
           <div className="space-y-4 lg:col-span-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-sky-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                <Activity className="w-5 h-5" />
-              </div>
+              <img
+                src="/icons/sehati-simbol-navbar.png"
+                alt="SEHATI"
+                className="w-10 h-10 object-contain"
+              />
               <span className="text-2xl font-black tracking-tight text-white font-sans">
                 {mockData.meta.systemName}
               </span>

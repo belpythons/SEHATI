@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Wifi, WifiOff, Download, ArrowRight, Activity, Menu, X } from 'lucide-react'
+import { Wifi, WifiOff, Download, ArrowRight, Menu, X } from 'lucide-react'
 import mockData from '../../data/mockData'
 
 interface FloatingNavbarProps {
@@ -37,9 +37,11 @@ export const FloatingNavbar: React.FC<FloatingNavbarProps> = ({
         <nav className="glass-nav rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between shadow-lg shadow-blue-900/5 transition-all duration-300">
           {/* Logo & Tagline */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <Activity className="w-5 h-5" />
-            </div>
+            <img
+              src="/icons/sehati-simbol-navbar.png"
+              alt="SEHATI"
+              className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+            />
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-xl font-extrabold tracking-tight text-slate-900 font-sans">

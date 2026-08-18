@@ -310,6 +310,8 @@ export const mockScreeningApi = {
       smokeExposure: true,
       economicQuintile: 2,
       diarrheaHistory: false,
+      bblrHistory: false,
+      motherEducation: true,
     })
 
     return fallbackResponse

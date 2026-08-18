@@ -1,15 +1,27 @@
 import { useEffect, useState } from 'react'
 
+const TOKEN_KEY = 'clientToken'
+
+/**
+ * Get or initialize client token synchronously
+ */
+export const getClientToken = (): string => {
+  let clientToken = localStorage.getItem(TOKEN_KEY)
+  if (!clientToken) {
+    clientToken = crypto.randomUUID()
+    localStorage.setItem(TOKEN_KEY, clientToken)
+  }
+  return clientToken
+}
+
+/**
+ * React hook to retrieve client token
+ */
 export const useSessionToken = (): string => {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState<string>(getClientToken)
 
   useEffect(() => {
-    let clientToken = localStorage.getItem('clientToken')
-    if (!clientToken) {
-      clientToken = crypto.randomUUID()
-      localStorage.setItem('clientToken', clientToken)
-    }
-    setToken(clientToken)
+    setToken(getClientToken())
   }, [])
 
   return token

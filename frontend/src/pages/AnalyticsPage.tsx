@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 import { ScreeningRecord, ScreeningSubmitResponse } from '../types/screening'
 import { screeningService } from '../services/screeningService'
+import { getMappedRealHash } from '../services/offlineQueueService'
 import { GrowthChartWidget } from '../components/analytics/GrowthChartWidget'
 import { RiskGaugeWidget } from '../components/analytics/RiskGaugeWidget'
 import { DeterminantRadarWidget } from '../components/analytics/DeterminantRadarWidget'
@@ -76,33 +77,58 @@ export const AnalyticsPage: React.FC = () => {
     const loadScreeningData = async () => {
       setIsLoading(true)
       try {
-        if (shareHash) {
-          // Mode 1: URL has :shareHash
-          const response: ScreeningSubmitResponse = await screeningService.getScreeningByHash(
-            shareHash
-          )
-          if (isMounted) {
-            setRecord(response.data)
-            setDataSource(response.dataSource || (response.isMockData ? 'mock' : 'live'))
+        // Always check sessionStorage first — it contains enriched data
+        // (bblrHistory & motherEducation from formData) that backend does not persist.
+        const cachedSession = sessionStorage.getItem('sehati_active_screening')
+        let cachedParsed: ScreeningSubmitResponse | null = null
+
+        if (cachedSession) {
+          try {
+            cachedParsed = JSON.parse(cachedSession) as ScreeningSubmitResponse
+          } catch {
+            cachedParsed = null
           }
-        } else {
-          // Mode 2: Check sessionStorage for active screening
-          const cachedSession = sessionStorage.getItem('sehati_active_screening')
-          if (cachedSession) {
-            const parsed: ScreeningSubmitResponse = JSON.parse(cachedSession)
+        }
+
+        if (shareHash) {
+          // Check if this hash was an offline mock hash that has since been synced to a real backend hash
+          const mappedRealHash = getMappedRealHash(shareHash)
+          const targetHash = mappedRealHash || shareHash
+
+          // URL has :shareHash — check if sessionStorage holds THIS screening
+          if (cachedParsed && (cachedParsed.shareHash === targetHash || cachedParsed.shareHash === shareHash)) {
+            // Priority 1: sessionStorage matches URL hash (user who just submitted)
+            // This preserves enriched bblrHistory & motherEducation from formData.
             if (isMounted) {
-              setRecord(parsed.data)
-              setDataSource(parsed.dataSource || (parsed.isMockData ? 'mock' : 'live'))
+              setRecord(cachedParsed.data)
+              setDataSource(cachedParsed.dataSource || (cachedParsed.isMockData ? 'mock' : 'live'))
             }
           } else {
-            // Mode 3: Fallback default sample (Loktuan, 18 Months)
-            const fallback: ScreeningSubmitResponse = await screeningService.getScreeningByHash(
-              'bntg-8xK9pL'
+            // Priority 2: Fetch targetHash from backend/mock
+            const response: ScreeningSubmitResponse = await screeningService.getScreeningByHash(
+              targetHash
             )
             if (isMounted) {
-              setRecord(fallback.data)
-              setDataSource('mock')
+              setRecord(response.data)
+              setDataSource(response.dataSource || (response.isMockData ? 'mock' : 'live'))
             }
+          }
+        } else if (cachedParsed) {
+          // No shareHash in URL — use sessionStorage if available
+          if (isMounted) {
+            setRecord(cachedParsed.data)
+            setDataSource(cachedParsed.dataSource || (cachedParsed.isMockData ? 'mock' : 'live'))
+          }
+        } else {
+          // No shareHash, no sessionStorage — fallback to default demo sample.
+          // mockApi.getByShareHash() auto-generates a Loktuan demo profile (18 bln, L)
+          // when no matching hash is found — this key is not a literal seed entry.
+          const fallback: ScreeningSubmitResponse = await screeningService.getScreeningByHash(
+            'demo-sample'
+          )
+          if (isMounted) {
+            setRecord(fallback.data)
+            setDataSource('mock')
           }
         }
       } catch (err) {
@@ -163,7 +189,7 @@ export const AnalyticsPage: React.FC = () => {
       case 'shareable-link':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <ShareableLinkWidget record={record} />
+            <ShareableLinkWidget record={record} dataSource={dataSource} />
           </DraggableWidget>
         )
       case 'ai-chat':

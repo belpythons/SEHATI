@@ -8,9 +8,16 @@ import {
   Sparkles,
   RefreshCw,
   Info,
-  Loader2,
+  Square,
+  Lock,
+  MessageSquare,
+  ChevronRight,
+  Fish,
+  TrendingUp,
+  Building2,
 } from 'lucide-react'
 import { ScreeningRecord } from '../../types/screening'
+import { chatService } from '../../services/chatService'
 
 interface Props {
   isOpen: boolean
@@ -23,24 +30,51 @@ interface ChatMessage {
   sender: 'user' | 'bot'
   text: string
   timestamp: string
+  isStreaming?: boolean
 }
+
+const QUICK_PROMPT_CHIPS = [
+  {
+    icon: Fish,
+    label: 'Resep Ikan Bawis',
+    query: 'Bagaimana takaran dan resep olahan ikan bawis & daun kelor untuk balita saya?',
+  },
+  {
+    icon: TrendingUp,
+    label: 'Tips Kejar Tumbuh',
+    query: 'Bagaimana langkah praktis catch-up growth untuk memperbaiki Z-Score TB/U balita saya?',
+  },
+  {
+    icon: Building2,
+    label: 'Layanan Posyandu',
+    query: 'Apa saja layanan dan pemantauan yang perlu saya ikuti di Posyandu kelurahan saya?',
+  },
+]
 
 export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputQuery, setInputQuery] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [inputQuery, setInputQuery] = useState<string>('')
+  const [isStreaming, setIsStreaming] = useState<boolean>(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Initialize initial greeting when drawer opens
+  // Verify that sessionId is present (strictly required by chat.controller.ts)
+  const sessionId = record?.sessionId
+  const hasValidSession = Boolean(sessionId && sessionId.trim() !== '')
+
+  // Initialize initial contextual greeting when drawer opens
   useEffect(() => {
-    if (isOpen && messages.length === 0 && record) {
+    if (isOpen && messages.length === 0 && record && hasValidSession) {
+      const zScore = record.zScore ?? -1.5
+      const status = record.statusGiziTBU || (zScore < -2 ? 'Pendek' : 'Normal')
       const initialGreeting =
-        `Halo! Saya Asisten Nutrisi SEHATI (didukung Gemini AI).\n\n` +
-        `Saya telah mempelajari data balita Anda:\n` +
-        `• Usia: ${record.ageMonths} Bulan (${record.kelurahan})\n` +
-        `• Status TB/U: ${record.statusGiziTBU || 'Normal'} (Z-Score: ${record.zScore} SD)\n` +
-        `• Derajat Risiko: ${record.riskTier}\n\n` +
-        `Ada yang ingin Anda tanyakan seputar variasi menu MPASI lokal Bontang, jadwal imunisasi posyandu, atau tips kejar tumbuh balita?`
+        `Halo! Saya Asisten Nutrisi Terpadu SEHATI (didukung Gemini 2.5 Flash).\n\n` +
+        `Saya telah mempelajari data antropometri balita Anda:\n` +
+        `• **Domisili:** Kelurahan ${record.kelurahan || 'Bontang'}\n` +
+        `• **Usia & Gender:** ${record.ageMonths} Bulan (${record.gender === 'L' ? 'Laki-laki' : 'Perempuan'})\n` +
+        `• **Status Antropometri:** ${record.heightCm} cm / ${record.weightKg} kg (Z-Score TB/U: ${zScore} SD — ${status})\n` +
+        `• **Tingkat Risiko:** ${record.riskTier || 'MODERATE'}\n\n` +
+        `Ada yang ingin Anda tanyakan seputar menu pangan lokal Bontang (Ikan Bawis/Bandeng), jadwal Posyandu, atau nutrisi harian?`
 
       setMessages([
         {
@@ -51,69 +85,104 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
         },
       ])
     }
-  }, [isOpen, record, messages.length])
+  }, [isOpen, record, hasValidSession, messages.length])
 
+  // Auto-scroll to bottom on message update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isGenerating])
+  }, [messages, isStreaming])
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!inputQuery.trim() || isGenerating) return
+  // Clean up abort controller on unmount
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
+  }, [])
 
-    const userText = inputQuery.trim()
+  const handleSendMessage = async (queryText?: string) => {
+    const textToSend = (queryText || inputQuery).trim()
+    if (!textToSend || isStreaming || !sessionId) return
+
     setInputQuery('')
 
+    const userMessageId = `user-${Date.now()}`
+    const botMessageId = `bot-${Date.now()}`
+
     const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: userMessageId,
       sender: 'user',
-      text: userText,
+      text: textToSend,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
 
-    setMessages((prev) => [...prev, userMsg])
-    setIsGenerating(true)
+    const botPlaceholderMsg: ChatMessage = {
+      id: botMessageId,
+      sender: 'bot',
+      text: '',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isStreaming: true,
+    }
 
-    // Simulate streaming mock response for Fase 4 (real SSE stream fully hooked in Fase 6)
-    setTimeout(() => {
-      const botResponse = generateMockAnswer(userText, record)
-      const botMsg: ChatMessage = {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: botResponse,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
-      setMessages((prev) => [...prev, botMsg])
-      setIsGenerating(false)
-    }, 900)
+    setMessages((prev) => [...prev, userMsg, botPlaceholderMsg])
+    setIsStreaming(true)
+
+    abortControllerRef.current = new AbortController()
+
+    await chatService.streamChat({
+      sessionId,
+      query: textToSend,
+      record,
+      signal: abortControllerRef.current.signal,
+      onChunk: (chunk: string) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? { ...msg, text: msg.text + chunk }
+              : msg
+          )
+        )
+      },
+      onDone: () => {
+        setIsStreaming(false)
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? { ...msg, isStreaming: false }
+              : msg
+          )
+        )
+      },
+      onError: (err: Error) => {
+        console.error('Streaming error:', err)
+        setIsStreaming(false)
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? {
+                  ...msg,
+                  text:
+                    msg.text ||
+                    'Maaf, terjadi kendala saat menyusun jawaban. Silakan ulangi pertanyaan Anda.',
+                  isStreaming: false,
+                }
+              : msg
+          )
+        )
+      },
+    })
   }
 
-  const generateMockAnswer = (query: string, rec: ScreeningRecord | null): string => {
-    const q = query.toLowerCase()
-    const age = rec?.ageMonths ?? 18
-
-    if (q.includes('bawis') || q.includes('ikan') || q.includes('resep') || q.includes('makan')) {
-      return (
-        `Untuk balita usia ${age} bulan, Ikan Bawis sangat ideal diolah menjadi **Sup Bening Ikan Bawis Daun Kelor** atau **Pepes Kukus Gurih Tanpa Cabai**.\n\n` +
-        `• Porsi: 1-2 potong kecil tanpa duri halus.\n` +
-        `• Kalsium & Seng pada ikan bawis membantu penyerapan nutrisi tulang untuk perbaikan Z-Score TB/U.\n` +
-        `• Tambahkan 1 sendok teh minyak kelapa/lemak sehat pada kuah untuk menambah kalori.`
-      )
-    }
-
-    if (q.includes('stunting') || q.includes('risiko') || q.includes('tinggi')) {
-      return (
-        `Berdasarkan data skrining, balita Anda berada pada kategori Z-Score **${rec?.zScore ?? -2.0} SD** (${rec?.statusGiziTBU ?? 'Stunted'}).\n\n` +
-        `Langkah utama kejar tumbuh (Catch-up Growth):\n` +
-        `1. Berikan minimal 1 butir telur dan 1 porsi ikan laut segar setiap hari.\n` +
-        `2. Pastikan sanitasi air dan lingkungan rumah bebas dari paparan asap rokok.\n` +
-        `3. Konsultasikan jadwal penimbangan rutin di Posyandu Kelurahan ${rec?.kelurahan ?? 'setempat'}.`
-      )
-    }
-
-    return (
-      `Terima kasih atas pertanyaannya. Menjaga asupan gizi hewani kaya zat besi dan menjaga lingkungan bersih adalah kunci utama pencegahan stunting pada balita usia ${age} bulan di Kota Bontang. Apakah ada hal spesifik lain yang ingin Anda konsultasikan?`
+  const handleStopStreaming = () => {
+    abortControllerRef.current?.abort()
+    setIsStreaming(false)
+    setMessages((prev) =>
+      prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
     )
+  }
+
+  const handleResetChat = () => {
+    handleStopStreaming()
+    setMessages([])
   }
 
   return (
@@ -126,7 +195,7 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity"
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 transition-opacity"
           />
 
           {/* Drawer Panel */}
@@ -134,114 +203,215 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl z-50 flex flex-col font-sans"
+            transition={{ type: 'spring', damping: 26, stiffness: 240 }}
+            className="fixed inset-y-0 right-0 max-w-lg w-full bg-white shadow-2xl z-50 flex flex-col font-sans border-l border-slate-200"
           >
-            {/* Drawer Header */}
-            <div className="px-5 py-4 border-b border-slate-200 bg-slate-900 text-white flex items-center justify-between">
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-slate-800 bg-slate-900 text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-blue-600/40 text-blue-300">
+                <div className="p-2 rounded-xl bg-blue-600/40 text-blue-300 backdrop-blur-xs">
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                    <span>Asisten AI Gemini</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-300 font-normal">
-                      SSE Active
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm text-white">
+                      Asisten Nutrisi SEHATI
+                    </h3>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/25 text-blue-300 border border-blue-400/30 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-300" />
+                      <span>Gemini 2.5 Flash</span>
                     </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Konteks: Sesi #{record?.sessionId ? record.sessionId.slice(-6) : 'Anonim'}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {hasValidSession
+                      ? `Konteks Sesi: #${sessionId?.slice(0, 8)}... (Grounded Antropometri)`
+                      : 'Konteks Belum Tersedia'}
                   </p>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Context Badge */}
-            <div className="px-4 py-2 bg-blue-50/80 border-b border-blue-100 flex items-center gap-2 text-xs text-blue-900">
-              <Info className="w-4 h-4 text-blue-600 shrink-0" />
-              <span className="truncate">
-                Balita: {record?.ageMonths ?? '-'} Bulan • Kelurahan {record?.kelurahan ?? 'Bontang'} • Risiko: {record?.riskTier ?? 'LOW'}
-              </span>
-            </div>
-
-            {/* Messages Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
-              {messages.map((msg) => {
-                const isBot = msg.sender === 'bot'
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex items-start gap-2.5 ${isBot ? '' : 'flex-row-reverse'}`}
+              <div className="flex items-center gap-1">
+                {messages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleResetChat}
+                    title="Mulai Ulang Percakapan"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
                   >
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs ${
-                        isBot
-                          ? 'bg-blue-600 text-white shadow-xs'
-                          : 'bg-slate-700 text-white'
-                      }`}
-                    >
-                      {isBot ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
-                    </div>
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                )}
 
-                    <div
-                      className={`max-w-[82%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-xs whitespace-pre-line ${
-                        isBot
-                          ? 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
-                          : 'bg-blue-600 text-white rounded-tr-none'
-                      }`}
-                    >
-                      {msg.text}
-                      <span
-                        className={`block text-[9px] mt-1.5 ${
-                          isBot ? 'text-slate-400' : 'text-blue-200 text-right'
-                        }`}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Context Header Ribbon */}
+            {hasValidSession && record && (
+              <div className="px-4 py-2 bg-blue-50/90 border-b border-blue-100 flex items-center justify-between text-xs text-blue-900">
+                <div className="flex items-center gap-2 truncate">
+                  <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="truncate font-medium">
+                    Balita: {record.ageMonths} Bln • Kel. {record.kelurahan} • Z-Score {record.zScore} SD ({record.riskTier})
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-blue-700 uppercase shrink-0">
+                  SSE ACTIVE
+                </span>
+              </div>
+            )}
+
+            {/* Main Chat Body */}
+            {!hasValidSession ? (
+              // LOCKED STATE: sessionId is missing
+              <div className="flex-1 p-8 flex flex-col items-center justify-center text-center bg-slate-50">
+                <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mb-4">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <h4 className="font-bold text-slate-800 text-base mb-1">
+                  Konsultasi AI Belum Terbuka
+                </h4>
+                <p className="text-xs text-slate-500 max-w-xs leading-relaxed mb-4">
+                  Asisten Gemini AI membutuhkan data hasil skrining antropometri balita (parameter <code>sessionId</code>) untuk memberikan rekomendasi nutrisi yang akurat.
+                </p>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-all cursor-pointer shadow-xs"
+                >
+                  Tutup & Lakukan Skrining
+                </button>
+              </div>
+            ) : (
+              // ACTIVE CHAT STATE
+              <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/60">
+                {/* Messages Scroll Area */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {messages.map((msg) => {
+                    const isBot = msg.sender === 'bot'
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex items-start gap-2.5 ${isBot ? '' : 'flex-row-reverse'}`}
                       >
-                        {msg.timestamp}
-                      </span>
+                        <div
+                          className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs shadow-xs ${
+                            isBot
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-700 text-white'
+                          }`}
+                        >
+                          {isBot ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                        </div>
+
+                        <div
+                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-xs whitespace-pre-line ${
+                            isBot
+                              ? 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none'
+                              : 'bg-blue-600 text-white rounded-tr-none'
+                          }`}
+                        >
+                          {msg.text || (
+                            <span className="inline-flex items-center gap-1.5 text-slate-400 italic">
+                              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                              Gemini AI sedang mengetik...
+                            </span>
+                          )}
+
+                          {msg.isStreaming && (
+                            <span className="inline-block w-1.5 h-3 ml-1 bg-blue-600 animate-pulse align-middle" />
+                          )}
+
+                          <span
+                            className={`block text-[9px] mt-1.5 ${
+                              isBot ? 'text-slate-400' : 'text-blue-200 text-right'
+                            }`}
+                          >
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Quick Prompt Chips */}
+                {messages.length <= 1 && !isStreaming && (
+                  <div className="px-4 py-2 border-t border-slate-200/70 bg-white/80 backdrop-blur-xs">
+                    <div className="text-[10px] uppercase font-bold text-slate-400 mb-1.5 tracking-wider">
+                      Saran Pertanyaan Cepat:
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {QUICK_PROMPT_CHIPS.map((chip, idx) => {
+                        const Icon = chip.icon
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleSendMessage(chip.query)}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-slate-200 text-[11px] font-medium text-slate-700 transition-all flex items-center gap-1.5 cursor-pointer text-left"
+                          >
+                            <Icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            <span>{chip.label}</span>
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
-                )
-              })}
+                )}
 
-              {isGenerating && (
-                <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-xl p-3 max-w-[70%]">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                  <span>Gemini AI sedang menyusun jawaban...</span>
+                {/* Input & Streaming Controls */}
+                <div className="p-3 border-t border-slate-200 bg-white">
+                  {isStreaming && (
+                    <div className="flex items-center justify-between mb-2 px-1">
+                      <span className="text-[11px] text-blue-600 font-medium flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
+                        Streaming respon Gemini AI aktif...
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleStopStreaming}
+                        className="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Square className="w-3 h-3 fill-slate-700" />
+                        <span>Hentikan</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      handleSendMessage()
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="text"
+                      value={inputQuery}
+                      onChange={(e) => setInputQuery(e.target.value)}
+                      disabled={isStreaming}
+                      placeholder="Tanyakan variasi menu ikan laut, porsi makan, atau Posyandu..."
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:bg-slate-100"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!inputQuery.trim() || isStreaming}
+                      className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition-all cursor-pointer shadow-xs shrink-0"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </form>
                 </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Footer */}
-            <form
-              onSubmit={handleSendMessage}
-              className="p-3 border-t border-slate-200 bg-white flex items-center gap-2"
-            >
-              <input
-                type="text"
-                value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
-                placeholder="Tanyakan rekomendasi gizi atau jadwal posyandu..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              />
-              <button
-                type="submit"
-                disabled={!inputQuery.trim() || isGenerating}
-                className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition-all cursor-pointer shadow-xs"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
+              </div>
+            )}
           </motion.div>
         </>
       )}

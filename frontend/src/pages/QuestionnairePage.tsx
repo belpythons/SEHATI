@@ -18,7 +18,11 @@ import {
   ScreeningFormData,
   ScreeningSubmitPayload,
 } from '../types/screening'
+import { getClientToken } from '../hooks/useSessionToken'
 import { screeningService } from '../services/screeningService'
+import { screeningApi } from '../lib/api'
+import { mockScreeningApi } from '../lib/mockApi'
+import { enqueueSubmission } from '../services/offlineQueueService'
 
 const BONTANG_KELURAHAN = [
   'Api-Api',
@@ -179,12 +183,8 @@ export const QuestionnairePage: React.FC = () => {
     setErrorMessage(null)
     if (!validateStep3()) return
 
-    // Ensure client session token
-    let clientToken = localStorage.getItem('clientToken')
-    if (!clientToken) {
-      clientToken = crypto.randomUUID()
-      localStorage.setItem('clientToken', clientToken)
-    }
+    // Ensure client session token via canonical helper
+    const clientToken = getClientToken()
 
     const payload: ScreeningSubmitPayload = {
       clientToken,
@@ -214,20 +214,81 @@ export const QuestionnairePage: React.FC = () => {
 
     setIsSubmitting(true)
     try {
-      const response = await screeningService.submitScreening(payload)
-      
-      // Store result in sessionStorage for instant retrieval by AnalyticsPage
-      sessionStorage.setItem('sehati_active_screening', JSON.stringify(response))
-      
-      // Clear offline draft on successful submit
-      screeningService.clearDraft()
+      if (!navigator.onLine) {
+        // SCENARIO 1: Device is genuinely offline
+        // 1. Generate immediate client-side approximation so user can still see interim growth analysis
+        const mockRes = await mockScreeningApi.submit(payload)
+        
+        // 2. Enqueue payload into IndexedDB with mockShareHash mapping for auto-sync upgrade
+        await enqueueSubmission(payload, mockRes.shareHash)
 
-      // Redirect to analytics result
-      navigate(`/analytics/${response.shareHash}`)
+        const enrichedOfflineResponse = {
+          ...mockRes,
+          isMockData: true,
+          dataSource: 'mock' as const,
+          data: {
+            ...mockRes.data,
+            bblrHistory: Boolean(formData.bblrHistory),
+            motherEducation: Boolean(formData.motherEducation),
+          },
+        }
+
+        // 3. Store in sessionStorage for local offline viewing
+        sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedOfflineResponse))
+        screeningService.clearDraft()
+
+        setToastMessage('Mode Offline: Data skrining telah disimpan di memori perangkat & akan disinkronkan otomatis saat online.')
+        setTimeout(() => {
+          navigate(`/analytics/${mockRes.shareHash}`)
+        }, 1200)
+        return
+      }
+
+      // SCENARIO 2: Device is online — Attempt real backend API
+      try {
+        const liveRes = await screeningApi.submit(payload)
+        const enrichedLiveResponse = {
+          ...liveRes,
+          isMockData: false,
+          dataSource: 'live' as const,
+          data: {
+            ...liveRes.data,
+            bblrHistory: Boolean(formData.bblrHistory),
+            motherEducation: Boolean(formData.motherEducation),
+          },
+        }
+
+        sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedLiveResponse))
+        screeningService.clearDraft()
+        navigate(`/analytics/${liveRes.shareHash}`)
+      } catch (backendError) {
+        console.warn('[SEHATI] Live backend unreachable, buffering to offline queue and activating simulation:', backendError)
+        
+        // 1. Fallback to mock simulation for uninterrupted demo UX
+        const mockRes = await mockScreeningApi.submit(payload)
+
+        // 2. Buffer to IndexedDB for retry with mockShareHash mapping
+        await enqueueSubmission(payload, mockRes.shareHash)
+        
+        const enrichedMockResponse = {
+          ...mockRes,
+          isMockData: true,
+          dataSource: 'mock' as const,
+          data: {
+            ...mockRes.data,
+            bblrHistory: Boolean(formData.bblrHistory),
+            motherEducation: Boolean(formData.motherEducation),
+          },
+        }
+
+        sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedMockResponse))
+        screeningService.clearDraft()
+        navigate(`/analytics/${mockRes.shareHash}`)
+      }
     } catch (err: any) {
-      console.error('Submission failed:', err)
+      console.error('Fatal submit error:', err)
       setErrorMessage(
-        'Terjadi kendala saat memproses skrining. Silakan coba lagi.'
+        'Terjadi kendala saat memproses kuesioner. Silakan coba lagi.'
       )
     } finally {
       setIsSubmitting(false)

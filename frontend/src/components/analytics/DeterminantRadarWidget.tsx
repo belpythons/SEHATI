@@ -16,19 +16,12 @@ interface Props {
 }
 
 export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
-  const dominantFactors = record.dominantFactors || []
-
-  // Intelligent fallback: when live backend returns undefined (since columns are not in Prisma schema),
-  // infer accurately from the dominantFactors returned by ML inference engine.
-  const hasBblrRisk =
-    record.bblrHistory === true ||
-    (record.bblrHistory === undefined && dominantFactors.includes('RIWAYAT_BBLR'))
-
-  const hasLowMotherEd =
-    record.motherEducation === false ||
-    (record.motherEducation === undefined &&
-      (dominantFactors.includes('PENDIDIKAN_IBU_RENDAH') ||
-        dominantFactors.includes('PENDIDIKAN_IBU_DASAR')))
+  // bblrHistory & motherEducation are NOT stored in Prisma schema — they only exist
+  // in sessionStorage for the submitting user. For shared links, these will be undefined.
+  // In that case we show a neutral "Data tidak tersedia" state (score 50, gray) instead
+  // of silently defaulting to a healthy or unhealthy value.
+  const bblrKnown = typeof record.bblrHistory === 'boolean'
+  const motherEdKnown = typeof record.motherEducation === 'boolean'
 
   // Convert boolean & categorical factors to 0-100 impact index for radar visualization
   const radarData = [
@@ -37,50 +30,64 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
       value: record.sanitationAccess ? 90 : 25,
       fullMark: 100,
       status: record.sanitationAccess ? 'Baik' : 'Beresiko',
+      available: true,
     },
     {
       subject: 'Air Bersih',
       value: record.cleanWaterAccess ? 95 : 30,
       fullMark: 100,
       status: record.cleanWaterAccess ? 'Baik' : 'Beresiko',
+      available: true,
     },
     {
       subject: 'Bebas Rokok',
       value: !record.smokeExposure ? 90 : 20,
       fullMark: 100,
       status: !record.smokeExposure ? 'Bebas Asap' : 'Paparan Tinggi',
+      available: true,
     },
     {
       subject: 'ASI Eksklusif',
       value: record.exclusiveAsi ? 95 : 35,
       fullMark: 100,
       status: record.exclusiveAsi ? 'Lengkap' : 'Tidak Eksklusif',
+      available: true,
     },
     {
       subject: 'Bebas Diare',
       value: !record.diarrheaHistory ? 90 : 25,
       fullMark: 100,
       status: !record.diarrheaHistory ? 'Jarang / Sehat' : 'Ada Riwayat',
+      available: true,
     },
     {
       subject: 'Bebas BBLR',
-      value: hasBblrRisk ? 25 : 90,
+      value: bblrKnown ? (!record.bblrHistory ? 90 : 25) : 50,
       fullMark: 100,
-      status: hasBblrRisk ? 'Riwayat BBLR' : 'Berat Lahir Cukup',
+      status: bblrKnown
+        ? (!record.bblrHistory ? 'Berat Lahir Cukup' : 'Riwayat BBLR')
+        : 'Data tidak tersedia',
+      available: bblrKnown,
     },
     {
       subject: 'Pendidikan Ibu',
-      value: hasLowMotherEd ? 35 : 90,
+      value: motherEdKnown ? (record.motherEducation ? 90 : 35) : 50,
       fullMark: 100,
-      status: hasLowMotherEd ? 'Dasar / Menengah' : 'Tamat SMA+',
+      status: motherEdKnown
+        ? (record.motherEducation ? 'Tamat SMA+' : 'Dasar / Menengah')
+        : 'Data tidak tersedia',
+      available: motherEdKnown,
     },
     {
       subject: 'Ekonomi (Q)',
       value: (record.economicQuintile || 3) * 20,
       fullMark: 100,
       status: `Kuintil ${record.economicQuintile || 3}`,
+      available: true,
     },
   ]
+
+  const dominantFactors = record.dominantFactors || []
 
   const factorLabels: Record<string, string> = {
     AKSES_SANITASI_BURUK: 'Akses Sanitasi / Jamban Belum Sehat',
@@ -131,8 +138,10 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
             />
             <Tooltip
               formatter={(val: any, _name: any, item: any) => [
-                `${val}/100 (${item.payload.status})`,
-                'Skor Kualitas',
+                item.payload.available
+                  ? `${val}/100 (${item.payload.status})`
+                  : `— (${item.payload.status})`,
+                item.payload.available ? 'Skor Kualitas' : '⚠ Tidak Tersimpan di Database',
               ]}
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -144,6 +153,14 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
           </RadarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Notice when BBLR / Mother Education data is unavailable */}
+      {(!bblrKnown || !motherEdKnown) && (
+        <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-[11px] text-slate-500 mb-3">
+          <span className="font-semibold text-slate-600">ⓘ </span>
+          Data <strong>Riwayat BBLR</strong> dan <strong>Pendidikan Ibu</strong> tidak tersimpan di database backend — sumbu abu-abu (50) menandakan data tidak tersedia pada tautan yang dibagikan.
+        </div>
+      )}
 
       {/* Dominant Risk Factors List */}
       <div className="mt-3 pt-3 border-t border-slate-100">

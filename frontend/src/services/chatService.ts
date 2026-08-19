@@ -110,6 +110,132 @@ export const chatService = {
       onError(err instanceof Error ? err : new Error(String(err)))
     }
   },
+
+  /**
+   * Stream chat consultation for Mode Umum (general nutrition education).
+   * 100% local mock — NEVER calls backend chat.controller.ts.
+   * No sessionId required.
+   */
+  async streamChatUmum(options: ChatUmumStreamOptions): Promise<void> {
+    const { query, onChunk, onDone, onError, signal } = options
+
+    try {
+      const fullAnswer = generateUmumAnswer(query)
+      const words = fullAnswer.split(/(?<=\s|(?<=[.,\n]))/)
+
+      let index = 0
+      const intervalMs = 28
+
+      const timer = setInterval(() => {
+        if (signal?.aborted) {
+          clearInterval(timer)
+          return
+        }
+
+        if (index < words.length) {
+          onChunk(words[index])
+          index++
+        } else {
+          clearInterval(timer)
+          onDone()
+        }
+      }, intervalMs)
+    } catch (err: any) {
+      onError(err instanceof Error ? err : new Error(String(err)))
+    }
+  },
+}
+
+/**
+ * Options for Mode Umum streaming (no sessionId, no record needed)
+ */
+export interface ChatUmumStreamOptions {
+  query: string
+  onChunk: (chunk: string) => void
+  onDone: () => void
+  onError: (error: Error) => void
+  signal?: AbortSignal
+}
+
+/**
+ * Generate mock educational answers for Mode Umum (general nutrition/stunting).
+ * NOT grounded in any specific child's data — purely educational content.
+ */
+function generateUmumAnswer(query: string): string {
+  const q = query.toLowerCase()
+
+  if (q.includes('stunting') || q.includes('apa itu')) {
+    return `**Apa Itu Stunting?**\n\n` +
+      `Stunting adalah kondisi **gagal tumbuh** pada anak balita akibat kekurangan gizi kronis, terutama dalam 1.000 Hari Pertama Kehidupan (HPK). Menurut standar WHO, anak dikategorikan stunting jika **tinggi badan menurut usia (TB/U) berada di bawah -2 Standar Deviasi (SD)** dari median referensi pertumbuhan.\n\n` +
+      `**Fakta Penting:**\n` +
+      `• Prevalensi stunting di Indonesia: **21,6%** (SSGI 2022), turun dari 24,4% di 2021.\n` +
+      `• Stunting bukan sekadar "anak pendek" — dampaknya meliputi gangguan perkembangan kognitif, daya tahan tubuh lemah, dan risiko penyakit degeneratif di usia dewasa.\n` +
+      `• Penyebab utama: asupan gizi tidak adekuat, infeksi berulang (diare, ISPA), sanitasi buruk, dan kurangnya akses pangan bergizi.\n\n` +
+      `💡 **Tip:** Lakukan skrining antropometri melalui SEHATI untuk mengetahui status gizi spesifik anak Anda dan mendapatkan rekomendasi nutrisi yang dipersonalisasi.`
+  }
+
+  if (q.includes('tanda') || q.includes('gejala') || q.includes('ciri') || q.includes('kenali')) {
+    return `**Tanda-Tanda Awal Stunting yang Perlu Diwaspadai:**\n\n` +
+      `1. **Pertumbuhan tinggi/panjang badan melambat** — anak terlihat lebih pendek dibanding teman sebaya.\n` +
+      `2. **Berat badan sulit naik** meski asupan makan terlihat cukup.\n` +
+      `3. **Mudah sakit** — sering mengalami infeksi berulang (batuk, pilek, diare).\n` +
+      `4. **Perkembangan motorik terlambat** — terlambat duduk, merangkak, atau berjalan.\n` +
+      `5. **Nafsu makan rendah** dan cenderung pemilih makanan (*picky eater*).\n\n` +
+      `⚠️ **Penting:** Stunting sering tidak disadari karena dianggap "keturunan" atau "wajar". Pemantauan rutin di Posyandu dengan pengukuran TB/BB setiap bulan adalah cara paling efektif untuk deteksi dini.\n\n` +
+      `💡 Gunakan fitur skrining SEHATI untuk menghitung Z-Score TB/U anak Anda secara otomatis.`
+  }
+
+  if (q.includes('cek') || q.includes('status gizi') || q.includes('ukur') || q.includes('z-score') || q.includes('cara')) {
+    return `**Cara Mengecek Status Gizi Anak:**\n\n` +
+      `**1. Ukur Tinggi/Panjang Badan:**\n` +
+      `• Usia 0–24 bulan: ukur **panjang badan** (terlentang) menggunakan *infantometer*.\n` +
+      `• Usia >24 bulan: ukur **tinggi badan** (berdiri) menggunakan *stadiometer* atau mikrotoa.\n\n` +
+      `**2. Timbang Berat Badan:**\n` +
+      `• Gunakan timbangan digital terkalibrasi, anak mengenakan pakaian minimal.\n\n` +
+      `**3. Interpretasi Z-Score:**\n` +
+      `• **> -2 SD**: Normal\n` +
+      `• **-2 SD s/d -3 SD**: Pendek (*Stunted*) — perlu intervensi gizi\n` +
+      `• **< -3 SD**: Sangat Pendek (*Severely Stunted*) — perlu rujukan segera\n\n` +
+      `💡 **Cara Termudah:** Gunakan fitur skrining SEHATI — cukup masukkan usia, jenis kelamin, dan hasil pengukuran TB/BB, sistem akan menghitung Z-Score otomatis berdasarkan standar WHO 2006.`
+  }
+
+  if (q.includes('mpasi') || q.includes('makanan') || q.includes('resep') || q.includes('menu') || q.includes('makan')) {
+    return `**Panduan Umum MPASI untuk Pencegahan Stunting:**\n\n` +
+      `**Usia 6–8 Bulan (Perkenalan MPASI):**\n` +
+      `• Tekstur: Bubur halus/puree → bertahap ke bubur kasar.\n` +
+      `• Frekuensi: 2–3 kali makan utama + 1–2 kali selingan.\n` +
+      `• Prioritas: Sumber **protein hewani** (telur, ikan, hati ayam) di setiap kali makan.\n\n` +
+      `**Usia 9–12 Bulan:**\n` +
+      `• Tekstur: Nasi tim, cincang halus, *finger food*.\n` +
+      `• Frekuensi: 3–4 kali makan utama + 1–2 kali selingan.\n\n` +
+      `**Usia 12–24 Bulan:**\n` +
+      `• Sudah bisa makan menu keluarga dengan porsi lebih kecil dan tekstur disesuaikan.\n` +
+      `• Pastikan **1 butir telur utuh setiap hari** — terbukti menurunkan risiko stunting hingga 47% (penelitian Ecuador, Lannotti et al. 2017).\n\n` +
+      `🐟 **Tip Pangan Lokal Kalimantan Timur:** Ikan bawis, bandeng, dan udang rebon merupakan sumber protein hewani lokal yang terjangkau dan kaya Omega-3.`
+  }
+
+  if (q.includes('posyandu') || q.includes('jadwal') || q.includes('kader') || q.includes('puskesmas')) {
+    return `**Peran Posyandu dalam Pencegahan Stunting:**\n\n` +
+      `Posyandu adalah garda terdepan pemantauan tumbuh kembang balita di Indonesia. Layanan yang tersedia:\n\n` +
+      `1. **Penimbangan & Pengukuran Rutin** — Berat badan dan tinggi/panjang badan diukur setiap bulan untuk memantau tren pertumbuhan.\n` +
+      `2. **Pemberian Vitamin A** — Diberikan setiap Februari dan Agustus untuk anak usia 6–59 bulan.\n` +
+      `3. **Imunisasi Dasar & Lanjutan** — Sesuai jadwal dari Kemenkes.\n` +
+      `4. **PMT (Pemberian Makanan Tambahan)** — Untuk balita dengan status gizi kurang.\n` +
+      `5. **Konseling Gizi** — Edukasi oleh kader terlatih tentang pola makan seimbang.\n\n` +
+      `📅 **Tips:** Kunjungi Posyandu secara rutin setiap bulan dan bawa **Buku KIA** (Kesehatan Ibu dan Anak) untuk pencatatan grafik pertumbuhan anak.\n\n` +
+      `💡 Lakukan skrining digital melalui SEHATI sebagai pelengkap pemantauan Posyandu Anda.`
+  }
+
+  // Default general answer
+  return `Terima kasih atas pertanyaannya! Saya **HATI** — Asisten Gizi AI dari SEHATI.\n\n` +
+    `Saya dapat membantu Anda dengan informasi seputar:\n` +
+    `• **Apa itu stunting** dan cara pencegahannya\n` +
+    `• **Tanda-tanda awal** yang perlu diwaspadai orang tua\n` +
+    `• **Cara mengecek status gizi** anak (interpretasi Z-Score)\n` +
+    `• **Panduan MPASI** dan nutrisi harian berbasis pangan lokal\n` +
+    `• **Peran Posyandu** dalam pemantauan tumbuh kembang\n\n` +
+    `Silakan tanyakan topik spesifik di atas, atau **lakukan skrining melalui SEHATI** untuk mendapatkan rekomendasi nutrisi yang dipersonalisasi berdasarkan data antropometri anak Anda.\n\n` +
+    `_Catatan: Saat ini Anda menggunakan Mode Edukasi Umum. Untuk konsultasi berbasis data anak spesifik, selesaikan skrining terlebih dahulu._`
 }
 
 export default chatService

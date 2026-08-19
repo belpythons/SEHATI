@@ -68,9 +68,9 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
   const isStunted = record.zScore < -2.0 || record.statusGiziTBU?.includes('Pendek')
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
             <Utensils className="w-4 h-4" />
@@ -80,36 +80,36 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
               Rekomendasi Gizi Pangan Lokal
             </h3>
             <p className="text-xs text-slate-500">
-              Intervensi Makanan Tambahan Berbasis Potensi Kota Bontang
+              Intervensi Makanan Tambahan Potensi Bontang
             </p>
           </div>
         </div>
 
         {isStunted && (
-          <span className="text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+          <span className="text-[10px] sm:text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
             <Sparkles className="w-3 h-3 text-red-600" />
-            <span>Fokus Protein Hewani</span>
+            <span>Protein Hewani</span>
           </span>
         )}
       </div>
 
       {/* Narrative Alert */}
-      <div className="p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-xl text-xs text-emerald-900 mb-3 flex items-start gap-2">
+      <div className="p-2.5 sm:p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-xl text-xs text-emerald-900 mb-3 flex items-start gap-2">
         <Fish className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-        <div>
+        <div className="leading-relaxed">
           <span className="font-semibold">Potensi Maritim Bontang: </span>
           Kekayaan ikan laut segar lokal memiliki bioavailabilitas protein tinggi untuk mempercepat kejar tumbuh balita (Catch-up Growth).
         </div>
       </div>
 
       {/* Nutrition Recommendation Table */}
-      <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left text-xs">
+      <div className="flex-1 overflow-x-auto -mx-1 px-1">
+        <table className="w-full text-left text-xs min-w-[280px]">
           <thead>
-            <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[10px]">
-              <th className="pb-2">Bahan Makanan Lokal</th>
-              <th className="pb-2 hidden sm:table-cell">Konteks & Keunggulan</th>
-              <th className="pb-2">Porsi / Frekuensi</th>
+            <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[9px] sm:text-[10px]">
+              <th className="pb-2 pr-2">Bahan Makanan</th>
+              <th className="pb-2 pr-2 hidden sm:table-cell">Konteks & Keunggulan</th>
+              <th className="pb-2 pr-2">Porsi / Hari</th>
               <th className="pb-2 text-right">Nutrisi Kunci</th>
             </tr>
           </thead>
@@ -117,16 +117,16 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
             {BONTANG_LOCAL_NUTRITION.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                 <td className="py-2.5 pr-2">
-                  <div className="font-semibold text-slate-800">{item.name}</div>
+                  <div className="font-semibold text-slate-800 leading-tight">{item.name}</div>
                   <div className="text-[10px] text-slate-500">{item.category}</div>
                 </td>
                 <td className="py-2.5 pr-2 text-slate-600 hidden sm:table-cell">
                   {item.bontangContext}
                 </td>
-                <td className="py-2.5 pr-2 font-medium text-slate-700">
+                <td className="py-2.5 pr-2 font-medium text-slate-700 leading-tight">
                   {item.portionRecommendation}
                 </td>
-                <td className="py-2.5 text-right font-medium text-blue-700 text-[11px]">
+                <td className="py-2.5 text-right font-medium text-blue-700 text-[10px] sm:text-[11px] leading-tight">
                   {item.keyNutrient}
                 </td>
               </tr>

@@ -318,27 +318,27 @@ export const AIChatDrawer: React.FC<Props> = ({
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40 transition-opacity"
           />
 
-          {/* Drawer Panel — Bottom-right popup card (HILDA pattern) */}
+          {/* Drawer Panel — Fullscreen on mobile (<640px), bottom-right card on tablet/desktop */}
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed bottom-4 right-4 w-[420px] max-h-[88vh] bg-white shadow-2xl z-50 flex flex-col font-sans rounded-2xl border border-slate-200/80 overflow-hidden max-[480px]:bottom-0 max-[480px]:right-0 max-[480px]:w-full max-[480px]:max-h-full max-[480px]:rounded-none"
+            className="fixed inset-x-0 bottom-0 top-0 sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:w-[420px] h-full sm:h-auto sm:max-h-[88vh] bg-white shadow-2xl z-50 flex flex-col font-sans rounded-none sm:rounded-2xl border-0 sm:border sm:border-slate-200/80 overflow-hidden"
           >
             {/* ──────────────── Header — HILDA Style ──────────────── */}
-            <div className="px-4 py-3.5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
+            <div className="px-3.5 sm:px-4 py-3 sm:py-3.5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5 sm:gap-3">
                 {/* Avatar bulat */}
                 <img
                   src="/icons/chat-avatar-64.png"
                   alt="HATI"
-                  className="w-11 h-11 rounded-full shadow-md ring-2 ring-teal-100"
+                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-full shadow-md ring-2 ring-teal-100 shrink-0"
                 />
                 {/* Name badge */}
                 <div>
                   <h3
-                    className="font-extrabold text-[22px] tracking-tight leading-none"
+                    className="font-extrabold text-lg sm:text-[22px] tracking-tight leading-none"
                     style={{
                       background: 'linear-gradient(135deg, #1e40af, #0d9488)',
                       WebkitBackgroundClip: 'text',
@@ -347,7 +347,7 @@ export const AIChatDrawer: React.FC<Props> = ({
                   >
                     HATI
                   </h3>
-                  <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                  <p className="text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
                     <span>by</span>
                     <img
                       src="/icons/sehati-simbol-navbar.png"
@@ -360,18 +360,18 @@ export const AIChatDrawer: React.FC<Props> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {/* Gemini badge */}
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1">
+                <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1 shrink-0">
                   <Sparkles className="w-3 h-3 text-amber-500" />
-                  <span>Gemini 2.5 Flash</span>
+                  <span className="hidden min-[380px]:inline">Gemini 2.5</span>
                 </span>
 
                 {/* Mode Simulasi badge — Mode Umum only */}
                 {isUmum && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                  <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1 shrink-0">
                     <FlaskConical className="w-3 h-3 text-amber-500" />
-                    <span>Mode Simulasi</span>
+                    <span>Simulasi</span>
                   </span>
                 )}
 

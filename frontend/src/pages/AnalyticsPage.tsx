@@ -4,7 +4,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -56,11 +57,20 @@ export const AnalyticsPage: React.FC = () => {
   const [dataSource, setDataSource] = useState<'live' | 'mock'>('mock')
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  // Configure drag and drop sensors
+  // Configure drag and drop sensors:
+  // MouseSensor for desktop mouse dragging (8px move activation)
+  // TouchSensor for mobile touch dragging (250ms press delay + 5px tolerance to allow normal page scrolling)
+  // KeyboardSensor for accessibility navigation
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -228,44 +238,57 @@ export const AnalyticsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Header Navbar */}
-      <header className="glass-nav sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 font-bold text-lg text-blue-600">
+      <header className="glass-nav sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-3.5 sm:px-6 py-2 sm:py-3">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4">
+          {/* Top Row on Mobile: Brand Logo on Left, Action Button on Right */}
+          <div className="flex items-center justify-between sm:justify-start gap-3">
+            <Link to="/" className="flex items-center gap-2 font-bold text-lg text-blue-600 shrink-0">
               <img
                 src="/icons/sehati-simbol-navbar.png"
                 alt="SEHATI"
-                className="w-7 h-7 object-contain"
+                className="w-7 h-7 object-contain shrink-0"
               />
-              <span>SEHATI</span>
+              <span className="shrink-0">SEHATI</span>
             </Link>
             <span className="text-xs text-slate-400 hidden sm:inline">|</span>
             <span className="text-xs font-semibold text-slate-600 hidden sm:inline">
               Dashboard Analitik & Konsultasi
             </span>
+
+            {/* Skrining Baru Button for Mobile (Top-Right aligned) */}
+            <button
+              type="button"
+              onClick={() => navigate('/questionnaire')}
+              className="sm:hidden px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Skrining Baru</span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Bottom Row on Mobile / Right Side on Desktop: Data Source Status Badge */}
+          <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100">
             {/* Live vs Mock Data Source Indicator Badge */}
             {dataSource === 'live' ? (
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span>Live Backend API</span>
               </span>
             ) : (
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 <span>Mode Simulasi (Mock Data)</span>
               </span>
             )}
 
+            {/* Skrining Baru Button for Desktop */}
             <button
               type="button"
               onClick={() => navigate('/questionnaire')}
-              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="hidden sm:flex px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Skrining Baru</span>
+              <span>Skrining Baru</span>
             </button>
           </div>
         </div>
@@ -275,31 +298,31 @@ export const AnalyticsPage: React.FC = () => {
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1">
         {/* Child Profile Overview Header Banner */}
         {record && (
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
-                <Baby className="w-6 h-6" />
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-6 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
+                <Baby className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-bold text-slate-900">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
                     Balita ({record.gender === 'L' ? 'Laki-laki' : 'Perempuan'}), {record.ageMonths} Bulan
                   </h1>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200">
+                  <span className="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200 shrink-0">
                     #{record.shareHash}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-y-1 gap-x-4 mt-1.5 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-y-1 gap-x-3 sm:gap-x-4 mt-1.5 text-xs text-slate-500">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Kelurahan {record.kelurahan}, Bontang</span>
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">Kel. {record.kelurahan}, Bontang</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>Persona: {record.persona}</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>
                       {new Date(record.createdAt).toLocaleDateString('id-ID', {
                         day: 'numeric',
@@ -313,19 +336,19 @@ export const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Quick Diagnostic Metrics Grid */}
-            <div className="grid grid-cols-3 gap-3 bg-slate-50/80 border border-slate-100 rounded-xl p-3 shrink-0">
-              <div className="text-center px-2">
-                <div className="text-[10px] uppercase font-semibold text-slate-400">TB / PB</div>
-                <div className="text-sm font-bold text-slate-900 mt-0.5">{record.heightCm} cm</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-50/80 border border-slate-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+              <div className="text-center px-1 sm:px-2">
+                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">TB / PB</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 whitespace-nowrap">{record.heightCm} cm</div>
               </div>
-              <div className="text-center px-2 border-x border-slate-200">
-                <div className="text-[10px] uppercase font-semibold text-slate-400">Berat Badan</div>
-                <div className="text-sm font-bold text-slate-900 mt-0.5">{record.weightKg} kg</div>
+              <div className="text-center px-1 sm:px-2 border-x border-slate-200">
+                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">Berat Badan</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 whitespace-nowrap">{record.weightKg} kg</div>
               </div>
-              <div className="text-center px-2">
-                <div className="text-[10px] uppercase font-semibold text-slate-400">Z-Score TB/U</div>
+              <div className="text-center px-1 sm:px-2">
+                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">Z-Score TB/U</div>
                 <div
-                  className={`text-sm font-bold mt-0.5 ${
+                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${
                     record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-600'
                   }`}
                 >
@@ -337,12 +360,12 @@ export const AnalyticsPage: React.FC = () => {
         )}
 
         {/* Drag and Drop Instructions Tip */}
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-3 px-1">
-          <span>Tata Letak Widget Interaktif (Tahan ikon di pojok kanan atas untuk menggeser susunan)</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] sm:text-xs text-slate-400 mb-3 px-1">
+          <span>Tata Letak Widget Interaktif (Tekan & tahan ikon di pojok kanan atas untuk menggeser)</span>
           <button
             type="button"
             onClick={() => setWidgetOrder(DEFAULT_WIDGET_ORDER)}
-            className="hover:text-blue-600 font-medium transition-colors cursor-pointer"
+            className="hover:text-blue-600 font-medium transition-colors cursor-pointer self-start sm:self-auto"
           >
             Reset Susunan Default
           </button>
@@ -351,7 +374,7 @@ export const AnalyticsPage: React.FC = () => {
         {/* Draggable Widgets Grid */}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={widgetOrder} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {widgetOrder.map((id) => renderWidget(id))}
             </div>
           </SortableContext>

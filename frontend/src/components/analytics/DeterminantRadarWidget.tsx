@@ -24,9 +24,11 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
   const motherEdKnown = typeof record.motherEducation === 'boolean'
 
   // Convert boolean & categorical factors to 0-100 impact index for radar visualization
+  // Subject labels are optimized for compact mobile screen widths (375px/414px)
   const radarData = [
     {
       subject: 'Sanitasi',
+      fullSubject: 'Akses Sanitasi',
       value: record.sanitationAccess ? 90 : 25,
       fullMark: 100,
       status: record.sanitationAccess ? 'Baik' : 'Beresiko',
@@ -34,6 +36,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
     },
     {
       subject: 'Air Bersih',
+      fullSubject: 'Akses Air Bersih',
       value: record.cleanWaterAccess ? 95 : 30,
       fullMark: 100,
       status: record.cleanWaterAccess ? 'Baik' : 'Beresiko',
@@ -41,13 +44,15 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
     },
     {
       subject: 'Bebas Rokok',
+      fullSubject: 'Bebas Asap Rokok',
       value: !record.smokeExposure ? 90 : 20,
       fullMark: 100,
       status: !record.smokeExposure ? 'Bebas Asap' : 'Paparan Tinggi',
       available: true,
     },
     {
-      subject: 'ASI Eksklusif',
+      subject: 'ASI Ekskl.',
+      fullSubject: 'ASI Eksklusif',
       value: record.exclusiveAsi ? 95 : 35,
       fullMark: 100,
       status: record.exclusiveAsi ? 'Lengkap' : 'Tidak Eksklusif',
@@ -55,6 +60,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
     },
     {
       subject: 'Bebas Diare',
+      fullSubject: 'Bebas Riwayat Diare',
       value: !record.diarrheaHistory ? 90 : 25,
       fullMark: 100,
       status: !record.diarrheaHistory ? 'Jarang / Sehat' : 'Ada Riwayat',
@@ -62,6 +68,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
     },
     {
       subject: 'Bebas BBLR',
+      fullSubject: 'Bebas Riwayat BBLR',
       value: bblrKnown ? (!record.bblrHistory ? 90 : 25) : 50,
       fullMark: 100,
       status: bblrKnown
@@ -70,7 +77,8 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
       available: bblrKnown,
     },
     {
-      subject: 'Pendidikan Ibu',
+      subject: 'Pend. Ibu',
+      fullSubject: 'Tingkat Pendidikan Ibu',
       value: motherEdKnown ? (record.motherEducation ? 90 : 35) : 50,
       fullMark: 100,
       status: motherEdKnown
@@ -79,7 +87,8 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
       available: motherEdKnown,
     },
     {
-      subject: 'Ekonomi (Q)',
+      subject: 'Ekonomi',
+      fullSubject: 'Kuintil Sosial Ekonomi',
       value: (record.economicQuintile || 3) * 20,
       fullMark: 100,
       status: `Kuintil ${record.economicQuintile || 3}`,
@@ -101,9 +110,9 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
             <PieChart className="w-4 h-4" />
@@ -120,13 +129,19 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Radar Chart Visual */}
-      <div className="flex-1 w-full min-h-[200px] flex items-center justify-center">
+      <div className="flex-1 w-full min-h-[230px] sm:min-h-[250px] flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+          <RadarChart
+            cx="50%"
+            cy="50%"
+            outerRadius="58%"
+            margin={{ top: 10, right: 18, bottom: 10, left: 18 }}
+            data={radarData}
+          >
             <PolarGrid stroke="#e2e8f0" />
             <PolarAngleAxis
               dataKey="subject"
-              tick={{ fill: '#475569', fontSize: 11, fontWeight: 500 }}
+              tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }}
             />
             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
             <Radar
@@ -141,7 +156,9 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
                 item.payload.available
                   ? `${val}/100 (${item.payload.status})`
                   : `— (${item.payload.status})`,
-                item.payload.available ? 'Skor Kualitas' : '⚠ Tidak Tersimpan di Database',
+                item.payload.available
+                  ? item.payload.fullSubject || 'Skor Kualitas'
+                  : '⚠ Tidak Tersimpan di Database',
               ]}
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',

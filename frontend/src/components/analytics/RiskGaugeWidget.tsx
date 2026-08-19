@@ -36,9 +36,9 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
   const Icon = tierConfig.icon
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Widget Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
             <ShieldAlert className="w-4 h-4" />
@@ -54,7 +54,7 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
         </div>
 
         <span
-          className={`text-xs font-bold px-2.5 py-1 rounded-full border flex items-center gap-1 ${tierConfig.badgeClass}`}
+          className={`text-xs font-bold px-2.5 py-1 rounded-full border flex items-center gap-1 shrink-0 ${tierConfig.badgeClass}`}
         >
           <Icon className="w-3.5 h-3.5" />
           <span>{tierConfig.label}</span>
@@ -63,7 +63,7 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
 
       {/* Gauge Component Container */}
       <div className="flex-1 flex flex-col items-center justify-center py-2">
-        <div className="w-full max-w-[260px]">
+        <div className="w-full max-w-[230px] sm:max-w-[260px]">
           <GaugeComponent
             type="semicircle"
             value={riskPercent}
@@ -104,7 +104,7 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
               valueLabel: {
                 formatTextValue: (value) => `${value}%`,
                 style: {
-                  fontSize: '28px',
+                  fontSize: '24px',
                   fontWeight: 'bold',
                   fill: '#1e293b',
                   textShadow: 'none',

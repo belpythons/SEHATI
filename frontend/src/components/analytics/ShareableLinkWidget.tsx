@@ -36,9 +36,9 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
   const waShareUrl = `https://api.whatsapp.com/send?text=${waText}`
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-sky-50 text-sky-600">
             <Share2 className="w-4 h-4" />
@@ -54,7 +54,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
         </div>
 
         {isMock && (
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shrink-0">
             <Lock className="w-3 h-3 text-amber-700" />
             <span>Mode Simulasi</span>
           </span>
@@ -63,7 +63,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
 
       {/* Offline/Mock Warning Banner */}
       {isMock ? (
-        <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-xs text-amber-900 mb-3 flex items-start gap-2">
+        <div className="p-2.5 sm:p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-xs text-amber-900 mb-3 flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed">
             <span className="font-bold">Perhatian: </span>
@@ -80,7 +80,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
       <div className={`flex items-center gap-2 rounded-xl p-1.5 pl-3 mb-3 border ${
         isMock ? 'bg-slate-100/70 border-slate-200 opacity-80' : 'bg-slate-50 border-slate-200'
       }`}>
-        <span className="font-mono text-xs text-slate-700 truncate flex-1 select-all">
+        <span className="font-mono text-[11px] sm:text-xs text-slate-700 truncate flex-1 select-all">
           {shareUrl}
         </span>
         <button
@@ -88,7 +88,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
           disabled={isMock}
           onClick={handleCopyLink}
           title={isMock ? 'Fitur salin dinonaktifkan saat mode simulasi offline' : 'Salin tautan'}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
             isMock
               ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
               : copied
@@ -111,7 +111,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-auto flex flex-wrap gap-2 pt-2">
+      <div className="mt-auto flex flex-col sm:flex-row gap-2 pt-2">
         {isMock ? (
           <div className="w-full text-center py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-500 font-medium">
             Tunggu status berubah menjadi <strong>&quot;Live Backend&quot;</strong> sebelum membagikan link ke orang lain.
@@ -122,7 +122,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
               href={waShareUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100/70 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer"
+              className="w-full sm:flex-1 px-3 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100/70 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer min-h-[40px]"
             >
               <MessageCircle className="w-4 h-4 text-emerald-600" />
               <span>Kirim via WhatsApp</span>
@@ -141,7 +141,7 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
                   handleCopyLink()
                 }
               }}
-              className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px]"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Bagikan</span>

@@ -50,9 +50,9 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
   const currentStatus = isTBU ? (record.statusGiziTBU || 'Normal') : (record.statusGiziBBU || 'Normal')
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Header & Mode Switch */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
@@ -63,16 +63,16 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
             </h3>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Standar Deviasi (SD) Antropometri Balita Standar WHO 2006
+            Standar Deviasi (SD) Antropometri Balita WHO 2006
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+        <div className="flex w-full sm:w-auto bg-slate-100 p-1 rounded-xl text-xs font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab('TBU')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all ${
               isTBU
                 ? 'bg-white text-blue-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -83,7 +83,7 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
           <button
             type="button"
             onClick={() => setActiveTab('BBU')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all ${
               !isTBU
                 ? 'bg-white text-blue-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -95,7 +95,7 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Score Summary Badge */}
-      <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl p-3 mb-3 text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-xl p-2.5 sm:p-3 mb-3 text-xs">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-slate-700">Posisi Balita:</span>
           <span className="font-bold text-slate-900">
@@ -123,17 +123,17 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={currentChartData}
-            margin={{ top: 10, right: 15, left: -10, bottom: 5 }}
+            margin={{ top: 10, right: 12, left: -18, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
               dataKey="month"
               tickFormatter={(m) => `${m} bln`}
-              tick={{ fontSize: 11, fill: '#64748b' }}
+              tick={{ fontSize: 10, fill: '#64748b' }}
             />
             <YAxis
               domain={isTBU ? [40, 130] : [2, 30]}
-              tick={{ fontSize: 11, fill: '#64748b' }}
+              tick={{ fontSize: 10, fill: '#64748b' }}
               unit={isTBU ? 'cm' : 'kg'}
             />
             <Tooltip
@@ -158,7 +158,7 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
               }}
             />
             <Legend
-              wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+              wrapperStyle={{ fontSize: '10px', paddingTop: '6px' }}
               formatter={(value) => {
                 if (value === 'median') return 'Median (0 SD)'
                 if (value === 'sd2Neg') return '-2 SD'

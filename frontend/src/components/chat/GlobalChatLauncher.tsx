@@ -60,13 +60,13 @@ export const GlobalChatLauncher: React.FC = () => {
           className="global-chat-launcher"
           style={{
             position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 9999,
+            bottom: '20px',
+            right: '20px',
+            zIndex: 40,
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            padding: '8px 16px 8px 8px',
+            padding: '8px 14px 8px 8px',
             borderRadius: '9999px',
             border: '2px solid rgba(13, 148, 136, 0.25)',
             background: 'linear-gradient(135deg, #1e3a5f, #0d4f4a)',
@@ -95,8 +95,8 @@ export const GlobalChatLauncher: React.FC = () => {
             src="/icons/chat-avatar-64.png"
             alt=""
             style={{
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
               flexShrink: 0,
@@ -105,11 +105,11 @@ export const GlobalChatLauncher: React.FC = () => {
           />
 
           {/* Label badge */}
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+          <div className="launcher-text" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
             <span
               style={{
                 fontWeight: 800,
-                fontSize: '16px',
+                fontSize: '15px',
                 letterSpacing: '-0.02em',
                 background: 'linear-gradient(135deg, #93c5fd, #5eead4)',
                 WebkitBackgroundClip: 'text',
@@ -140,12 +140,14 @@ export const GlobalChatLauncher: React.FC = () => {
               box-shadow: 0 12px 40px rgba(30, 64, 175, 0.4), 0 0 20px rgba(13, 148, 136, 0.2) !important;
             }
             /* Hide label text on very small screens, keep avatar only */
-            @media (max-width: 380px) {
-              .global-chat-launcher > div:last-of-type {
+            @media (max-width: 420px) {
+              .global-chat-launcher .launcher-text {
                 display: none !important;
               }
               .global-chat-launcher {
-                padding: 8px !important;
+                padding: 6px !important;
+                bottom: 16px !important;
+                right: 16px !important;
               }
             }
           `}</style>

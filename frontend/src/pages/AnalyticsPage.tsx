@@ -36,7 +36,6 @@ import { NutritionTableWidget } from '../components/analytics/NutritionTableWidg
 import { ShareableLinkWidget } from '../components/analytics/ShareableLinkWidget'
 import { AIChatWidget } from '../components/analytics/AIChatWidget'
 import { DraggableWidget } from '../components/analytics/DraggableWidget'
-import { WidgetErrorBoundary } from '../components/analytics/WidgetErrorBoundary'
 import { AIChatDrawer } from '../components/chat/AIChatDrawer'
 
 const DEFAULT_WIDGET_ORDER = [
@@ -165,49 +164,37 @@ export const AnalyticsPage: React.FC = () => {
       case 'growth-chart':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="Growth Chart">
-              <GrowthChartWidget record={record} />
-            </WidgetErrorBoundary>
+            <GrowthChartWidget record={record} />
           </DraggableWidget>
         )
       case 'risk-gauge':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="Risk Gauge">
-              <RiskGaugeWidget record={record} />
-            </WidgetErrorBoundary>
+            <RiskGaugeWidget record={record} />
           </DraggableWidget>
         )
       case 'determinant-radar':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="Determinant Radar">
-              <DeterminantRadarWidget record={record} />
-            </WidgetErrorBoundary>
+            <DeterminantRadarWidget record={record} />
           </DraggableWidget>
         )
       case 'nutrition-table':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="Nutrition Table">
-              <NutritionTableWidget record={record} />
-            </WidgetErrorBoundary>
+            <NutritionTableWidget record={record} />
           </DraggableWidget>
         )
       case 'shareable-link':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="Shareable Link">
-              <ShareableLinkWidget record={record} dataSource={dataSource} />
-            </WidgetErrorBoundary>
+            <ShareableLinkWidget record={record} dataSource={dataSource} />
           </DraggableWidget>
         )
       case 'ai-chat':
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="AI Chat">
-              <AIChatWidget record={record} onOpenChat={() => setIsChatOpen(true)} />
-            </WidgetErrorBoundary>
+            <AIChatWidget record={record} onOpenChat={() => setIsChatOpen(true)} />
           </DraggableWidget>
         )
       default:

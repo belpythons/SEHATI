@@ -1,5 +1,5 @@
 import React from 'react'
-import { GaugeComponent } from 'react-gauge-component'
+import GaugeComponent from 'react-gauge-component'
 import { ScreeningRecord } from '../../types/screening'
 import { ShieldAlert, AlertTriangle, CheckCircle2 } from 'lucide-react'
 

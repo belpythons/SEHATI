@@ -131,10 +131,14 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
             <button
               type="button"
               onClick={() => {
-                if (navigator.share) {
+                if (
+                  typeof navigator !== 'undefined' &&
+                  'share' in navigator &&
+                  typeof navigator.share === 'function'
+                ) {
                   navigator.share({
                     title: 'Hasil Skrining Stunting SEHATI',
-                    text: `Hasil skrining balita: Z-Score TB/U ${record.zScore} SD (${record.statusGiziTBU})`,
+                    text: `Hasil skrining balita: Z-Score TB/U ${record.zScore} SD (${record.statusGiziTBU || 'Normal'})`,
                     url: shareUrl,
                   }).catch(() => {})
                 } else {
@@ -143,8 +147,17 @@ export const ShareableLinkWidget: React.FC<Props> = ({ record, dataSource = 'moc
               }}
               className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px]"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Bagikan</span>
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-700">Tautan Disalin!</span>
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Bagikan</span>
+                </>
+              )}
             </button>
           </>
         )}

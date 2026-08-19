@@ -38,12 +38,14 @@ export const PersonaPreviewSection: React.FC = () => {
         {/* 3 Persona Cards (Halodoc Selection Card Pattern) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {personaOptions.map((persona) => (
-            <div
+            <button
               key={persona.id}
+              type="button"
               onClick={() => handleSelectPersona(persona.id)}
-              className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
+              aria-label={`Pilih peran ${persona.label}: ${persona.description}`}
+              className="text-left w-full bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
             >
-              <div className="space-y-3.5">
+              <div className="space-y-3.5 w-full">
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:scale-105 transition-transform">
                     {iconMap[persona.id]}
@@ -63,11 +65,11 @@ export const PersonaPreviewSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+              <div className="w-full pt-4 mt-5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
                 <span>Pilih Peran Ini</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

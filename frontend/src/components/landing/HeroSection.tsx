@@ -1,109 +1,329 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles, Shield, Cpu, Activity, Wifi, CheckCircle2, PlayCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  ArrowRight,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Activity,
+  MapPin,
+  Bot,
+  CheckCircle2,
+  PlayCircle,
+  ShieldCheck,
+  TrendingDown,
+  Fish,
+} from 'lucide-react'
 import mockData from '../../data/mockData'
 
-export const HeroSection: React.FC = () => {
-  const heroData = mockData.landingPage.heroSection
+interface SlideItem {
+  id: string
+  badgeText: string
+  badgeIcon: React.ReactNode
+  title: string
+  highlight: string
+  description: string
+  ctaText: string
+  ctaPath: string
+  secondaryCtaText?: string
+  secondaryCtaPath?: string
+  bgGradient: string
+  decorIcon: React.ReactNode
+  metricBox?: {
+    value: string
+    label: string
+  }
+}
 
-  const statIcons = [
-    <Activity key="activity" className="w-5 h-5 text-blue-600" />,
-    <Cpu key="cpu" className="w-5 h-5 text-emerald-600" />,
-    <Sparkles key="sparkles" className="w-5 h-5 text-purple-600" />,
-    <Wifi key="wifi" className="w-5 h-5 text-amber-600" />
-  ]
+const CAROUSEL_SLIDES: SlideItem[] = [
+  {
+    id: 'slide-who',
+    badgeText: 'Inisiatif Kesehatan Balita Kota Bontang',
+    badgeIcon: <Activity className="w-3.5 h-3.5 text-blue-600" />,
+    title: 'Deteksi Dini & Pencegahan',
+    highlight: 'Stunting Balita Terintegrasi',
+    description:
+      'Platform cerdas ramah keluarga untuk skrining antropometri standar WHO 2006, kalkulasi Z-Score akurat, serta inferensi risiko determinan Naïve Bayes tanpa hambatan login.',
+    ctaText: 'Mulai Skrining Sekarang',
+    ctaPath: '/questionnaire',
+    secondaryCtaText: 'Lihat Contoh Analisis',
+    secondaryCtaPath: '/analytics',
+    bgGradient: 'from-slate-900 via-blue-950 to-slate-900',
+    decorIcon: <Activity className="w-48 h-48 text-blue-500/10" />,
+    metricBox: {
+      value: 'WHO 2006',
+      label: 'Standar Antropometri Baku',
+    },
+  },
+  {
+    id: 'slide-bontang',
+    badgeText: 'Fokus Wilayah & Target Intervensi',
+    badgeIcon: <MapPin className="w-3.5 h-3.5 text-rose-500" />,
+    title: 'Target Penurunan Prevalensi',
+    highlight: 'Menuju Generasi Emas Bontang',
+    description:
+      'Memantau kerentanan stunting di 3 kecamatan (Bontang Utara, Selatan, Barat) dan 15 kelurahan dengan pendekatan intervensi gizi tepat sasaran pada 1.000 HPK.',
+    ctaText: 'Cek Status Balita Anda',
+    ctaPath: '/questionnaire',
+    secondaryCtaText: 'Pelajari Data Wilayah',
+    secondaryCtaPath: '#wilayah-bontang',
+    bgGradient: 'from-slate-900 via-teal-950 to-slate-900',
+    decorIcon: <TrendingDown className="w-48 h-48 text-teal-500/10" />,
+    metricBox: {
+      value: '27.4% → 14%',
+      label: 'Target Penurunan Stunting',
+    },
+  },
+  {
+    id: 'slide-ai',
+    badgeText: 'Konsultasi Interaktif Cerdas',
+    badgeIcon: <Bot className="w-3.5 h-3.5 text-emerald-500" />,
+    title: 'Tanya HATI Asisten Gizi AI &',
+    highlight: 'Menu Pangan Lokal Bontang',
+    description:
+      'Dapatkan panduan variasi menu kaya protein hewani lokal (Ikan Bawis, Bandeng) dan jadwal pemantauan Posyandu secara interaktif bersama asisten virtual kami.',
+    ctaText: 'Konsultasi Sekarang',
+    ctaPath: '/questionnaire',
+    bgGradient: 'from-blue-950 via-slate-900 to-teal-950',
+    decorIcon: <Fish className="w-48 h-48 text-emerald-500/10" />,
+    metricBox: {
+      value: 'Ikan Bawis & Kelor',
+      label: 'Kaya Zinc & Kalsium',
+    },
+  },
+]
+
+export const HeroSection: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const autoSlideTimerRef = useRef<number | null>(null)
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % CAROUSEL_SLIDES.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length)
+  }
+
+  // Auto-slide effect (5 seconds)
+  useEffect(() => {
+    if (!isPaused) {
+      autoSlideTimerRef.current = window.setInterval(() => {
+        nextSlide()
+      }, 5500)
+    }
+    return () => {
+      if (autoSlideTimerRef.current) clearInterval(autoSlideTimerRef.current)
+    }
+  }, [isPaused, currentSlide])
+
+  const slide = CAROUSEL_SLIDES[currentSlide]
 
   return (
-    <section className="relative pt-24 sm:pt-32 pb-16 sm:pb-24 overflow-hidden">
-      {/* Background Decorative Gradients */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-blue-200/40 via-sky-100/30 to-purple-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute top-1/3 right-10 w-72 h-72 bg-emerald-100/40 rounded-full blur-2xl pointer-events-none -z-10" />
+    <section className="relative pt-24 sm:pt-28 pb-12 sm:pb-16 overflow-hidden">
+      {/* Subtle Background Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-blue-200/30 via-teal-100/25 to-indigo-100/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-4xl mx-auto space-y-6">
-          {/* Official Location Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full gradient-badge border border-blue-200/80 shadow-sm animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-            </span>
-            <span className="text-xs sm:text-sm font-semibold text-blue-800 tracking-wide">
-              {heroData.badge}
-            </span>
+        {/* Main Grid: 70% Carousel + 30% Side Promo Card (Halodoc Layout Pattern) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* ──────────────── 1. Main Hero Carousel (8 Cols on LG) ──────────────── */}
+          <div
+            className="lg:col-span-8 relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 bg-slate-900 min-h-[380px] sm:min-h-[420px] flex flex-col justify-between"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            {/* Slide Animation via Framer Motion */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className={`w-full h-full p-6 sm:p-10 flex flex-col justify-between bg-gradient-to-br ${slide.bgGradient} relative text-white`}
+              >
+                {/* Decorative Background Icon */}
+                <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none select-none">
+                  {slide.decorIcon}
+                </div>
+
+                {/* Top Content */}
+                <div className="relative z-10 space-y-4 max-w-2xl">
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-teal-200 shadow-sm">
+                    {slide.badgeIcon}
+                    <span>{slide.badgeText}</span>
+                  </div>
+
+                  {/* Headline */}
+                  <h1 className="text-2xl sm:text-4xl lg:text-4xl font-extrabold tracking-tight leading-[1.2]">
+                    {slide.title}{' '}
+                    <span
+                      style={{
+                        background: 'linear-gradient(135deg, #93c5fd, #5eead4)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      {slide.highlight}
+                    </span>
+                  </h1>
+
+                  {/* Subtitle */}
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                    {slide.description}
+                  </p>
+                </div>
+
+                {/* Bottom CTA & Metric Footer */}
+                <div className="relative z-10 pt-6 mt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link
+                      to={slide.ctaPath}
+                      className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer active:scale-95"
+                      style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
+                    >
+                      <span>{slide.ctaText}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+
+                    {slide.secondaryCtaText && (
+                      <Link
+                        to={slide.secondaryCtaPath || '#'}
+                        className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-semibold transition-colors border border-white/15"
+                      >
+                        <PlayCircle className="w-4 h-4 text-teal-300" />
+                        <span>{slide.secondaryCtaText}</span>
+                      </Link>
+                    )}
+                  </div>
+
+                  {slide.metricBox && (
+                    <div className="hidden sm:block text-right">
+                      <div className="text-sm font-bold text-white tracking-tight">
+                        {slide.metricBox.value}
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        {slide.metricBox.label}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Slider Controls (Dots & Arrows) */}
+            <div className="absolute bottom-3 right-4 sm:bottom-4 sm:right-6 z-20 flex items-center gap-2">
+              {/* Dot Indicators */}
+              <div className="flex items-center gap-1.5 mr-2">
+                {CAROUSEL_SLIDES.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setCurrentSlide(idx)}
+                    aria-label={`Pindah ke slide ${idx + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      idx === currentSlide
+                        ? 'w-6 bg-teal-400'
+                        : 'w-2 bg-white/30 hover:bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Prev / Next Buttons */}
+              <button
+                type="button"
+                onClick={prevSlide}
+                aria-label="Slide Sebelumnya"
+                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={nextSlide}
+                aria-label="Slide Selanjutnya"
+                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] sm:leading-[1.12]">
-            Deteksi Dini & Pencegahan{' '}
-            <span className="gradient-text">Stunting Balita</span> Secara Terintegrasi
-          </h1>
+          {/* ──────────────── 2. Side Promo Card (4 Cols on LG - Halodoc Pattern) ──────────────── */}
+          <div className="lg:col-span-4 rounded-3xl p-6 sm:p-7 bg-gradient-to-br from-blue-900 via-blue-950 to-teal-950 text-white border border-blue-800/40 shadow-xl flex flex-col justify-between relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute -top-10 -right-10 w-36 h-36 bg-teal-500/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
-            {heroData.subtitle}
-          </p>
+            {/* Top Side Content */}
+            <div className="relative z-10 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-400/30 uppercase tracking-wider">
+                  Skrining Mandiri
+                </span>
+                <span className="text-[11px] text-slate-400">⏱️ Cuma 2 Menit</span>
+              </div>
 
-          {/* CTA Buttons Group */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to={heroData.ctaPrimary.path}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-base rounded-2xl shadow-xl shadow-blue-600/25 hover:shadow-2xl hover:shadow-blue-600/35 hover:-translate-y-0.5 active:translate-y-0 transition-all group"
-            >
-              <span>{heroData.ctaPrimary.label}</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-white/20 rounded-full text-white/95">
-                {heroData.ctaPrimary.badge}
-              </span>
-            </Link>
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                Cek Status Gizi & Risiko Stunting Balita
+              </h3>
 
-            <Link
-              to={heroData.ctaSecondary.path}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-base rounded-2xl border border-slate-200 shadow-sm hover:shadow transition-all"
-            >
-              <PlayCircle className="w-5 h-5 text-slate-500" />
-              <span>{heroData.ctaSecondary.label}</span>
-            </Link>
-          </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Kalkulasi otomatis indeks antropometri WHO, inferensi Naïve Bayes, serta rekomendasi pangan lokal Bontang seketika.
+              </p>
 
-          {/* Quick Trust Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-slate-500">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              Bebas Registrasi / Tanpa Password
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              Kalkulasi Standar Deviasi WHO 2006
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              Data Tersimpan Aman di Perangkat
-            </span>
+              {/* Verified Trust Points */}
+              <div className="space-y-2 pt-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                  <span>Gratis & Tanpa Perlu Login / Akun</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                  <span>Kalkulasi Z-Score TB/U, BB/U, BB/TB</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                  <span>Penyimpanan Aman & Dukungan Offline</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Side Card Action Button */}
+            <div className="relative z-10 pt-5 mt-4 border-t border-white/10">
+              <Link
+                to="/questionnaire"
+                className="w-full py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm text-center text-slate-900 bg-gradient-to-r from-teal-300 to-emerald-300 hover:from-teal-200 hover:to-emerald-200 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
+              >
+                <span>Mulai Skrining Sekarang</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* 4 Feature Highlights Grid Cards */}
-        <div className="mt-14 sm:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {heroData.statsHighlights.map((stat, index) => (
+        {/* ──────────────── 3. Quick Stats Ribbon (Halodoc Summary Bar) ──────────────── */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {mockData.landingPage.heroSection.statsHighlights.map((stat, idx) => (
             <div
-              key={index}
-              className="glass-card glass-card-hover rounded-2xl p-5 sm:p-6 flex flex-col justify-between"
+              key={idx}
+              className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  {stat.label}
-                </span>
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 shadow-sm">
-                  {statIcons[index % statIcons.length]}
-                </div>
-              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                {stat.label}
+              </span>
               <div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">
+                <div className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                   {stat.value}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500">
+                </div>
+                <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
                   {stat.desc}
-                </p>
+                </div>
               </div>
             </div>
           ))}

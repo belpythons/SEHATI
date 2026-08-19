@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
@@ -63,6 +63,7 @@ const INITIAL_FORM_DATA: ScreeningFormData = {
 
 export const QuestionnairePage: React.FC = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [step, setStep] = useState<number>(1)
   const [formData, setFormData] = useState<ScreeningFormData>(INITIAL_FORM_DATA)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -70,13 +71,18 @@ export const QuestionnairePage: React.FC = () => {
   const [hasDraftAvailable, setHasDraftAvailable] = useState<boolean>(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  // Check for saved offline draft on mount
+  // Check for persona passed from Landing Page & saved offline draft on mount
   useEffect(() => {
+    const incomingPersona = location.state?.selectedPersona as PersonaType | undefined
+    if (incomingPersona && ['ORANG_TUA', 'KADER_POSYANDU', 'SURVEYOR'].includes(incomingPersona)) {
+      setFormData((prev) => ({ ...prev, persona: incomingPersona }))
+    }
+
     const draft = screeningService.loadDraft()
     if (draft && (draft.kelurahan || draft.ageMonths !== '' || draft.weightKg !== '')) {
       setHasDraftAvailable(true)
     }
-  }, [])
+  }, [location.state])
 
   const updateField = <K extends keyof ScreeningFormData>(key: K, value: ScreeningFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }))

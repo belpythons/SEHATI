@@ -36,12 +36,12 @@ export const PersonaPreviewSection: React.FC = () => {
         </div>
 
         {/* 3 Persona Cards (Halodoc Selection Card Pattern) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {personaOptions.map((persona) => (
             <div
               key={persona.id}
               onClick={() => handleSelectPersona(persona.id)}
-              className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
+              className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">

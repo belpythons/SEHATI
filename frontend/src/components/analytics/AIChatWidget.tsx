@@ -20,7 +20,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-blue-950 to-teal-950 text-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
+    <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-blue-950 to-teal-950 text-white rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden">
       {/* Decorative background glows */}
       <div className="absolute -top-12 -right-12 w-36 h-36 bg-teal-500/15 rounded-full blur-2xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
@@ -28,16 +28,16 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
 
       {/* Header — HILDA-style: Avatar + Name + Badge */}
       <div className="flex items-center justify-between mb-3 relative z-10">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Avatar bulat */}
           <img
             src="/icons/chat-avatar-64.png"
             alt="HATI"
-            className="w-11 h-11 rounded-full shadow-lg ring-2 ring-teal-400/30"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg ring-2 ring-teal-400/30 shrink-0"
           />
           <div>
             <h3
-              className="font-extrabold text-xl tracking-tight leading-none"
+              className="font-extrabold text-lg sm:text-xl tracking-tight leading-none"
               style={{
                 background: 'linear-gradient(135deg, #93c5fd, #5eead4)',
                 WebkitBackgroundClip: 'text',
@@ -46,7 +46,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
             >
               HATI
             </h3>
-            <p className="text-[11px] text-slate-300/80 flex items-center gap-1 mt-0.5">
+            <p className="text-[10px] sm:text-[11px] text-slate-300/80 flex items-center gap-1 mt-0.5">
               <span>by</span>
               <img src="/icons/sehati-simbol-navbar.png" alt="" className="w-3.5 h-3.5" />
               <span className="font-semibold text-slate-200">SEHATI</span>
@@ -55,7 +55,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
           </div>
         </div>
 
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30 flex items-center gap-1">
+        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30 flex items-center gap-1 shrink-0">
           <Sparkles className="w-3 h-3 text-amber-300" />
           <span>Gemini 2.5 Flash</span>
         </span>
@@ -80,7 +80,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
           <button
             type="button"
             onClick={handleOpenChat}
-            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30"
+            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 min-h-[42px]"
             style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
           >
             <MessageSquare className="w-4 h-4" />

@@ -64,11 +64,11 @@ export const FeatureHighlightsGrid: React.FC = () => {
         </div>
 
         {/* 3 Grid Cards (Halodoc Card Layout Pattern) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {features.map((feature) => (
             <div
               key={feature.id}
-              className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-teal-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+              className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-teal-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
             >
               <div className="space-y-4">
                 {/* Header Badge & Icon */}

@@ -151,15 +151,15 @@ export const HeroSection: React.FC = () => {
                 </div>
 
                 {/* Top Content */}
-                <div className="relative z-10 space-y-4 max-w-2xl">
+                <div className="relative z-10 space-y-3 sm:space-y-4 max-w-2xl">
                   {/* Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-teal-200 shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] sm:text-xs font-semibold text-teal-200 shadow-sm">
                     {slide.badgeIcon}
                     <span>{slide.badgeText}</span>
                   </div>
 
                   {/* Headline */}
-                  <h1 className="text-2xl sm:text-4xl lg:text-4xl font-extrabold tracking-tight leading-[1.2]">
+                  <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-[1.2]">
                     {slide.title}{' '}
                     <span
                       style={{
@@ -179,11 +179,11 @@ export const HeroSection: React.FC = () => {
                 </div>
 
                 {/* Bottom CTA & Metric Footer */}
-                <div className="relative z-10 pt-6 mt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-3">
+                <div className="relative z-10 pt-4 sm:pt-6 mt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                     <Link
                       to={slide.ctaPath}
-                      className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer active:scale-95"
+                      className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-white font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer active:scale-95 text-center min-h-[42px]"
                       style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
                     >
                       <span>{slide.ctaText}</span>
@@ -193,7 +193,7 @@ export const HeroSection: React.FC = () => {
                     {slide.secondaryCtaText && (
                       <Link
                         to={slide.secondaryCtaPath || '#'}
-                        className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-semibold transition-colors border border-white/15"
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-semibold transition-colors border border-white/15 text-center min-h-[42px]"
                       >
                         <PlayCircle className="w-4 h-4 text-teal-300" />
                         <span>{slide.secondaryCtaText}</span>

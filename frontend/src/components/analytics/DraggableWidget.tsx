@@ -39,9 +39,10 @@ export const DraggableWidget: React.FC<Props> = ({ id, children, span = 'col-spa
         type="button"
         {...attributes}
         {...listeners}
+        style={{ touchAction: 'none' }}
         aria-label="Geser posisi widget"
         title="Tahan dan geser untuk mengatur tata letak widget"
-        className="absolute top-3 right-3 z-20 p-1.5 rounded-lg bg-slate-100/90 text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-grab active:cursor-grabbing backdrop-blur-xs"
+        className="absolute top-3 right-3 z-20 p-1.5 rounded-lg bg-slate-100/95 text-slate-500 sm:text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 cursor-grab active:cursor-grabbing backdrop-blur-xs shadow-xs"
       >
         <GripVertical className="w-3.5 h-3.5" />
       </button>

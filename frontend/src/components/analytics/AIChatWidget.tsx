@@ -1,14 +1,23 @@
 import React from 'react'
 import { ScreeningRecord } from '../../types/screening'
-import { Sparkles, MessageSquare, ChevronRight, Lock } from 'lucide-react'
+import { Sparkles, MessageSquare, ChevronRight } from 'lucide-react'
+import { useChatDrawer } from '../chat/ChatDrawerContext'
 
 interface Props {
   record?: ScreeningRecord | null
-  onOpenChat: () => void
 }
 
-export const AIChatWidget: React.FC<Props> = ({ record, onOpenChat }) => {
+export const AIChatWidget: React.FC<Props> = ({ record }) => {
+  const { openChat } = useChatDrawer()
   const hasSession = Boolean(record?.sessionId)
+
+  const handleOpenChat = () => {
+    if (hasSession && record) {
+      openChat('personal', record)
+    } else {
+      openChat('umum')
+    }
+  }
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-blue-950 to-teal-950 text-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
@@ -55,42 +64,28 @@ export const AIChatWidget: React.FC<Props> = ({ record, onOpenChat }) => {
       {/* Body Content */}
       <div className="relative z-10 flex-1 flex flex-col justify-between">
         <p className="text-xs text-slate-200 leading-relaxed my-2">
-          Diskusikan hasil antropometri balita ({record?.heightCm ?? '-'} cm / {record?.weightKg ?? '-'} kg) dan tanyakan resep MPASI pangan lokal Bontang secara interaktif.
+          {hasSession
+            ? `Diskusikan hasil antropometri balita (${record?.heightCm ?? '-'} cm / ${record?.weightKg ?? '-'} kg) dan tanyakan resep MPASI pangan lokal Bontang secara interaktif.`
+            : 'Tanyakan apa saja seputar gizi anak & pencegahan stunting. Lakukan skrining untuk rekomendasi yang dipersonalisasi.'}
         </p>
 
         <div className="space-y-2 mt-2">
           <div className="bg-white/10 backdrop-blur-xs border border-white/10 rounded-xl p-2.5 text-xs text-slate-200">
             <span className="text-teal-300 font-semibold">Topik Rekomendasi: </span>
-            &quot;Bagaimana takaran porsi ikan bawis &amp; daun kelor untuk balita {record?.ageMonths ?? 18} bulan?&quot;
+            {hasSession
+              ? `"Bagaimana takaran porsi ikan bawis & daun kelor untuk balita ${record?.ageMonths ?? 18} bulan?"`
+              : '"Apa itu stunting dan bagaimana cara pencegahannya?"'}
           </div>
 
           <button
             type="button"
-            disabled={!hasSession}
-            onClick={onOpenChat}
-            className={`w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
-              hasSession
-                ? 'text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30'
-                : 'bg-white/20 text-slate-400 cursor-not-allowed'
-            }`}
-            style={
-              hasSession
-                ? { background: 'linear-gradient(135deg, #1e40af, #0d9488)' }
-                : undefined
-            }
+            onClick={handleOpenChat}
+            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30"
+            style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
           >
-            {hasSession ? (
-              <>
-                <MessageSquare className="w-4 h-4" />
-                <span>Buka Konsultasi Chat AI</span>
-                <ChevronRight className="w-4 h-4 ml-auto" />
-              </>
-            ) : (
-              <>
-                <Lock className="w-4 h-4 text-slate-400" />
-                <span>Selesaikan skrining untuk membuka chat</span>
-              </>
-            )}
+            <MessageSquare className="w-4 h-4" />
+            <span>{hasSession ? 'Buka Konsultasi Chat AI' : 'Tanya HATI — Mode Edukasi'}</span>
+            <ChevronRight className="w-4 h-4 ml-auto" />
           </button>
         </div>
       </div>

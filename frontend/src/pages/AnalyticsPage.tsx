@@ -37,7 +37,6 @@ import { ShareableLinkWidget } from '../components/analytics/ShareableLinkWidget
 import { AIChatWidget } from '../components/analytics/AIChatWidget'
 import { DraggableWidget } from '../components/analytics/DraggableWidget'
 import { WidgetErrorBoundary } from '../components/analytics/WidgetErrorBoundary'
-import { AIChatDrawer } from '../components/chat/AIChatDrawer'
 
 const DEFAULT_WIDGET_ORDER = [
   'growth-chart',
@@ -56,7 +55,6 @@ export const AnalyticsPage: React.FC = () => {
   const [record, setRecord] = useState<ScreeningRecord | null>(null)
   const [dataSource, setDataSource] = useState<'live' | 'mock'>('mock')
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false)
 
   // Configure drag and drop sensors
   const sensors = useSensors(
@@ -206,7 +204,7 @@ export const AnalyticsPage: React.FC = () => {
         return (
           <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
             <WidgetErrorBoundary widgetName="AI Chat">
-              <AIChatWidget record={record} onOpenChat={() => setIsChatOpen(true)} />
+              <AIChatWidget record={record} />
             </WidgetErrorBoundary>
           </DraggableWidget>
         )
@@ -360,12 +358,7 @@ export const AnalyticsPage: React.FC = () => {
         </DndContext>
       </main>
 
-      {/* Floating AI Chat Drawer */}
-      <AIChatDrawer
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        record={record}
-      />
+      {/* AIChatDrawer is now mounted globally at App level via ChatDrawerContext */}
     </div>
   )
 }

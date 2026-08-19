@@ -11,14 +11,20 @@ import {
   Fish,
   TrendingUp,
   Building2,
+  HelpCircle,
+  AlertTriangle,
+  Ruler,
+  FlaskConical,
 } from 'lucide-react'
 import { ScreeningRecord } from '../../types/screening'
 import { chatService } from '../../services/chatService'
+import { ChatMode } from './ChatDrawerContext'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
   record: ScreeningRecord | null
+  mode?: ChatMode
 }
 
 interface ChatMessage {
@@ -31,7 +37,9 @@ interface ChatMessage {
 
 const MAX_INPUT_LENGTH = 500
 
-const QUICK_PROMPT_CHIPS = [
+// ────────────── Quick Prompt Chips per Mode ──────────────
+
+const PERSONAL_CHIPS = [
   {
     icon: Fish,
     label: 'Resep Ikan Bawis',
@@ -49,41 +57,133 @@ const QUICK_PROMPT_CHIPS = [
   },
 ]
 
-export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
+const UMUM_CHIPS = [
+  {
+    icon: HelpCircle,
+    label: 'Apa itu stunting?',
+    query: 'Apa itu stunting dan apa penyebab utamanya?',
+  },
+  {
+    icon: AlertTriangle,
+    label: 'Tanda-tanda awal',
+    query: 'Apa saja tanda-tanda awal stunting yang perlu diwaspadai orang tua?',
+  },
+  {
+    icon: Ruler,
+    label: 'Cara cek status gizi',
+    query: 'Bagaimana cara mengecek status gizi anak dan menginterpretasi Z-Score?',
+  },
+]
+
+// ────────────── Greeting Generators ──────────────
+
+function buildPersonalGreeting(record: ScreeningRecord): string {
+  const zScore = record.zScore ?? -1.5
+  const status = record.statusGiziTBU || (zScore < -2 ? 'Pendek' : 'Normal')
+  return (
+    `Halo! Saya **HATI** — Asisten Nutrisi Terpadu SEHATI (didukung Gemini 2.5 Flash).\n\n` +
+    `Saya telah mempelajari data antropometri balita Anda:\n` +
+    `• **Domisili:** Kelurahan ${record.kelurahan || 'Bontang'}\n` +
+    `• **Usia & Gender:** ${record.ageMonths} Bulan (${record.gender === 'L' ? 'Laki-laki' : 'Perempuan'})\n` +
+    `• **Status Antropometri:** ${record.heightCm} cm / ${record.weightKg} kg (Z-Score TB/U: ${zScore} SD — ${status})\n` +
+    `• **Tingkat Risiko:** ${record.riskTier || 'MODERATE'}\n\n` +
+    `Ada yang ingin Anda tanyakan seputar menu pangan lokal Bontang (Ikan Bawis/Bandeng), jadwal Posyandu, atau nutrisi harian?`
+  )
+}
+
+function buildUmumGreeting(): string {
+  return (
+    `Halo! Saya **HATI** — Asisten Gizi AI dari SEHATI, platform deteksi dini & pencegahan stunting Kota Bontang.\n\n` +
+    `Tanyakan apa saja seputar **gizi anak & pencegahan stunting** secara umum. Beberapa topik yang bisa saya bantu:\n` +
+    `• Apa itu stunting & penyebabnya\n` +
+    `• Tanda-tanda awal yang perlu diwaspadai\n` +
+    `• Cara mengecek status gizi anak\n` +
+    `• Panduan MPASI & nutrisi harian\n\n` +
+    `💡 Untuk rekomendasi yang **dipersonalisasi** ke kondisi anak Anda, lakukan skrining antropometri terlebih dahulu melalui menu "Mulai Skrining".`
+  )
+}
+
+// ════════════════════════════════════════════════════════════
+//  Component
+// ════════════════════════════════════════════════════════════
+
+export const AIChatDrawer: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  record,
+  mode = 'personal',
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputQuery, setInputQuery] = useState<string>('')
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
   const abortControllerRef = useRef<AbortController | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Verify that sessionId is present (strictly required by chat.controller.ts)
+  const isUmum = mode === 'umum'
   const sessionId = record?.sessionId
   const hasValidSession = Boolean(sessionId && sessionId.trim() !== '')
+  const chips = isUmum ? UMUM_CHIPS : PERSONAL_CHIPS
 
-  // Initialize initial contextual greeting when drawer opens
+  // ──────────────────────────────────────────────────────────
+  // EFFECT 1: Reset messages when mode OR session context changes.
+  //
+  // ⚠️ ORDERING CRITICAL — this effect MUST be defined BEFORE
+  //    the greeting injection effect (Effect 2) below, so that
+  //    React executes reset first, then greeting injection sees
+  //    messages.length === 0 and injects the new greeting.
+  // ──────────────────────────────────────────────────────────
+  const prevModeRef = useRef<ChatMode | undefined>(mode)
+  const prevSessionIdRef = useRef<string | undefined>(record?.sessionId)
+
   useEffect(() => {
-    if (isOpen && messages.length === 0 && record && hasValidSession) {
-      const zScore = record.zScore ?? -1.5
-      const status = record.statusGiziTBU || (zScore < -2 ? 'Pendek' : 'Normal')
-      const initialGreeting =
-        `Halo! Saya **HATI** — Asisten Nutrisi Terpadu SEHATI (didukung Gemini 2.5 Flash).\n\n` +
-        `Saya telah mempelajari data antropometri balita Anda:\n` +
-        `• **Domisili:** Kelurahan ${record.kelurahan || 'Bontang'}\n` +
-        `• **Usia & Gender:** ${record.ageMonths} Bulan (${record.gender === 'L' ? 'Laki-laki' : 'Perempuan'})\n` +
-        `• **Status Antropometri:** ${record.heightCm} cm / ${record.weightKg} kg (Z-Score TB/U: ${zScore} SD — ${status})\n` +
-        `• **Tingkat Risiko:** ${record.riskTier || 'MODERATE'}\n\n` +
-        `Ada yang ingin Anda tanyakan seputar menu pangan lokal Bontang (Ikan Bawis/Bandeng), jadwal Posyandu, atau nutrisi harian?`
+    const modeChanged = prevModeRef.current !== mode
+    const sessionChanged = prevSessionIdRef.current !== record?.sessionId
 
+    if (modeChanged || sessionChanged) {
+      // Abort any active streaming
+      abortControllerRef.current?.abort()
+      setIsStreaming(false)
+      // Clear messages — greeting effect (below) will re-inject fresh greeting
+      setMessages([])
+      setInputQuery('')
+
+      // Update refs to current values
+      prevModeRef.current = mode
+      prevSessionIdRef.current = record?.sessionId
+    }
+  }, [mode, record?.sessionId])
+
+  // ──────────────────────────────────────────────────────────
+  // EFFECT 2: Inject initial greeting when drawer opens with
+  //           empty messages (either first open, or after reset).
+  //
+  //           Runs AFTER Effect 1 due to definition order.
+  // ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen || messages.length > 0) return
+
+    let greetingText: string | null = null
+
+    if (isUmum) {
+      // Mode Umum — always has greeting, no session required
+      greetingText = buildUmumGreeting()
+    } else if (record && hasValidSession) {
+      // Mode Personal — needs valid session + record
+      greetingText = buildPersonalGreeting(record)
+    }
+    // If mode='personal' but no session → no greeting (locked state shows instead)
+
+    if (greetingText) {
       setMessages([
         {
           id: 'msg-init',
           sender: 'bot',
-          text: initialGreeting,
+          text: greetingText,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ])
     }
-  }, [isOpen, record, hasValidSession, messages.length])
+  }, [isOpen, messages.length, isUmum, record, hasValidSession])
 
   // Auto-scroll to bottom on message update
   useEffect(() => {
@@ -97,9 +197,15 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
     }
   }, [])
 
+  // ──────────────────────────────────────────────────────────
+  // Send Message Handler — routes to correct service per mode
+  // ──────────────────────────────────────────────────────────
   const handleSendMessage = async (queryText?: string) => {
     const textToSend = (queryText || inputQuery).trim()
-    if (!textToSend || isStreaming || !sessionId) return
+    if (!textToSend || isStreaming) return
+
+    // Mode Personal requires sessionId
+    if (!isUmum && !sessionId) return
 
     setInputQuery('')
 
@@ -126,10 +232,7 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
 
     abortControllerRef.current = new AbortController()
 
-    await chatService.streamChat({
-      sessionId,
-      query: textToSend,
-      record,
+    const streamCallbacks = {
       signal: abortControllerRef.current.signal,
       onChunk: (chunk: string) => {
         setMessages((prev) =>
@@ -167,7 +270,23 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
           )
         )
       },
-    })
+    }
+
+    if (isUmum) {
+      // Mode Umum — local mock, NEVER calls backend
+      await chatService.streamChatUmum({
+        query: textToSend,
+        ...streamCallbacks,
+      })
+    } else {
+      // Mode Personal — existing chatService (unchanged)
+      await chatService.streamChat({
+        sessionId: sessionId!,
+        query: textToSend,
+        record,
+        ...streamCallbacks,
+      })
+    }
   }
 
   const handleStopStreaming = () => {
@@ -182,6 +301,9 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
     handleStopStreaming()
     setMessages([])
   }
+
+  // Determine if chat body should show (Mode Umum always shows; Personal needs session)
+  const showChatBody = isUmum || hasValidSession
 
   return (
     <AnimatePresence>
@@ -245,6 +367,14 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
                   <span>Gemini 2.5 Flash</span>
                 </span>
 
+                {/* Mode Simulasi badge — Mode Umum only */}
+                {isUmum && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                    <FlaskConical className="w-3 h-3 text-amber-500" />
+                    <span>Mode Simulasi</span>
+                  </span>
+                )}
+
                 {messages.length > 0 && (
                   <button
                     type="button"
@@ -267,8 +397,8 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
             </div>
 
             {/* ──────────────── Main Chat Body ──────────────── */}
-            {!hasValidSession ? (
-              // LOCKED STATE: sessionId is missing
+            {!showChatBody ? (
+              // LOCKED STATE: Mode Personal without sessionId (edge case)
               <div className="flex-1 p-8 flex flex-col items-center justify-center text-center bg-slate-50">
                 <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 border border-amber-100">
                   <Lock className="w-7 h-7" />
@@ -297,7 +427,9 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
                   {messages.length <= 1 && (
                     <div className="mx-0 mb-2 px-3.5 py-3 rounded-xl border border-teal-100/80 bg-gradient-to-r from-blue-50/80 to-teal-50/80">
                       <p className="text-[11px] text-slate-600 leading-relaxed">
-                        💡 Konsultasi berdasarkan hasil skrining kamu, tanyakan apa saja seputar tumbuh kembang si kecil.
+                        {isUmum
+                          ? '🌍 Mode Edukasi Umum — Tanyakan apa saja seputar gizi & stunting. Untuk rekomendasi personal, lakukan skrining terlebih dahulu.'
+                          : '💡 Konsultasi berdasarkan hasil skrining kamu, tanyakan apa saja seputar tumbuh kembang si kecil.'}
                       </p>
                     </div>
                   )}
@@ -369,7 +501,7 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
                       Saran Pertanyaan Cepat:
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {QUICK_PROMPT_CHIPS.map((chip, idx) => {
+                      {chips.map((chip, idx) => {
                         const Icon = chip.icon
                         return (
                           <button
@@ -393,7 +525,9 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
                     <div className="flex items-center justify-between mb-2 px-1">
                       <span className="text-[11px] text-teal-600 font-medium flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-teal-500 animate-ping" />
-                        Streaming respon Gemini AI aktif...
+                        {isUmum
+                          ? 'Menyusun jawaban edukasi...'
+                          : 'Streaming respon Gemini AI aktif...'}
                       </span>
                       <button
                         type="button"
@@ -424,7 +558,11 @@ export const AIChatDrawer: React.FC<Props> = ({ isOpen, onClose, record }) => {
                         }}
                         disabled={isStreaming}
                         maxLength={MAX_INPUT_LENGTH}
-                        placeholder="Tanyakan seputar gizi & tumbuh kembang anak..."
+                        placeholder={
+                          isUmum
+                            ? 'Tanyakan seputar gizi & pencegahan stunting...'
+                            : 'Tanyakan seputar gizi & tumbuh kembang anak...'
+                        }
                         className="w-full px-4 py-2.5 pr-14 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-300 transition-all disabled:bg-slate-50 disabled:text-slate-400 bg-slate-50/50"
                       />
                       {/* Character counter */}

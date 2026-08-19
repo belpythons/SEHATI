@@ -197,6 +197,19 @@ export const AIChatDrawer: React.FC<Props> = ({
     }
   }, [])
 
+  // Close drawer on Escape key press
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
   // ──────────────────────────────────────────────────────────
   // Send Message Handler — routes to correct service per mode
   // ──────────────────────────────────────────────────────────
@@ -260,12 +273,12 @@ export const AIChatDrawer: React.FC<Props> = ({
           prev.map((msg) =>
             msg.id === botMessageId
               ? {
-                  ...msg,
-                  text:
-                    msg.text ||
-                    'Maaf, terjadi kendala saat menyusun jawaban. Silakan ulangi pertanyaan Anda.',
-                  isStreaming: false,
-                }
+                ...msg,
+                text:
+                  msg.text ||
+                  'Maaf, terjadi kendala saat menyusun jawaban. Silakan ulangi pertanyaan Anda.',
+                isStreaming: false,
+              }
               : msg
           )
         )
@@ -320,6 +333,9 @@ export const AIChatDrawer: React.FC<Props> = ({
 
           {/* Drawer Panel — Fullscreen on mobile (<640px), bottom-right card on tablet/desktop */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Asisten Konsultasi Gizi HATI"
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
@@ -380,7 +396,8 @@ export const AIChatDrawer: React.FC<Props> = ({
                     type="button"
                     onClick={handleResetChat}
                     title="Mulai Ulang Percakapan"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    aria-label="Mulai Ulang Percakapan"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
@@ -389,7 +406,8 @@ export const AIChatDrawer: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  aria-label="Tutup Konsultasi Chat"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -456,11 +474,10 @@ export const AIChatDrawer: React.FC<Props> = ({
 
                         {/* Message Bubble */}
                         <div
-                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm whitespace-pre-line ${
-                            isBot
+                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm whitespace-pre-line ${isBot
                               ? 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none'
                               : 'text-white rounded-tr-none'
-                          }`}
+                            }`}
                           style={
                             !isBot
                               ? { background: 'linear-gradient(135deg, #1e40af, #0d9488)' }
@@ -481,9 +498,8 @@ export const AIChatDrawer: React.FC<Props> = ({
                           )}
 
                           <span
-                            className={`block text-[9px] mt-1.5 ${
-                              isBot ? 'text-slate-400' : 'text-blue-200 text-right'
-                            }`}
+                            className={`block text-[9px] mt-1.5 ${isBot ? 'text-slate-400' : 'text-blue-200 text-right'
+                              }`}
                           >
                             {msg.timestamp}
                           </span>
@@ -508,7 +524,7 @@ export const AIChatDrawer: React.FC<Props> = ({
                             key={idx}
                             type="button"
                             onClick={() => handleSendMessage(chip.query)}
-                            className="px-3 py-1.5 rounded-full bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-teal-50 border border-slate-200 hover:border-teal-200 text-[11px] font-medium text-slate-600 hover:text-teal-700 transition-all flex items-center gap-1.5 cursor-pointer text-left shadow-sm hover:shadow"
+                            className="px-3 py-1.5 rounded-full bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-teal-50 border border-slate-200 hover:border-teal-200 text-[11px] font-medium text-slate-600 hover:text-teal-700 transition-all flex items-center gap-1.5 cursor-pointer text-left shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                           >
                             <Icon className="w-3.5 h-3.5 text-teal-500 shrink-0" />
                             <span>{chip.label}</span>
@@ -532,7 +548,7 @@ export const AIChatDrawer: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={handleStopStreaming}
-                        className="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                        className="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                       >
                         <Square className="w-3 h-3 fill-slate-700" />
                         <span>Hentikan</span>
@@ -567,11 +583,10 @@ export const AIChatDrawer: React.FC<Props> = ({
                       />
                       {/* Character counter */}
                       <span
-                        className={`absolute right-3 bottom-2.5 text-[9px] font-medium transition-colors ${
-                          inputQuery.length > MAX_INPUT_LENGTH * 0.9
+                        className={`absolute right-3 bottom-2.5 text-[9px] font-medium transition-colors ${inputQuery.length > MAX_INPUT_LENGTH * 0.9
                             ? 'text-amber-500'
                             : 'text-slate-300'
-                        }`}
+                          }`}
                       >
                         {inputQuery.length}/{MAX_INPUT_LENGTH}
                       </span>
@@ -580,8 +595,9 @@ export const AIChatDrawer: React.FC<Props> = ({
                     {/* Send button — gradient circle (HILDA pattern) */}
                     <button
                       type="submit"
+                      aria-label="Kirim Pertanyaan"
                       disabled={!inputQuery.trim() || isStreaming}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all cursor-pointer shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none shrink-0"
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all cursor-pointer shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
                       style={{
                         background:
                           !inputQuery.trim() || isStreaming

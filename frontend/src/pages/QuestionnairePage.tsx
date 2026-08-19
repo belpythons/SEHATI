@@ -434,10 +434,12 @@ export const QuestionnairePage: React.FC = () => {
                     ].map((p) => {
                       const isSelected = formData.persona === p.value
                       return (
-                        <div
+                        <button
                           key={p.value}
+                          type="button"
                           onClick={() => updateField('persona', p.value as PersonaType)}
-                          className={`cursor-pointer rounded-xl p-4 border-2 transition-all ${
+                          aria-pressed={isSelected}
+                          className={`text-left cursor-pointer rounded-xl p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                             isSelected
                               ? 'border-blue-600 bg-blue-50/50 shadow-sm'
                               : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -452,7 +454,7 @@ export const QuestionnairePage: React.FC = () => {
                             )}
                           </div>
                           <p className="text-xs text-slate-500 mt-1">{p.desc}</p>
-                        </div>
+                        </button>
                       )
                     })}
                   </div>
@@ -513,17 +515,19 @@ export const QuestionnairePage: React.FC = () => {
                       ].map((g) => {
                         const isSelected = formData.gender === g.value
                         return (
-                          <div
+                          <button
                             key={g.value}
+                            type="button"
                             onClick={() => updateField('gender', g.value as GenderType)}
-                            className={`cursor-pointer rounded-xl p-3 text-center border-2 transition-all font-medium text-sm ${
+                            aria-pressed={isSelected}
+                            className={`cursor-pointer rounded-xl p-3 text-center border-2 transition-all font-medium text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                               isSelected
                                 ? 'border-blue-600 bg-blue-50/50 text-blue-700 font-semibold'
-                                : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                                : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                             }`}
                           >
                             {g.label}
-                          </div>
+                          </button>
                         )
                       })}
                     </div>
@@ -572,20 +576,22 @@ export const QuestionnairePage: React.FC = () => {
                     ].map((pos) => {
                       const isSelected = formData.measurementPosition === pos.value
                       return (
-                        <div
+                        <button
                           key={pos.value}
+                          type="button"
                           onClick={() =>
                             updateField('measurementPosition', pos.value as MeasurementPositionType)
                           }
-                          className={`cursor-pointer rounded-xl p-3 border-2 transition-all ${
+                          aria-pressed={isSelected}
+                          className={`text-left cursor-pointer rounded-xl p-3 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                             isSelected
-                              ? 'border-blue-600 bg-blue-50/50 text-blue-700'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                              ? 'border-blue-600 bg-blue-50/50 text-blue-700 font-semibold'
+                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                           }`}
                         >
                           <div className="font-semibold text-sm">{pos.label}</div>
                           <div className="text-xs text-slate-500 mt-0.5">{pos.desc}</div>
-                        </div>
+                        </button>
                       )
                     })}
                   </div>
@@ -711,7 +717,8 @@ export const QuestionnairePage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => updateField(q.key, true)}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                            aria-pressed={value === true}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                               value === true
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                                 : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
@@ -722,7 +729,8 @@ export const QuestionnairePage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => updateField(q.key, false)}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                            aria-pressed={value === false}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                               value === false
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                                 : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
@@ -760,7 +768,8 @@ export const QuestionnairePage: React.FC = () => {
                           key={item.q}
                           type="button"
                           onClick={() => updateField('economicQuintile', item.q)}
-                          className={`py-2 px-1 rounded-xl text-center border-2 transition-all text-xs font-semibold ${
+                          aria-pressed={isSelected}
+                          className={`py-2 px-1 rounded-xl text-center border-2 transition-all text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                             isSelected
                               ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
                               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'

@@ -225,7 +225,7 @@ export const HeroSection: React.FC = () => {
                     type="button"
                     onClick={() => setCurrentSlide(idx)}
                     aria-label={`Pindah ke slide ${idx + 1}`}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                       idx === currentSlide
                         ? 'w-6 bg-teal-400'
                         : 'w-2 bg-white/30 hover:bg-white/50'
@@ -239,7 +239,7 @@ export const HeroSection: React.FC = () => {
                 type="button"
                 onClick={prevSlide}
                 aria-label="Slide Sebelumnya"
-                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
+                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -247,7 +247,7 @@ export const HeroSection: React.FC = () => {
                 type="button"
                 onClick={nextSlide}
                 aria-label="Slide Selanjutnya"
-                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
+                className="w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

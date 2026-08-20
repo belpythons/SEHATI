@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { screeningController } from "../controllers/screening.controller";
+import { submitScreening } from "../controllers/screening.controller";
 
 const router = Router();
 
-router.post("/submit", screeningController.submit);
+// Post /api/v1/ning/submit
+router.post("/submit", submitScreening );
 
 export default router;

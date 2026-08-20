@@ -475,8 +475,8 @@ export const AIChatDrawer: React.FC<Props> = ({
                         {/* Message Bubble */}
                         <div
                           className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm whitespace-pre-line ${isBot
-                              ? 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none'
-                              : 'text-white rounded-tr-none'
+                            ? 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none'
+                            : 'text-white rounded-tr-none'
                             }`}
                           style={
                             !isBot
@@ -584,8 +584,8 @@ export const AIChatDrawer: React.FC<Props> = ({
                       {/* Character counter */}
                       <span
                         className={`absolute right-3 bottom-2.5 text-[9px] font-medium transition-colors ${inputQuery.length > MAX_INPUT_LENGTH * 0.9
-                            ? 'text-amber-500'
-                            : 'text-slate-300'
+                          ? 'text-amber-500'
+                          : 'text-slate-300'
                           }`}
                       >
                         {inputQuery.length}/{MAX_INPUT_LENGTH}

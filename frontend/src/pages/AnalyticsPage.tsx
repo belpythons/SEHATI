@@ -347,9 +347,8 @@ export const AnalyticsPage: React.FC = () => {
               <div className="text-center px-1 sm:px-2">
                 <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">Z-Score TB/U</div>
                 <div
-                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${
-                    record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-600'
-                  }`}
+                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-600'
+                    }`}
                 >
                   {record.zScore > 0 ? `+${record.zScore}` : record.zScore} SD
                 </div>

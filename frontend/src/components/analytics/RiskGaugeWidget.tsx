@@ -35,6 +35,16 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
 
   const Icon = tierConfig.icon
 
+  const arcTooltipStyle: React.CSSProperties = {
+    zIndex: 9999,
+    fontSize: '12px',
+    fontWeight: 600,
+    padding: '6px 10px',
+    borderRadius: '8px',
+    boxShadow: '0 8px 20px -2px rgba(0, 0, 0, 0.25)',
+  }
+
+
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
       {/* Widget Header */}
@@ -78,19 +88,28 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
                   limit: 40,
                   color: '#10B981',
                   showTick: true,
-                  tooltip: { text: 'Risiko Rendah (0-40%)' },
+                  tooltip: {
+                    text: 'Risiko Rendah (0-40%)',
+                    style: arcTooltipStyle,
+                  },
                 },
                 {
                   limit: 70,
                   color: '#F59E0B',
                   showTick: true,
-                  tooltip: { text: 'Risiko Sedang (40-70%)' },
+                  tooltip: {
+                    text: 'Risiko Sedang (40-70%)',
+                    style: arcTooltipStyle,
+                  },
                 },
                 {
                   limit: 100,
                   color: '#EF4444',
                   showTick: true,
-                  tooltip: { text: 'Risiko Tinggi (70-100%)' },
+                  tooltip: {
+                    text: 'Risiko Tinggi (70-100%)',
+                    style: arcTooltipStyle,
+                  },
                 },
               ],
             }}

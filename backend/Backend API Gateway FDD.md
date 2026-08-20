@@ -32,25 +32,7 @@ generator client {
   provider \= "prisma-client-js"  
 }
 
-enum DataSourceType {  
-  PWA\_DIRECT\_USER  
-  RISKESDAS\_KEMENKES  
-  SURVEY\_CSV\_UPLOAD  
-  EXTERNAL\_HEALTH\_API  
-}
-
-model AnonymousSession {  
-  id               String            @id @default(uuid())  
-  clientToken      String            @unique  
-  persona          String            @default("ORANG\_TUA")  
-  createdAt        DateTime          @default(now())  
-  updatedAt        DateTime          @updatedAt  
-  screenings       ScreeningRecord\[\]
-
-  @@index(\[clientToken\])  
-}
-
-model ScreeningRecord {  
+enum DataSourceType {  model ScreeningRecord {  
   id               String            @id @default(uuid())  
   shareHash        String            @unique @default(nanoid(10))  
   sessionId        String  
@@ -85,6 +67,68 @@ model ScreeningRecord {
   @@index(\[shareHash\])  
   @@index(\[kelurahan\])  
   @@index(\[riskTier\])  
+}
+  PWA\_DIRECT\_USER  
+  RISKESDAS\_KEMENKES  
+  SURVEY\_CSV\_UPLOAD  
+  EXTERNAL\_HEALTH\_API  
+}
+
+model AnonymousSession {  
+  id               String            @id @default(uuid())  
+  clientToken      String            @unique  
+  persona          String            @default("ORANG\_TUA")  
+  createdAt        DateTime          @default(now())  
+  updatedAt        DateTime          @updatedAt  
+  screenings       ScreeningRecord\[\]
+
+  @@index(\[clientToken\])  
+}
+
+model ScreeningRecord {
+  id               String           @id @default(uuid())
+  shareHash        String           @unique @default(nanoid(10))
+  sessionId        String
+  session          AnonymousSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sourceType       DataSourceType   @default(PWA_DIRECT_USER)
+  sourceBatchId    String?
+  persona          String
+  kelurahan        String
+  ageMonths        Int
+  gender           String
+  weightKg         Float
+  heightCm         Float
+
+  zScore           Float            // Z-Score TB/U
+  zScoreWAZ        Float?           // Z-Score BB/U
+  zScoreWHZ        Float?           // Z-Score BB/TB
+  statusGiziTBU    String?          // Severely Stunted, Stunted, Normal, Tinggi
+  statusGiziBBU    String?          // Severely Underweight, Underweight, Normal, BB Lebih
+  statusGiziBBTB   String?          // Severely Wasted, Wasted, Normal, Risk Overweight, Overweight
+
+  bblrOption       Int              // 1=Normal (>=2500g), 2=BBLR (<2500g), 3=Tidak Tahu
+  exclusiveAsi     Int              // 1=ASI Eksklusif, 2=Tidak Eksklusif / Formula, 3=Belum 6 Bulan
+  mpasiAge         Int              // 1=<6 Bln (Dini), 2=Tepat 6 Bln, 3=>6 Bln (Terlambat), 4=Belum MPASI
+  animalProtein    Int[]            // Array [1=Ikan, 2=Telur, 3=Daging, 4=Susu, 5=Sangat Jarang]
+  cleanWaterAccess Int              // 1=Kemasan/Isi Ulang, 2=PDAM, 3=Sumur Bor, 4=Sumur Gali/Mata Air/Hujan
+  sanitationAccess Int              // 1=Milik Sendiri (Leher Angsa + Septic Tank), 2=Cemplung, 3=MCK Umum, 4=Tidak Memiliki
+  smokeExposure    Int              // 1=Bebas Asap Rokok, 2=Terpapar Asap Rokok
+  motherEducation  Int              // 1=Tidak Tamat/Tamat SD, 2=SMP, 3=SMA/SMK, 4=Diploma/Sarjana
+  economicQuintile Int              // 1=Kuintil 1, 2=Kuintil 2, 3=Kuintil 3, 4=Kuintil 4, 5=Kuintil 5
+  diarrheaHistory  Int              // 1=Tidak Pernah/1x Ringan, 2=Sering/Berulang (>=2x)
+  posyanduKia      Int              // 1=Rutin Posyandu + Ada KIA, 2=Kadang-kadang, 3=Tidak Pernah/Jarang
+
+  // Prediksi Risiko & Output AI
+  riskTier         String           // LOW, MODERATE, HIGH
+  riskScore        Float            // 0.0 - 1.0
+  dominantFactors  String[]
+  rawMetadata      Json?
+  createdAt        DateTime         @default(now())
+
+  @@index([sessionId])
+  @@index([shareHash])
+  @@index([kelurahan])
+  @@index([riskTier])
 }
 
 model HealthKnowledgeBase {  

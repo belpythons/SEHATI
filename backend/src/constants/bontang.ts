@@ -1,0 +1,17 @@
+export const kelurahanBontang = [
+  'Api-Api',
+  'Bontang Baru',
+  'Bontang Kuala',
+  'Guntung',
+  'Gunung Elai',
+  'Loktuan',
+  'Berbas Tengah',
+  'Berbas Pantai',
+  'Bontang Lestari',
+  'Satimpo',
+  'Tanjung Laut',
+  'Tanjung Laut Indah',
+  'Kanaan',
+  'Gunung Telihan',
+  'Belimbing',
+] as const;

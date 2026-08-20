@@ -1,7 +1,8 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useChatDrawer } from './ChatDrawerContext'
-import { ScreeningSubmitResponse } from '../../types/screening'
+import { ChatTeaserBubble } from './ChatTeaserBubble'
+import { getActiveScreeningSession } from './chatSessionHelper'
 
 /**
  * GlobalChatLauncher — Floating "HATI" chat button (HILDA Halodoc pattern).
@@ -24,26 +25,17 @@ export const GlobalChatLauncher: React.FC = () => {
       return
     }
 
-    // Detect mode based on sessionStorage
-    const cached = sessionStorage.getItem('sehati_active_screening')
-    if (cached) {
-      try {
-        const parsed: ScreeningSubmitResponse = JSON.parse(cached)
-        if (parsed.data?.sessionId) {
-          openChat('personal', parsed.data)
-          return
-        }
-      } catch {
-        // Parse failed — fallback to Mode Umum
-      }
-    }
-
-    // No active screening session → Mode Umum
-    openChat('umum')
+    // Detect mode based on sessionStorage safely
+    const { mode, record } = getActiveScreeningSession()
+    openChat(mode, record)
   }
 
   return (
-    <AnimatePresence>
+    <>
+      {/* Proactive Speech Bubble Teaser (Halodoc Pattern) */}
+      <ChatTeaserBubble />
+
+      <AnimatePresence>
       {/* Hide launcher button when drawer is open — the drawer itself
           has its own close button, and showing both would be redundant */}
       {!state.isOpen && (
@@ -154,5 +146,6 @@ export const GlobalChatLauncher: React.FC = () => {
         </motion.button>
       )}
     </AnimatePresence>
+    </>
   )
 }

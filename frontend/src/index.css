@@ -57,3 +57,10 @@
     opacity: 0.7;
   }
 }
+
+/* react-gauge-component arc tooltip: prevent clipping/obstruction by neighboring dashboard cards */
+.gauge-component-arc-tooltip {
+  z-index: 9999 !important;
+  pointer-events: none;
+  font-family: inherit;
+}

@@ -35,7 +35,6 @@ import { RiskGaugeWidget } from '../components/analytics/RiskGaugeWidget'
 import { DeterminantRadarWidget } from '../components/analytics/DeterminantRadarWidget'
 import { NutritionTableWidget } from '../components/analytics/NutritionTableWidget'
 import { ShareableLinkWidget } from '../components/analytics/ShareableLinkWidget'
-import { AIChatWidget } from '../components/analytics/AIChatWidget'
 import { DraggableWidget } from '../components/analytics/DraggableWidget'
 import { WidgetErrorBoundary } from '../components/analytics/WidgetErrorBoundary'
 
@@ -45,7 +44,6 @@ const DEFAULT_WIDGET_ORDER = [
   'determinant-radar',
   'nutrition-table',
   'shareable-link',
-  'ai-chat',
 ]
 
 export const AnalyticsPage: React.FC = () => {
@@ -210,14 +208,6 @@ export const AnalyticsPage: React.FC = () => {
             </WidgetErrorBoundary>
           </DraggableWidget>
         )
-      case 'ai-chat':
-        return (
-          <DraggableWidget key={widgetId} id={widgetId} span="col-span-1">
-            <WidgetErrorBoundary widgetName="AI Chat">
-              <AIChatWidget record={record} />
-            </WidgetErrorBoundary>
-          </DraggableWidget>
-        )
       default:
         return null
     }
@@ -240,20 +230,29 @@ export const AnalyticsPage: React.FC = () => {
       {/* Header Navbar */}
       <header className="glass-nav sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-3.5 sm:px-6 py-2 sm:py-3">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4">
-          {/* Top Row on Mobile: Brand Logo on Left, Action Button on Right */}
-          <div className="flex items-center justify-between sm:justify-start gap-3">
-            <Link to="/" className="flex items-center gap-2 font-bold text-lg text-blue-600 shrink-0">
+          {/* Left Side: Back to Home Link & Dashboard Title */}
+          <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3">
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 font-medium text-xs sm:text-sm transition-colors py-1 px-2 rounded-lg hover:bg-slate-100/80 shrink-0"
+              title="Kembali ke Beranda"
+            >
+              <ArrowLeft className="w-4 h-4 text-slate-500 shrink-0" />
+              <span>Kembali ke Beranda</span>
+            </Link>
+
+            <span className="text-xs text-slate-300 hidden md:inline">|</span>
+
+            <div className="hidden md:flex items-center gap-2 shrink-0">
               <img
                 src="/icons/sehati-simbol-navbar.png"
                 alt="SEHATI"
-                className="w-7 h-7 object-contain shrink-0"
+                className="w-5 h-5 object-contain shrink-0"
               />
-              <span className="shrink-0">SEHATI</span>
-            </Link>
-            <span className="text-xs text-slate-400 hidden sm:inline">|</span>
-            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">
-              Dashboard Analitik & Konsultasi
-            </span>
+              <span className="text-xs font-semibold text-slate-600">
+                Dashboard Analitik & Konsultasi
+              </span>
+            </div>
 
             {/* Skrining Baru Button for Mobile (Top-Right aligned) */}
             <button
@@ -266,7 +265,7 @@ export const AnalyticsPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Bottom Row on Mobile / Right Side on Desktop: Data Source Status Badge */}
+          {/* Right Side: Data Source Status Badge & Desktop Skrining Baru Button */}
           <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100">
             {/* Live vs Mock Data Source Indicator Badge */}
             {dataSource === 'live' ? (

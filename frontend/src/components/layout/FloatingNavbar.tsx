@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 interface FloatingNavbarProps {
   onInstallPWA?: () => void
@@ -26,7 +27,12 @@ export const FloatingNavbar: React.FC<FloatingNavbarProps> = ({
   }, [])
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-6 pointer-events-none">
+    <motion.header 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }} // Exponential ease-out
+      className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-6 pointer-events-none"
+    >
       <div className="max-w-4xl mx-auto flex justify-center">
         <nav className="bg-white/95 backdrop-blur-md rounded-full px-2 py-2 flex items-center justify-between border border-slate-200/80 shadow-sm pointer-events-auto w-full max-w-2xl">
           
@@ -79,6 +85,6 @@ export const FloatingNavbar: React.FC<FloatingNavbarProps> = ({
           
         </nav>
       </div>
-    </header>
+    </motion.header>
   )
 }

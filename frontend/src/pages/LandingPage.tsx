@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
-import { HeroSection } from '../components/landing/HeroSection'
-import { BontangContextSection } from '../components/landing/BontangContextSection'
-import { FeatureHighlightsGrid } from '../components/landing/FeatureHighlightsGrid'
-import { PersonaPreviewSection } from '../components/landing/PersonaPreviewSection'
-import { QuickStartCTA } from '../components/landing/QuickStartCTA'
+import { EditorialHero } from '../components/landing/EditorialHero'
+import { TrustProofSection } from '../components/landing/TrustProofSection'
+import { WhyEarlyScreening } from '../components/landing/WhyEarlyScreening'
+import { ProductIntelligence } from '../components/landing/ProductIntelligence'
+import { NutritionEducation } from '../components/landing/NutritionEducation'
+import { FinalCTA } from '../components/landing/FinalCTA'
 import { FooterSection } from '../components/layout/FooterSection'
 
 export const LandingPage: React.FC = () => {
@@ -37,29 +38,34 @@ export const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex flex-col font-sans selection:bg-slate-900 selection:text-white">
       {/* Floating Header Navbar */}
       <FloatingNavbar
         canInstallPWA={canInstallPWA}
         onInstallPWA={handleInstallPWA}
       />
 
-      {/* Main Content Sections */}
-      <main className="flex-grow">
-        {/* 1. Hero Section */}
-        <HeroSection />
+      {/* Main Content Sections (Narrative Workflow) */}
+      <main className="flex-grow pt-8">
+        
+        {/* 1. Hero */}
+        <EditorialHero />
 
-        {/* 2. Bontang Health Context & Prevalence (27.4%) */}
-        <BontangContextSection />
+        {/* 2. Trust / Product Proof */}
+        <TrustProofSection />
 
-        {/* 3. Three Main Feature Pillars (WHO Z-Score, Naive Bayes, Gemini AI) */}
-        <FeatureHighlightsGrid />
+        {/* 3. Why early screening matters */}
+        <WhyEarlyScreening />
 
-        {/* 4. Three Target Personas Selection Preview */}
-        <PersonaPreviewSection />
+        {/* 4. Product intelligence / analysis (Horizontal storytelling) */}
+        <ProductIntelligence />
 
-        {/* 5. Quick Action Banner */}
-        <QuickStartCTA />
+        {/* 5. Nutrition / local food education */}
+        <NutritionEducation />
+
+        {/* 6. Final CTA */}
+        <FinalCTA />
+        
       </main>
 
       {/* Footer Section */}

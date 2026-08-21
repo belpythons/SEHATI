@@ -250,10 +250,10 @@ export const AIChatDrawer: React.FC<Props> = ({
             role="dialog"
             aria-modal="false"
             aria-label="Asisten Konsultasi Kesehatan HATI"
-            initial={{ opacity: 0, x: 20, y: 0 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, x: 20, y: 0 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
             className="fixed bottom-0 right-0 top-0 w-full sm:w-[400px] bg-white border-l border-slate-200 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] z-50 flex flex-col font-sans"
           >
             {/* Header */}
@@ -326,8 +326,11 @@ export const AIChatDrawer: React.FC<Props> = ({
                   {messages.map((msg) => {
                     const isBot = msg.sender === 'bot'
                     return (
-                      <div
+                      <motion.div
                         key={msg.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
                         className={`flex flex-col ${isBot ? 'items-start' : 'items-end'}`}
                       >
                         {/* Sender Label */}
@@ -361,7 +364,7 @@ export const AIChatDrawer: React.FC<Props> = ({
                             </div>
                           )}
                         </div>
-                      </div>
+                      </motion.div>
                     )
                   })}
                   <div ref={messagesEndRef} />
@@ -370,10 +373,25 @@ export const AIChatDrawer: React.FC<Props> = ({
                 {/* Contextual Actions (Text Rows) */}
                 {messages.length <= 1 && !isStreaming && (
                   <div className="px-5 py-4 border-t border-slate-200/60 bg-white">
-                    <div className="flex flex-col">
+                    <motion.div 
+                      initial="hidden"
+                      animate="show"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        show: {
+                          opacity: 1,
+                          transition: { staggerChildren: 0.08, delayChildren: 0.1 }
+                        }
+                      }}
+                      className="flex flex-col"
+                    >
                       {chips.map((action, idx) => (
-                        <button
+                        <motion.button
                           key={idx}
+                          variants={{
+                            hidden: { opacity: 0, x: 10 },
+                            show: { opacity: 1, x: 0, transition: { duration: 0.3 } }
+                          }}
                           onClick={() => handleSendMessage(action)}
                           className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0 text-left w-full group hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:bg-slate-50"
                         >
@@ -381,9 +399,9 @@ export const AIChatDrawer: React.FC<Props> = ({
                             {action}
                           </span>
                           <ArrowRight01Icon className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors shrink-0" />
-                        </button>
+                        </motion.button>
                       ))}
-                    </div>
+                    </motion.div>
                   </div>
                 )}
 

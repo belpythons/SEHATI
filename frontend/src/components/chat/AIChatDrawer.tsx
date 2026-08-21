@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  X,
-  ArrowUp,
-  User,
-  Sparkles,
-  RefreshCw,
-  Square,
-  Lock,
-  Fish,
-  TrendingUp,
-  Building2,
-  HelpCircle,
-  AlertTriangle,
-  Ruler,
-  FlaskConical,
-} from 'lucide-react'
+  Cancel01Icon,
+  UserIcon,
+  RefreshIcon,
+  LockPasswordIcon,
+  ArrowRight01Icon,
+  ArrowUp01Icon,
+  SquareIcon
+} from 'hugeicons-react'
 import { ScreeningRecord } from '../../types/screening'
 import { chatService } from '../../services/chatService'
 import { ChatMode } from './ChatDrawerContext'
@@ -37,75 +30,35 @@ interface ChatMessage {
 
 const MAX_INPUT_LENGTH = 500
 
-// ────────────── Quick Prompt Chips per Mode ──────────────
-
 const PERSONAL_CHIPS = [
-  {
-    icon: Fish,
-    label: 'Resep Ikan Bawis',
-    query: 'Bagaimana takaran dan resep olahan ikan bawis & daun kelor untuk balita saya?',
-  },
-  {
-    icon: TrendingUp,
-    label: 'Tips Kejar Tumbuh',
-    query: 'Bagaimana langkah praktis catch-up growth untuk memperbaiki Z-Score TB/U balita saya?',
-  },
-  {
-    icon: Building2,
-    label: 'Layanan Posyandu',
-    query: 'Apa saja layanan dan pemantauan yang perlu saya ikuti di Posyandu kelurahan saya?',
-  },
+  "Apa arti hasil skrining ini?",
+  "Mengapa status gizi anak saya seperti ini?",
+  "Apa yang harus saya siapkan untuk Posyandu?"
 ]
 
 const UMUM_CHIPS = [
-  {
-    icon: HelpCircle,
-    label: 'Apa itu stunting?',
-    query: 'Apa itu stunting dan apa penyebab utamanya?',
-  },
-  {
-    icon: AlertTriangle,
-    label: 'Tanda-tanda awal',
-    query: 'Apa saja tanda-tanda awal stunting yang perlu diwaspadai orang tua?',
-  },
-  {
-    icon: Ruler,
-    label: 'Cara cek status gizi',
-    query: 'Bagaimana cara mengecek status gizi anak dan menginterpretasi Z-Score?',
-  },
+  "Apa arti Z-Score dalam pertumbuhan anak?",
+  "Bagaimana mencegah stunting sejak dini?",
+  "Kapan saya harus khawatir dengan BB anak?"
 ]
-
-// ────────────── Greeting Generators ──────────────
 
 function buildPersonalGreeting(record: ScreeningRecord): string {
   const zScore = record.zScore ?? -1.5
   const status = record.statusGiziTBU || (zScore < -2 ? 'Pendek' : 'Normal')
   return (
-    `Halo! Saya **HATI** — Asisten Nutrisi Terpadu SEHATI (didukung Gemini 2.5 Flash).\n\n` +
-    `Saya telah mempelajari data antropometri balita Anda:\n` +
-    `• **Domisili:** Kelurahan ${record.kelurahan || 'Bontang'}\n` +
-    `• **Usia & Gender:** ${record.ageMonths} Bulan (${record.gender === 'L' ? 'Laki-laki' : 'Perempuan'})\n` +
-    `• **Status Antropometri:** ${record.heightCm} cm / ${record.weightKg} kg (Z-Score TB/U: ${zScore} SD — ${status})\n` +
-    `• **Tingkat Risiko:** ${record.riskTier || 'MODERATE'}\n\n` +
-    `Ada yang ingin Anda tanyakan seputar menu pangan lokal Bontang (Ikan Bawis/Bandeng), jadwal Posyandu, atau nutrisi harian?`
+    `Halo, saya HATI. Saya telah menganalisis hasil skrining antropometri anak Anda.\n\n` +
+    `Saat ini, Z-Score TB/U berada di angka ${zScore} SD (${status}). Penilaian ini didasarkan pada kurva pertumbuhan standar WHO 2006 yang membandingkan parameter pengukuran dengan kurva sehat universal.\n\n` +
+    `Ada yang ingin Anda pahami lebih lanjut mengenai arti dari hasil skrining ini?`
   )
 }
 
 function buildUmumGreeting(): string {
   return (
-    `Halo! Saya **HATI** — Asisten Gizi AI dari SEHATI, platform deteksi dini & pencegahan stunting Kota Bontang.\n\n` +
-    `Tanyakan apa saja seputar **gizi anak & pencegahan stunting** secara umum. Beberapa topik yang bisa saya bantu:\n` +
-    `• Apa itu stunting & penyebabnya\n` +
-    `• Tanda-tanda awal yang perlu diwaspadai\n` +
-    `• Cara mengecek status gizi anak\n` +
-    `• Panduan MPASI & nutrisi harian\n\n` +
-    `💡 Untuk rekomendasi yang **dipersonalisasi** ke kondisi anak Anda, lakukan skrining antropometri terlebih dahulu melalui menu "Mulai Skrining".`
+    `Halo, saya HATI, asisten edukasi kesehatan SEHATI.\n\n` +
+    `Saya dapat membantu Anda memahami standar pertumbuhan WHO 2006, mengenali tanda-tanda stunting, atau merencanakan asupan gizi yang tepat.\n\n` +
+    `Penting untuk diingat bahwa edukasi ini bersifat umum. Untuk analisis spesifik, silakan lakukan skrining terlebih dahulu.`
   )
 }
-
-// ════════════════════════════════════════════════════════════
-//  Component
-// ════════════════════════════════════════════════════════════
 
 export const AIChatDrawer: React.FC<Props> = ({
   isOpen,
@@ -124,14 +77,6 @@ export const AIChatDrawer: React.FC<Props> = ({
   const hasValidSession = Boolean(sessionId && sessionId.trim() !== '')
   const chips = isUmum ? UMUM_CHIPS : PERSONAL_CHIPS
 
-  // ──────────────────────────────────────────────────────────
-  // EFFECT 1: Reset messages when mode OR session context changes.
-  //
-  // ⚠️ ORDERING CRITICAL — this effect MUST be defined BEFORE
-  //    the greeting injection effect (Effect 2) below, so that
-  //    React executes reset first, then greeting injection sees
-  //    messages.length === 0 and injects the new greeting.
-  // ──────────────────────────────────────────────────────────
   const prevModeRef = useRef<ChatMode | undefined>(mode)
   const prevSessionIdRef = useRef<string | undefined>(record?.sessionId)
 
@@ -140,38 +85,26 @@ export const AIChatDrawer: React.FC<Props> = ({
     const sessionChanged = prevSessionIdRef.current !== record?.sessionId
 
     if (modeChanged || sessionChanged) {
-      // Abort any active streaming
       abortControllerRef.current?.abort()
       setIsStreaming(false)
-      // Clear messages — greeting effect (below) will re-inject fresh greeting
       setMessages([])
       setInputQuery('')
 
-      // Update refs to current values
       prevModeRef.current = mode
       prevSessionIdRef.current = record?.sessionId
     }
   }, [mode, record?.sessionId])
 
-  // ──────────────────────────────────────────────────────────
-  // EFFECT 2: Inject initial greeting when drawer opens with
-  //           empty messages (either first open, or after reset).
-  //
-  //           Runs AFTER Effect 1 due to definition order.
-  // ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen || messages.length > 0) return
 
     let greetingText: string | null = null
 
     if (isUmum) {
-      // Mode Umum — always has greeting, no session required
       greetingText = buildUmumGreeting()
     } else if (record && hasValidSession) {
-      // Mode Personal — needs valid session + record
       greetingText = buildPersonalGreeting(record)
     }
-    // If mode='personal' but no session → no greeting (locked state shows instead)
 
     if (greetingText) {
       setMessages([
@@ -185,19 +118,16 @@ export const AIChatDrawer: React.FC<Props> = ({
     }
   }, [isOpen, messages.length, isUmum, record, hasValidSession])
 
-  // Auto-scroll to bottom on message update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isStreaming])
 
-  // Clean up abort controller on unmount
   useEffect(() => {
     return () => {
       abortControllerRef.current?.abort()
     }
   }, [])
 
-  // Close drawer on Escape key press
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -210,14 +140,10 @@ export const AIChatDrawer: React.FC<Props> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // ──────────────────────────────────────────────────────────
-  // Send Message Handler — routes to correct service per mode
-  // ──────────────────────────────────────────────────────────
   const handleSendMessage = async (queryText?: string) => {
     const textToSend = (queryText || inputQuery).trim()
     if (!textToSend || isStreaming) return
 
-    // Mode Personal requires sessionId
     if (!isUmum && !sessionId) return
 
     setInputQuery('')
@@ -276,7 +202,7 @@ export const AIChatDrawer: React.FC<Props> = ({
                 ...msg,
                 text:
                   msg.text ||
-                  'Maaf, terjadi kendala saat menyusun jawaban. Silakan ulangi pertanyaan Anda.',
+                  'Sistem saat ini sedang mengalami kendala jaringan. Mohon coba beberapa saat lagi.',
                 isStreaming: false,
               }
               : msg
@@ -286,13 +212,11 @@ export const AIChatDrawer: React.FC<Props> = ({
     }
 
     if (isUmum) {
-      // Mode Umum — local mock, NEVER calls backend
       await chatService.streamChatUmum({
         query: textToSend,
         ...streamCallbacks,
       })
     } else {
-      // Mode Personal — existing chatService (unchanged)
       await chatService.streamChat({
         sessionId: sessionId!,
         query: textToSend,
@@ -315,194 +239,127 @@ export const AIChatDrawer: React.FC<Props> = ({
     setMessages([])
   }
 
-  // Determine if chat body should show (Mode Umum always shows; Personal needs session)
   const showChatBody = isUmum || hasValidSession
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40 transition-opacity"
-          />
-
-          {/* Drawer Panel — Fullscreen on mobile (<640px), bottom-right card on tablet/desktop */}
+          {/* Drawer Panel */}
           <motion.div
             role="dialog"
-            aria-modal="true"
-            aria-label="Asisten Konsultasi Gizi HATI"
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.96 }}
+            aria-modal="false"
+            aria-label="Asisten Konsultasi Kesehatan HATI"
+            initial={{ opacity: 0, x: 20, y: 0 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, x: 20, y: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 top-0 sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:w-[420px] h-full sm:h-auto sm:max-h-[88vh] bg-white shadow-2xl z-50 flex flex-col font-sans rounded-none sm:rounded-2xl border-0 sm:border sm:border-slate-200/80 overflow-hidden"
+            className="fixed bottom-0 right-0 top-0 w-full sm:w-[400px] bg-white border-l border-slate-200 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] z-50 flex flex-col font-sans"
           >
-            {/* ──────────────── Header — HILDA Style ──────────────── */}
-            <div className="px-3.5 sm:px-4 py-3 sm:py-3.5 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5 sm:gap-3">
-                {/* Avatar bulat */}
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+              <div className="flex items-center gap-3">
                 <img
                   src="/icons/chat-avatar-64.png"
                   alt="HATI"
-                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-full shadow-md ring-2 ring-teal-100 shrink-0"
+                  className="w-9 h-9 rounded-full border border-slate-200 shrink-0"
                 />
-                {/* Name badge */}
-                <div>
-                  <h3
-                    className="font-extrabold text-lg sm:text-[22px] tracking-tight leading-none"
-                    style={{
-                      background: 'linear-gradient(135deg, #1e40af, #0d9488)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
+                <div className="flex flex-col text-left">
+                  <span className="font-display text-base font-medium leading-none mb-1 text-slate-900">
                     HATI
-                  </h3>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                    <span>by</span>
-                    <img
-                      src="/icons/sehati-simbol-navbar.png"
-                      alt=""
-                      className="w-3.5 h-3.5 inline-block"
-                    />
-                    <span className="font-semibold text-slate-600">SEHATI</span>
-                    <span className="text-slate-400">AI</span>
-                  </p>
+                  </span>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-slate-400 leading-none">
+                    Asisten Kesehatan SEHATI
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 sm:gap-1.5">
-                {/* Gemini badge */}
-                <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1 shrink-0">
-                  <Sparkles className="w-3 h-3 text-amber-500" />
-                  <span className="hidden min-[380px]:inline">Gemini 2.5</span>
-                </span>
-
-                {/* Mode Simulasi badge — Mode Umum only */}
-                {isUmum && (
-                  <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1 shrink-0">
-                    <FlaskConical className="w-3 h-3 text-amber-500" />
-                    <span>Simulasi</span>
-                  </span>
-                )}
-
+              <div className="flex items-center gap-2">
                 {messages.length > 0 && (
                   <button
                     type="button"
                     onClick={handleResetChat}
                     title="Mulai Ulang Percakapan"
-                    aria-label="Mulai Ulang Percakapan"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                    className="p-2 rounded-md text-slate-400 hover:text-slate-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshIcon className="w-4 h-4" strokeWidth={2} />
                   </button>
                 )}
 
                 <button
                   type="button"
                   onClick={onClose}
-                  aria-label="Tutup Konsultasi Chat"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                  aria-label="Tutup Panel"
+                  className="p-2 rounded-md text-slate-400 hover:text-slate-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
                 >
-                  <X className="w-5 h-5" />
+                  <Cancel01Icon className="w-5 h-5" strokeWidth={2} />
                 </button>
               </div>
             </div>
 
-            {/* ──────────────── Main Chat Body ──────────────── */}
+            {/* Main Chat Body */}
             {!showChatBody ? (
-              // LOCKED STATE: Mode Personal without sessionId (edge case)
-              <div className="flex-1 p-8 flex flex-col items-center justify-center text-center bg-slate-50">
-                <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 border border-amber-100">
-                  <Lock className="w-7 h-7" />
+              // LOCKED STATE
+              <div className="flex-1 p-8 flex flex-col items-center justify-center text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-4">
+                  <LockPasswordIcon className="w-5 h-5" />
                 </div>
-                <h4 className="font-bold text-slate-800 text-base mb-1">
-                  Konsultasi AI Belum Terbuka
+                <h4 className="font-display font-medium text-slate-800 text-lg mb-2">
+                  Memerlukan Data Skrining
                 </h4>
-                <p className="text-xs text-slate-500 max-w-xs leading-relaxed mb-4">
-                  Asisten Gemini AI membutuhkan data hasil skrining antropometri balita (parameter <code>sessionId</code>) untuk memberikan rekomendasi nutrisi yang akurat.
+                <p className="text-sm text-slate-500 max-w-xs leading-relaxed mb-6">
+                  HATI memerlukan data hasil skrining antropometri untuk memberikan analisis kesehatan yang akurat dan spesifik.
                 </p>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl text-white font-semibold text-xs hover:shadow-lg transition-all cursor-pointer shadow-sm"
-                  style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
+                  className="px-6 py-2.5 rounded-full bg-[#0f172a] hover:bg-[#1e293b] text-white font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                 >
-                  Tutup & Lakukan Skrining
+                  Tutup Panel
                 </button>
               </div>
             ) : (
               // ACTIVE CHAT STATE
-              <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/60">
+              <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/30">
                 {/* Messages Scroll Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {/* ── Session Notice Banner (static, HILDA-style) ── */}
-                  {messages.length <= 1 && (
-                    <div className="mx-0 mb-2 px-3.5 py-3 rounded-xl border border-teal-100/80 bg-gradient-to-r from-blue-50/80 to-teal-50/80">
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
-                        {isUmum
-                          ? '🌍 Mode Edukasi Umum — Tanyakan apa saja seputar gizi & stunting. Untuk rekomendasi personal, lakukan skrining terlebih dahulu.'
-                          : '💡 Konsultasi berdasarkan hasil skrining kamu, tanyakan apa saja seputar tumbuh kembang si kecil.'}
-                      </p>
-                    </div>
-                  )}
-
+                <div className="flex-1 overflow-y-auto p-5 space-y-6">
                   {messages.map((msg) => {
                     const isBot = msg.sender === 'bot'
                     return (
                       <div
                         key={msg.id}
-                        className={`flex items-start gap-2.5 ${isBot ? '' : 'flex-row-reverse'}`}
+                        className={`flex flex-col ${isBot ? 'items-start' : 'items-end'}`}
                       >
-                        {/* Avatar */}
-                        {isBot ? (
-                          <img
-                            src="/icons/chat-avatar-64.png"
-                            alt="HATI"
-                            className="w-7 h-7 rounded-full shadow-sm ring-1 ring-teal-100 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs shadow-sm bg-slate-700 text-white">
-                            <User className="w-4 h-4" />
-                          </div>
-                        )}
+                        {/* Sender Label */}
+                        <span className="font-mono text-[9px] uppercase tracking-widest text-slate-400 mb-1.5 px-1">
+                          {isBot ? 'HATI' : 'Anda'}
+                        </span>
 
                         {/* Message Bubble */}
                         <div
-                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm whitespace-pre-line ${isBot
-                            ? 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-none'
-                            : 'text-white rounded-tr-none'
+                          className={`max-w-[90%] rounded-xl px-4 py-3 text-[13px] leading-relaxed whitespace-pre-line ${isBot
+                            ? 'bg-white border border-slate-200/60 text-slate-700'
+                            : 'bg-[#0f172a] text-white'
                             }`}
-                          style={
-                            !isBot
-                              ? { background: 'linear-gradient(135deg, #1e40af, #0d9488)' }
-                              : undefined
-                          }
                         >
                           {msg.text || (
-                            <span className="inline-flex items-center gap-1.5 text-slate-400 italic">
-                              <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse" />
-                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.15s' }} />
-                              <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
-                              HATI sedang mengetik...
+                            <span className="inline-flex items-center gap-1.5 text-slate-400">
+                              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-pulse" />
+                              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.15s' }} />
+                              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
                             </span>
                           )}
 
                           {msg.isStreaming && (
-                            <span className="inline-block w-1.5 h-3 ml-1 bg-teal-500 animate-pulse align-middle rounded-sm" />
+                            <span className="inline-block w-1.5 h-3 ml-1 bg-teal-600 animate-pulse align-middle rounded-sm" />
                           )}
 
-                          <span
-                            className={`block text-[9px] mt-1.5 ${isBot ? 'text-slate-400' : 'text-blue-200 text-right'
-                              }`}
-                          >
-                            {msg.timestamp}
-                          </span>
+                          {/* Contextual Source (only for initial bot greeting in personal mode) */}
+                          {isBot && msg.id === 'msg-init' && !isUmum && (
+                            <div className="mt-4 pt-3 border-t border-slate-100 font-mono text-[9px] uppercase tracking-widest text-slate-400">
+                              Berdasarkan hasil skrining SEHATI
+                            </div>
+                          )}
                         </div>
                       </div>
                     )
@@ -510,48 +367,41 @@ export const AIChatDrawer: React.FC<Props> = ({
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* ── Quick Prompt Chips — Pill style (HILDA pattern) ── */}
+                {/* Contextual Actions (Text Rows) */}
                 {messages.length <= 1 && !isStreaming && (
-                  <div className="px-4 py-2.5 border-t border-slate-100 bg-white/90 backdrop-blur-xs">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 mb-2 tracking-wider">
-                      Saran Pertanyaan Cepat:
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {chips.map((chip, idx) => {
-                        const Icon = chip.icon
-                        return (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => handleSendMessage(chip.query)}
-                            className="px-3 py-1.5 rounded-full bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-teal-50 border border-slate-200 hover:border-teal-200 text-[11px] font-medium text-slate-600 hover:text-teal-700 transition-all flex items-center gap-1.5 cursor-pointer text-left shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                          >
-                            <Icon className="w-3.5 h-3.5 text-teal-500 shrink-0" />
-                            <span>{chip.label}</span>
-                          </button>
-                        )
-                      })}
+                  <div className="px-5 py-4 border-t border-slate-200/60 bg-white">
+                    <div className="flex flex-col">
+                      {chips.map((action, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSendMessage(action)}
+                          className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0 text-left w-full group hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:bg-slate-50"
+                        >
+                          <span className="text-[13px] text-slate-600 group-hover:text-slate-900 font-medium">
+                            {action}
+                          </span>
+                          <ArrowRight01Icon className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors shrink-0" />
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* ── Input & Streaming Controls ── */}
-                <div className="p-3 border-t border-slate-100 bg-white shrink-0">
+                {/* Input Area */}
+                <div className="p-4 border-t border-slate-200/60 bg-white shrink-0">
                   {isStreaming && (
-                    <div className="flex items-center justify-between mb-2 px-1">
+                    <div className="flex items-center justify-between mb-3 px-1">
                       <span className="text-[11px] text-teal-600 font-medium flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-teal-500 animate-ping" />
-                        {isUmum
-                          ? 'Menyusun jawaban edukasi...'
-                          : 'Streaming respon Gemini AI aktif...'}
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                        Menyusun penjelasan klinis...
                       </span>
                       <button
                         type="button"
                         onClick={handleStopStreaming}
-                        className="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                        className="px-2.5 py-1 rounded-md text-slate-500 hover:bg-slate-100 text-[11px] font-medium flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
                       >
-                        <Square className="w-3 h-3 fill-slate-700" />
-                        <span>Hentikan</span>
+                        <SquareIcon className="w-3 h-3" />
+                        Hentikan
                       </button>
                     </div>
                   )}
@@ -561,51 +411,35 @@ export const AIChatDrawer: React.FC<Props> = ({
                       e.preventDefault()
                       handleSendMessage()
                     }}
-                    className="flex items-end gap-2"
+                    className="flex flex-col gap-2 relative"
                   >
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        value={inputQuery}
-                        onChange={(e) => {
-                          if (e.target.value.length <= MAX_INPUT_LENGTH) {
-                            setInputQuery(e.target.value)
-                          }
-                        }}
-                        disabled={isStreaming}
-                        maxLength={MAX_INPUT_LENGTH}
-                        placeholder={
-                          isUmum
-                            ? 'Tanyakan seputar gizi & pencegahan stunting...'
-                            : 'Tanyakan seputar gizi & tumbuh kembang anak...'
+                    <textarea
+                      value={inputQuery}
+                      onChange={(e) => {
+                        if (e.target.value.length <= MAX_INPUT_LENGTH) {
+                          setInputQuery(e.target.value)
                         }
-                        className="w-full px-4 py-2.5 pr-14 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-300 transition-all disabled:bg-slate-50 disabled:text-slate-400 bg-slate-50/50"
-                      />
-                      {/* Character counter */}
-                      <span
-                        className={`absolute right-3 bottom-2.5 text-[9px] font-medium transition-colors ${inputQuery.length > MAX_INPUT_LENGTH * 0.9
-                          ? 'text-amber-500'
-                          : 'text-slate-300'
-                          }`}
-                      >
-                        {inputQuery.length}/{MAX_INPUT_LENGTH}
-                      </span>
-                    </div>
-
-                    {/* Send button — gradient circle (HILDA pattern) */}
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault()
+                          handleSendMessage()
+                        }
+                      }}
+                      disabled={isStreaming}
+                      maxLength={MAX_INPUT_LENGTH}
+                      placeholder="Tuliskan pertanyaan Anda di sini..."
+                      rows={2}
+                      className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 text-[13px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all disabled:bg-slate-50 disabled:text-slate-400 bg-white resize-none"
+                    />
+                    
                     <button
                       type="submit"
                       aria-label="Kirim Pertanyaan"
                       disabled={!inputQuery.trim() || isStreaming}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all cursor-pointer shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                      style={{
-                        background:
-                          !inputQuery.trim() || isStreaming
-                            ? '#cbd5e1'
-                            : 'linear-gradient(135deg, #1e40af, #0d9488)',
-                      }}
+                      className="absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center bg-[#0f172a] text-white transition-all disabled:opacity-30 disabled:bg-slate-200 disabled:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-1"
                     >
-                      <ArrowUp className="w-4.5 h-4.5" />
+                      <ArrowUp01Icon className="w-4 h-4" strokeWidth={2} />
                     </button>
                   </form>
                 </div>

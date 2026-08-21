@@ -1,91 +1,104 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ShieldCheck, Heart, MapPin, ExternalLink } from 'lucide-react'
-import mockData from '../../data/mockData'
+import { FavouriteIcon } from 'hugeicons-react'
 
 export const FooterSection: React.FC = () => {
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 sm:pt-16 pb-10 sm:pb-12 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 pb-8 sm:pb-12 border-b border-slate-800">
-          {/* Brand & Mission */}
-          <div className="space-y-3 sm:space-y-4 sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-3">
-              <img
-                src="/icons/sehati-simbol-navbar.png"
-                alt="SEHATI"
-                className="w-9 h-9 sm:w-10 sm:h-10 object-contain"
-              />
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-white font-sans">
-                {mockData.meta.systemName}
-              </span>
+    <footer className="relative bg-[#0b1121] text-slate-300 py-24 md:py-32 overflow-hidden border-t border-slate-800">
+      {/* Subtle Background Icon */}
+      <div className="absolute right-0 bottom-0 pointer-events-none opacity-5 translate-x-1/4 translate-y-1/4">
+        <FavouriteIcon className="w-[400px] h-[400px] text-white" strokeWidth={0.5} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 mb-24">
+          
+          {/* Brand Statement (6 cols) */}
+          <div className="lg:col-span-6 flex flex-col items-start">
+            <img
+              src="/icons/sehati-simbol-navbar.png"
+              alt="SEHATI Logo"
+              className="w-12 h-12 rounded-full border border-slate-700/50 mb-8"
+            />
+            
+            <h2 className="text-4xl md:text-5xl font-display font-medium text-white mb-6 leading-[1.1] tracking-tight max-w-lg">
+              Menjaga pertumbuhan hari ini, <br />
+              untuk masa depan yang <span className="text-teal-400">lebih sehat.</span>
+            </h2>
+            
+            <div className="mt-4 text-slate-400 font-light">
+              <p className="text-xl font-medium text-white mb-1 tracking-wide uppercase font-sans">SEHATI</p>
+              <p className="text-base tracking-wide">Sistem Edukasi & Deteksi Stunting Terintegrasi.</p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md leading-relaxed">
-              {mockData.meta.systemFullName}. Platform digital ramah pengguna untuk pencegahan stunting balita berbasis standar WHO 2006, machine learning Naïve Bayes, dan pangan lokal Kota Bontang.
+          </div>
+
+          {/* Navigation (6 cols) */}
+          <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-10">
+            {/* Nav Group 1 */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Produk</h4>
+              <ul className="space-y-4 text-sm font-medium text-slate-300">
+                <li><Link to="/questionnaire" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Skrining</Link></li>
+                <li><Link to="/analytics" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Dashboard Analitik</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Edukasi Gizi</Link></li>
+              </ul>
+            </div>
+            
+            {/* Nav Group 2 */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Tentang</h4>
+              <ul className="space-y-4 text-sm font-medium text-slate-300">
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Tentang SEHATI</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Misi & Tujuan</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Kota Bontang</Link></li>
+              </ul>
+            </div>
+            
+            {/* Nav Group 3 */}
+            <div className="space-y-4 col-span-2 md:col-span-1">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Bantuan</h4>
+              <ul className="space-y-4 text-sm font-medium text-slate-300">
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Panduan Pengguna</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">FAQ</Link></li>
+                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Hubungi Kami</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-slate-800/80 pt-8 pb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+          
+          {/* Trust Information */}
+          <div className="flex flex-col md:flex-row gap-8 md:gap-16">
+            <div>
+              <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500 mb-1">WHO 2006</span>
+              <span className="text-sm font-medium text-slate-300">Standar antropometri</span>
+            </div>
+            <div>
+              <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500 mb-1">Offline-ready</span>
+              <span className="text-sm font-medium text-slate-300">Dapat digunakan tanpa koneksi</span>
+            </div>
+            <div>
+              <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500 mb-1">Bontang</span>
+              <span className="text-sm font-medium text-slate-300">Kalimantan Timur</span>
+            </div>
+          </div>
+
+          {/* Footer Ending */}
+          <div className="text-left md:text-right">
+            <p className="text-sm font-medium text-slate-400 mb-1">
+              © 2026 SEHATI Bontang.
             </p>
-            <div className="flex items-center gap-2 text-xs text-slate-400 pt-1">
-              <MapPin className="w-4 h-4 text-rose-400 flex-shrink-0" />
-              <span>{mockData.meta.cityContext}</span>
-            </div>
+            <p className="text-xs font-mono tracking-widest text-slate-500 uppercase">
+              Sistem Edukasi & Deteksi Stunting Terintegrasi.
+            </p>
           </div>
-
-          {/* Quick Navigation Links */}
-          <div className="space-y-2.5 sm:space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Navigasi Cepat
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
-              <li>
-                <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-                  Beranda
-                </Link>
-              </li>
-              <li>
-                <Link to="/questionnaire" className="text-slate-400 hover:text-white transition-colors">
-                  Kuesioner Skrining
-                </Link>
-              </li>
-              <li>
-                <Link to="/analytics" className="text-slate-400 hover:text-white transition-colors">
-                  Dashboard Analitik
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Standard & Compliance */}
-          <div className="space-y-2.5 sm:space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-              Standar & Keamanan
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-              <li className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Standar Baku WHO 2006 LMS</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Zero-Login Friction (Privasi Terjaga)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Intervensi Pangan Lokal Bontang</span>
-              </li>
-            </ul>
-          </div>
+          
         </div>
 
-        {/* Disclaimer & Copyright */}
-        <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-slate-500 text-center sm:text-left">
-          <p>
-            © {new Date().getFullYear()} SEHATI. Inisiatif Deteksi & Pencegahan Stunting Terintegrasi.
-          </p>
-          <div className="flex items-center gap-1 text-slate-400">
-            <span>Dibuat dengan</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-            <span>untuk anak-anak sehat Kota Bontang</span>
-          </div>
-        </div>
       </div>
     </footer>
   )

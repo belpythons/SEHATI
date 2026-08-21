@@ -4,12 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
   ArrowRight,
-  Save,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  RefreshCw,
-  Sparkles,
 } from 'lucide-react'
 import {
   PersonaType,
@@ -68,39 +65,39 @@ export const QuestionnairePage: React.FC = () => {
   const [formData, setFormData] = useState<ScreeningFormData>(INITIAL_FORM_DATA)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [hasDraftAvailable, setHasDraftAvailable] = useState<boolean>(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   // Check for persona passed from Landing Page & saved offline draft on mount
   useEffect(() => {
-    const incomingPersona = location.state?.selectedPersona as PersonaType | undefined
-    if (incomingPersona && ['ORANG_TUA', 'KADER_POSYANDU', 'SURVEYOR'].includes(incomingPersona)) {
-      setFormData((prev) => ({ ...prev, persona: incomingPersona }))
-    }
-
     const draft = screeningService.loadDraft()
+    const incomingPersona = location.state?.selectedPersona as PersonaType | undefined
+
+    setFormData((prev) => {
+      let newData = { ...prev }
+      let hasChanges = false
+
+      if (draft && (draft.kelurahan || draft.ageMonths !== '' || draft.weightKg !== '')) {
+        newData = draft
+        hasChanges = true
+      }
+
+      if (incomingPersona && ['ORANG_TUA', 'KADER_POSYANDU', 'SURVEYOR'].includes(incomingPersona)) {
+        newData.persona = incomingPersona
+        hasChanges = true
+      }
+
+      return hasChanges ? newData : prev
+    })
+
     if (draft && (draft.kelurahan || draft.ageMonths !== '' || draft.weightKg !== '')) {
-      setHasDraftAvailable(true)
+      setToastMessage('Melanjutkan draft kuesioner sebelumnya...')
+      setTimeout(() => setToastMessage(null), 3000)
     }
   }, [location.state])
 
   const updateField = <K extends keyof ScreeningFormData>(key: K, value: ScreeningFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }))
     setErrorMessage(null)
-  }
-
-  const handleRestoreDraft = () => {
-    const draft = screeningService.loadDraft()
-    if (draft) {
-      setFormData(draft)
-      setHasDraftAvailable(false)
-      setToastMessage('Draft berhasil dipulihkan!')
-      setTimeout(() => setToastMessage(null), 3000)
-    }
-  }
-
-  const handleDismissDraft = () => {
-    setHasDraftAvailable(false)
   }
 
   // Step 1 Validation (Persona & Kelurahan)
@@ -175,15 +172,14 @@ export const QuestionnairePage: React.FC = () => {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleSaveDraft = () => {
-    const success = screeningService.saveDraft(formData)
-    if (success) {
-      setToastMessage('Draft kuesioner berhasil disimpan ke penyimpanan lokal!')
-      setTimeout(() => setToastMessage(null), 3000)
-    } else {
-      setErrorMessage('Gagal menyimpan draft kuesioner.')
-    }
-  }
+  // Auto-save draft automatically
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      screeningService.saveDraft(formData)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [formData])
 
   const handleSubmit = async () => {
     setErrorMessage(null)
@@ -345,37 +341,6 @@ export const QuestionnairePage: React.FC = () => {
 
       {/* Main Container */}
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-center">
-        {/* Draft Recovery Prompt */}
-        {hasDraftAvailable && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-blue-900"
-          >
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-5 h-5 text-blue-600 shrink-0" />
-              <span>Ditemukan draf kuesioner yang tersimpan di perangkat ini.</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleRestoreDraft}
-                className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold text-xs transition-all flex items-center gap-1.5"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Pulihkan</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleDismissDraft}
-                className="px-3 py-1.5 rounded-lg border border-blue-300 text-blue-700 hover:bg-blue-100/50 font-medium text-xs transition-all"
-              >
-                Abaikan
-              </button>
-            </div>
-          </motion.div>
-        )}
-
         {/* Error Alert Box */}
         {errorMessage && (
           <motion.div
@@ -801,16 +766,6 @@ export const QuestionnairePage: React.FC = () => {
                 <span>Sebelumnya</span>
               </button>
             )}
-
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={handleSaveDraft}
-              className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-sm transition-all flex items-center gap-2 disabled:opacity-50"
-            >
-              <Save className="w-4 h-4 text-slate-600" />
-              <span>Simpan Draft</span>
-            </button>
 
             <div className="flex-1" />
 

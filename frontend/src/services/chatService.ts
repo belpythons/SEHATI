@@ -1,14 +1,13 @@
 /**
  * Chat Service — Gemini AI Consultation Streaming Client
  *
- * Implements SSE (Server-Sent Events) streaming for real-time interactive
- * nutrition consultation based on the child's screening context.
- *
- * Note: Uses mock progressive streaming by default per Phase 6 instructions
- * to ensure bulletproof demonstration reliability. Contract strictly matches
- * GET /api/v1/chat/stream?sessionId=${sessionId}&query=${encodeURIComponent(query)}.
+ * Implements real-time SSE (Server-Sent Events) streaming for interactive
+ * nutrition consultation grounded in child screening metrics & WHO 2006 standards.
+ * Connects directly to backend GET /api/v1/chat/stream with graceful offline fallback.
  */
 import { ScreeningRecord } from '../types/screening'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 export interface ChatStreamOptions {
   sessionId: string
@@ -20,8 +19,231 @@ export interface ChatStreamOptions {
   signal?: AbortSignal
 }
 
+export interface ChatUmumStreamOptions {
+  query: string
+  onChunk: (chunk: string) => void
+  onDone: () => void
+  onError: (error: Error) => void
+  signal?: AbortSignal
+}
+
 /**
- * Generate contextual mock answers grounded in child's screening metrics & Bontang local foods
+ * Generic SSE reader for reading token streams from backend Express Gateway
+ */
+async function consumeSseStream(
+  url: string,
+  bodyPayload: any,
+  onChunk: (chunk: string) => void,
+  onDone: () => void,
+  onError: (error: Error) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+    },
+    body: JSON.stringify(bodyPayload),
+    signal,
+  })
+
+  if (!response.ok) {
+    let errorDetail = `Server returned HTTP ${response.status}`
+    try {
+      const errJson = await response.json()
+      if (errJson.error) errorDetail = errJson.error
+    } catch {
+      // ignore
+    }
+    throw new Error(errorDetail)
+  }
+
+  if (!response.body) {
+    throw new Error('ReadableStream not supported by response body.')
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+
+  try {
+    while (true) {
+      if (signal?.aborted) {
+        await reader.cancel()
+        return
+      }
+
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      // Keep unfinished line in buffer
+      buffer = lines.pop() ?? ''
+
+      for (const line of lines) {
+        const trimmed = line.trim()
+        if (!trimmed || !trimmed.startsWith('data:')) continue
+
+        const dataStr = trimmed.replace(/^data:\s*/, '')
+        if (dataStr === '[DONE]') {
+          onDone()
+          return
+        }
+
+        try {
+          const parsed = JSON.parse(dataStr)
+          if (parsed.type === 'chunk' && typeof parsed.text === 'string') {
+            onChunk(parsed.text)
+          } else if (parsed.type === 'done') {
+            onDone()
+            return
+          } else if (parsed.type === 'error') {
+            onError(new Error(parsed.message || 'Gagal memproses respons dari Gemini AI.'))
+            return
+          }
+        } catch {
+          // If server sent plain text chunk instead of JSON
+          if (dataStr) {
+            onChunk(dataStr)
+          }
+        }
+      }
+    }
+
+    onDone()
+  } catch (err: any) {
+    if (signal?.aborted || err?.name === 'AbortError') {
+      return
+    }
+    throw err
+  }
+}
+
+/**
+ * Offline simulation fallback for personal mode
+ */
+function streamFallbackPersonal(options: ChatStreamOptions) {
+  const { query, record, onChunk, onDone, onError, signal } = options
+  try {
+    const fullAnswer = generateContextualAnswer(query, record)
+    const words = fullAnswer.split(/(?<=\s|(?<=[.,\n]))/)
+    let index = 0
+    const timer = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(timer)
+        return
+      }
+      if (index < words.length) {
+        onChunk(words[index])
+        index++
+      } else {
+        clearInterval(timer)
+        onDone()
+      }
+    }, 28)
+  } catch (err: any) {
+    onError(err instanceof Error ? err : new Error(String(err)))
+  }
+}
+
+/**
+ * Offline simulation fallback for mode umum
+ */
+function streamFallbackUmum(options: ChatUmumStreamOptions) {
+  const { query, onChunk, onDone, onError, signal } = options
+  try {
+    const fullAnswer = generateUmumAnswer(query)
+    const words = fullAnswer.split(/(?<=\s|(?<=[.,\n]))/)
+    let index = 0
+    const timer = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(timer)
+        return
+      }
+      if (index < words.length) {
+        onChunk(words[index])
+        index++
+      } else {
+        clearInterval(timer)
+        onDone()
+      }
+    }, 28)
+  } catch (err: any) {
+    onError(err instanceof Error ? err : new Error(String(err)))
+  }
+}
+
+export const chatService = {
+  /**
+   * Stream chat consultation via live Gemini SSE backend (Personal Mode)
+   * POST /api/v1/chat/stream with child screening metrics context
+   */
+  async streamChat(options: ChatStreamOptions): Promise<void> {
+    const { sessionId, query, record, onChunk, onDone, onError, signal } = options
+
+    if (!sessionId) {
+      onError(new Error('sessionId is required to ground AI consultation context.'))
+      return
+    }
+
+    const endpointUrl = `${API_BASE_URL}/api/v1/chat/stream`
+    const payload = {
+      sessionId,
+      query,
+      mode: 'personal',
+      record,
+    }
+
+    try {
+      await consumeSseStream(endpointUrl, payload, onChunk, onDone, onError, signal)
+    } catch (networkError: any) {
+      if (signal?.aborted || networkError?.name === 'AbortError') {
+        return
+      }
+
+      console.info(
+        '[SEHATI Chat] Live backend SSE unavailable, activating local offline knowledge generator:',
+        networkError?.message || networkError
+      )
+      // Resilient fallback to local contextual generator
+      streamFallbackPersonal(options)
+    }
+  },
+
+  /**
+   * Stream chat consultation for Mode Umum (general nutrition education)
+   * POST /api/v1/chat/stream
+   */
+  async streamChatUmum(options: ChatUmumStreamOptions): Promise<void> {
+    const { query, onChunk, onDone, onError, signal } = options
+
+    const endpointUrl = `${API_BASE_URL}/api/v1/chat/stream`
+    const payload = {
+      query,
+      mode: 'umum',
+    }
+
+    try {
+      await consumeSseStream(endpointUrl, payload, onChunk, onDone, onError, signal)
+    } catch (networkError: any) {
+      if (signal?.aborted || networkError?.name === 'AbortError') {
+        return
+      }
+
+      console.info(
+        '[SEHATI Chat] Live backend SSE unavailable for Mode Umum, activating local offline knowledge generator:',
+        networkError?.message || networkError
+      )
+      // Resilient fallback to local educational knowledge
+      streamFallbackUmum(options)
+    }
+  },
+}
+
+/**
+ * Local offline contextual mock answers grounded in child's screening metrics & Bontang local foods
  */
 function generateContextualAnswer(query: string, record: ScreeningRecord | null): string {
   const q = query.toLowerCase()
@@ -71,95 +293,8 @@ function generateContextualAnswer(query: string, record: ScreeningRecord | null)
     `Apakah Anda ingin menanyakan resep olahan pangan lokal spesifik, takaran porsi harian, atau tips mengatasi anak susah makan (GTM)?`
 }
 
-export const chatService = {
-  /**
-   * Stream chat consultation via progressive token mock simulation
-   * (Matches GET /api/v1/chat/stream contract)
-   */
-  async streamChat(options: ChatStreamOptions): Promise<void> {
-    const { sessionId, query, record, onChunk, onDone, onError, signal } = options
-
-    if (!sessionId) {
-      onError(new Error('sessionId is required to ground AI consultation context.'))
-      return
-    }
-
-    try {
-      const fullAnswer = generateContextualAnswer(query, record)
-      // Break into realistic SSE token chunks (words and punctuation)
-      const words = fullAnswer.split(/(?<=\s|(?<=[.,\n]))/)
-
-      let index = 0
-      const intervalMs = 28 // Realistic typewriter streaming speed
-
-      const timer = setInterval(() => {
-        if (signal?.aborted) {
-          clearInterval(timer)
-          return
-        }
-
-        if (index < words.length) {
-          onChunk(words[index])
-          index++
-        } else {
-          clearInterval(timer)
-          onDone()
-        }
-      }, intervalMs)
-    } catch (err: any) {
-      onError(err instanceof Error ? err : new Error(String(err)))
-    }
-  },
-
-  /**
-   * Stream chat consultation for Mode Umum (general nutrition education).
-   * 100% local mock — NEVER calls backend chat.controller.ts.
-   * No sessionId required.
-   */
-  async streamChatUmum(options: ChatUmumStreamOptions): Promise<void> {
-    const { query, onChunk, onDone, onError, signal } = options
-
-    try {
-      const fullAnswer = generateUmumAnswer(query)
-      const words = fullAnswer.split(/(?<=\s|(?<=[.,\n]))/)
-
-      let index = 0
-      const intervalMs = 28
-
-      const timer = setInterval(() => {
-        if (signal?.aborted) {
-          clearInterval(timer)
-          return
-        }
-
-        if (index < words.length) {
-          onChunk(words[index])
-          index++
-        } else {
-          clearInterval(timer)
-          onDone()
-        }
-      }, intervalMs)
-    } catch (err: any) {
-      onError(err instanceof Error ? err : new Error(String(err)))
-    }
-  },
-}
-
 /**
- * Options for Mode Umum streaming (no sessionId, no record needed)
- */
-export interface ChatUmumStreamOptions {
-  query: string
-  onChunk: (chunk: string) => void
-  onDone: () => void
-  onError: (error: Error) => void
-  signal?: AbortSignal
-}
-
-/**
- * Generate mock educational answers for Mode Umum (general nutrition/stunting).
- * NOT grounded in any specific child's data — purely educational content.
+ * Local offline answers for Mode Umum
  */
 function generateUmumAnswer(query: string): string {
   const q = query.toLowerCase()

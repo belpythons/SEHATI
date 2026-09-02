@@ -19,7 +19,7 @@ export const FooterSection: React.FC = () => {
             <img
               src="/icons/sehati-simbol-navbar.png"
               alt="SEHATI Logo"
-              className="w-12 h-12 rounded-full border border-slate-700/50 mb-8"
+              className="w-12 h-12 mb-8"
             />
             
             <h2 className="text-4xl md:text-5xl font-display font-medium text-white mb-6 leading-[1.1] tracking-tight max-w-lg">

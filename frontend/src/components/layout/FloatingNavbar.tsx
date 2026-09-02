@@ -44,7 +44,7 @@ export const FloatingNavbar: React.FC<FloatingNavbarProps> = ({
             <img
               src="/icons/sehati-simbol-navbar.png"
               alt="SEHATI Logo"
-              className="w-8 h-8 rounded-full shadow-sm border border-slate-200/60"
+              className="w-8 h-8"
             />
             <span className="text-sm font-semibold tracking-wide text-slate-900 font-sans uppercase">
               SEHATI

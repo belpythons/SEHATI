@@ -185,18 +185,18 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-5 shadow-xs">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+          <span className="p-1.5 rounded-lg bg-[var(--color-paper-2)] text-[var(--color-navy)] border border-[var(--color-rule)]">
             <PieChart className="w-4 h-4" />
           </span>
           <div>
-            <h3 className="font-bold text-slate-800 text-base">
+            <h3 className="font-display font-medium text-[var(--color-ink)] text-base sm:text-lg">
               Radar Determinan Stunting
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[var(--color-ink-2)]">
               Analisis Komposit Multi-Faktor Lingkungan & Pola Asuh
             </p>
           </div>
@@ -243,8 +243,8 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Dominant Risk Factors List */}
-      <div className="mt-3 pt-3 border-t border-slate-100">
-        <div className="text-xs font-semibold text-slate-700 mb-2">
+      <div className="mt-3 pt-3 border-t border-[var(--color-rule)]">
+        <div className="text-xs font-semibold text-[var(--color-ink)] mb-2">
           Faktor Pemicu Dominan:
         </div>
         {dominantFactors.length > 0 ? (
@@ -252,7 +252,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
             {dominantFactors.map((factor) => (
               <div
                 key={factor}
-                className="flex items-start gap-2 text-xs bg-amber-50/70 border border-amber-200/60 rounded-lg p-2 text-amber-900"
+                className="flex items-start gap-2 text-xs bg-amber-50/80 border border-amber-200/80 rounded-lg p-2 text-amber-900"
               >
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <span className="font-medium">

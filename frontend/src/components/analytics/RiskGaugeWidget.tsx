@@ -46,18 +46,18 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
 
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-5 shadow-xs">
       {/* Widget Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+          <span className="p-1.5 rounded-lg bg-[var(--color-paper-2)] text-[var(--color-navy)] border border-[var(--color-rule)]">
             <ShieldAlert className="w-4 h-4" />
           </span>
           <div>
-            <h3 className="font-bold text-slate-800 text-base">
+            <h3 className="font-display font-medium text-[var(--color-ink)] text-base sm:text-lg">
               Risk Gauge Meter
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[var(--color-ink-2)]">
               Derajat Kerentanan Stunting (Naïve Bayes)
             </p>
           </div>
@@ -144,8 +144,8 @@ export const RiskGaugeWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Narrative Interpretation Box */}
-      <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 leading-relaxed">
-        <p className="font-semibold text-slate-800 mb-0.5">
+      <div className="mt-2 p-3 bg-[var(--color-paper-2)] rounded-xl border border-[var(--color-rule)] text-xs text-[var(--color-ink-2)] leading-relaxed">
+        <p className="font-semibold text-[var(--color-ink)] mb-0.5">
           Indeks Probabilitas Risiko: {riskScore.toFixed(2)} / 1.00
         </p>
         <p>{tierConfig.desc}</p>

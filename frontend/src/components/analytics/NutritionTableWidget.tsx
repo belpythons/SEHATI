@@ -68,18 +68,18 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
   const isStunted = record.zScore < -2.0 || record.statusGiziTBU?.includes('Pendek')
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-5 shadow-xs">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+          <span className="p-1.5 rounded-lg bg-[var(--color-paper-2)] text-[var(--color-navy)] border border-[var(--color-rule)]">
             <Utensils className="w-4 h-4" />
           </span>
           <div>
-            <h3 className="font-bold text-slate-800 text-base">
+            <h3 className="font-display font-medium text-[var(--color-ink)] text-base sm:text-lg">
               Rekomendasi Gizi Pangan Lokal
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[var(--color-ink-2)]">
               Intervensi Makanan Tambahan Potensi Bontang
             </p>
           </div>
@@ -94,10 +94,10 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Narrative Alert */}
-      <div className="p-2.5 sm:p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-xl text-xs text-emerald-900 mb-3 flex items-start gap-2">
-        <Fish className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+      <div className="p-2.5 sm:p-3 bg-[var(--color-paper-2)] border border-[var(--color-rule)] rounded-xl text-xs text-[var(--color-ink)] mb-3 flex items-start gap-2">
+        <Fish className="w-4 h-4 text-[var(--color-teal)] shrink-0 mt-0.5" />
         <div className="leading-relaxed">
-          <span className="font-semibold">Potensi Maritim Bontang: </span>
+          <span className="font-semibold text-[var(--color-navy)]">Potensi Maritim Bontang: </span>
           Kekayaan ikan laut segar lokal memiliki bioavailabilitas protein tinggi untuk mempercepat kejar tumbuh balita (Catch-up Growth).
         </div>
       </div>
@@ -106,27 +106,27 @@ export const NutritionTableWidget: React.FC<Props> = ({ record }) => {
       <div className="flex-1 overflow-x-auto -mx-1 px-1">
         <table className="w-full text-left text-xs min-w-[280px]">
           <thead>
-            <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[9px] sm:text-[10px]">
+            <tr className="border-b border-[var(--color-rule)] text-[var(--color-ink-2)] uppercase tracking-wider font-semibold font-mono text-[9px] sm:text-[10px]">
               <th className="pb-2 pr-2">Bahan Makanan</th>
               <th className="pb-2 pr-2 hidden sm:table-cell">Konteks & Keunggulan</th>
               <th className="pb-2 pr-2">Porsi / Hari</th>
               <th className="pb-2 text-right">Nutrisi Kunci</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-[var(--color-rule)]/60">
             {BONTANG_LOCAL_NUTRITION.map((item) => (
-              <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+              <tr key={item.id} className="hover:bg-[var(--color-paper-2)]/60 transition-colors">
                 <td className="py-2.5 pr-2">
-                  <div className="font-semibold text-slate-800 leading-tight">{item.name}</div>
-                  <div className="text-[10px] text-slate-500">{item.category}</div>
+                  <div className="font-semibold text-[var(--color-ink)] leading-tight">{item.name}</div>
+                  <div className="text-[10px] text-[var(--color-ink-2)]">{item.category}</div>
                 </td>
-                <td className="py-2.5 pr-2 text-slate-600 hidden sm:table-cell">
+                <td className="py-2.5 pr-2 text-[var(--color-ink-2)] hidden sm:table-cell">
                   {item.bontangContext}
                 </td>
-                <td className="py-2.5 pr-2 font-medium text-slate-700 leading-tight">
+                <td className="py-2.5 pr-2 font-medium text-[var(--color-ink)] leading-tight">
                   {item.portionRecommendation}
                 </td>
-                <td className="py-2.5 text-right font-medium text-blue-700 text-[10px] sm:text-[11px] leading-tight">
+                <td className="py-2.5 text-right font-medium text-[var(--color-navy)] text-[10px] sm:text-[11px] leading-tight">
                   {item.keyNutrient}
                 </td>
               </tr>

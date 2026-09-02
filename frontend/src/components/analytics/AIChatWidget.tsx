@@ -20,7 +20,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-blue-950 to-teal-950 text-white rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden">
+    <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-blue-950 to-teal-950 text-white rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden border border-white/10">
       {/* Decorative background glows */}
       <div className="absolute -top-12 -right-12 w-36 h-36 bg-teal-500/15 rounded-full blur-2xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
@@ -37,7 +37,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
           />
           <div>
             <h3
-              className="font-extrabold text-lg sm:text-xl tracking-tight leading-none"
+              className="font-extrabold text-lg sm:text-xl tracking-tight leading-none font-display"
               style={{
                 background: 'linear-gradient(135deg, #93c5fd, #5eead4)',
                 WebkitBackgroundClip: 'text',
@@ -80,7 +80,7 @@ export const AIChatWidget: React.FC<Props> = ({ record }) => {
           <button
             type="button"
             onClick={handleOpenChat}
-            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 min-h-[42px]"
+            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md text-white shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 min-h-[42px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
             style={{ background: 'linear-gradient(135deg, #1e40af, #0d9488)' }}
           >
             <MessageSquare className="w-4 h-4" />

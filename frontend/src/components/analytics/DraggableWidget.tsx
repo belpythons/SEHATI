@@ -31,7 +31,7 @@ export const DraggableWidget: React.FC<Props> = ({ id, children, span = 'col-spa
       ref={setNodeRef}
       style={style}
       className={`group relative flex flex-col ${span} transition-shadow duration-200 ${
-        isDragging ? 'shadow-2xl ring-2 ring-blue-500 rounded-2xl' : ''
+        isDragging ? 'shadow-2xl ring-2 ring-[var(--color-navy)] rounded-2xl' : ''
       }`}
     >
       {/* Drag handle button on top right of widget */}
@@ -42,7 +42,7 @@ export const DraggableWidget: React.FC<Props> = ({ id, children, span = 'col-spa
         style={{ touchAction: 'none' }}
         aria-label="Geser posisi widget"
         title="Tahan dan geser untuk mengatur tata letak widget"
-        className="absolute top-3 right-3 z-20 p-1.5 rounded-lg bg-slate-100/95 text-slate-500 sm:text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-grab active:cursor-grabbing backdrop-blur-xs shadow-xs"
+        className="absolute top-3 right-3 z-20 p-1.5 rounded-lg bg-[var(--color-paper-2)]/95 border border-[var(--color-rule)] text-[var(--color-ink-2)] hover:text-[var(--color-ink)] hover:bg-[var(--color-paper-3)] transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] cursor-grab active:cursor-grabbing backdrop-blur-xs shadow-xs"
       >
         <GripVertical className="w-3.5 h-3.5" />
       </button>

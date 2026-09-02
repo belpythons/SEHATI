@@ -305,7 +305,7 @@ export const AnalyticsPage: React.FC = () => {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                    Balita ({record.gender === 'L' ? 'Laki-laki' : 'Perempuan'}), {record.ageMonths} Bulan
+                    Balita ({record.gender === 'L' || record.gender === 'Laki-Laki' ? 'Laki-laki' : 'Perempuan'}), {record.ageMonths} Bulan
                   </h1>
                   <span className="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200 shrink-0">
                     #{record.shareHash}
@@ -314,7 +314,9 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-y-1 gap-x-3 sm:gap-x-4 mt-1.5 text-xs text-slate-500">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">Kel. {record.kelurahan}, Bontang</span>
+                    <span className="truncate">
+                      {record.isOutsideBontang ? `Kel./Desa ${record.kelurahan} (Luar Bontang)` : `Kel. ${record.kelurahan}, Bontang`}
+                    </span>
                   </span>
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />

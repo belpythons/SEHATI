@@ -16,6 +16,7 @@ export interface ChatStreamOptions {
   onChunk: (chunk: string) => void
   onDone: () => void
   onError: (error: Error) => void
+  onFallback?: () => void
   signal?: AbortSignal
 }
 
@@ -24,6 +25,7 @@ export interface ChatUmumStreamOptions {
   onChunk: (chunk: string) => void
   onDone: () => void
   onError: (error: Error) => void
+  onFallback?: () => void
   signal?: AbortSignal
 }
 
@@ -207,6 +209,8 @@ export const chatService = {
         '[SEHATI Chat] Live backend SSE unavailable, activating local offline knowledge generator:',
         networkError?.message || networkError
       )
+      // Notify UI that we are switching to offline simulation
+      options.onFallback?.()
       // Resilient fallback to local contextual generator
       streamFallbackPersonal(options)
     }
@@ -236,6 +240,8 @@ export const chatService = {
         '[SEHATI Chat] Live backend SSE unavailable for Mode Umum, activating local offline knowledge generator:',
         networkError?.message || networkError
       )
+      // Notify UI that we are switching to offline simulation
+      options.onFallback?.()
       // Resilient fallback to local educational knowledge
       streamFallbackUmum(options)
     }

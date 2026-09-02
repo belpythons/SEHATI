@@ -10,7 +10,7 @@ import {
   ArrowUp01Icon,
   SquareIcon,
 } from 'hugeicons-react'
-import { SparklesIcon } from 'lucide-react'
+import { SparklesIcon, AlertCircleIcon } from 'lucide-react'
 import { ScreeningRecord } from '../../types/screening'
 import { chatService } from '../../services/chatService'
 import { ChatMode } from './ChatDrawerContext'
@@ -131,6 +131,7 @@ export const AIChatDrawer: React.FC<Props> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputQuery, setInputQuery] = useState<string>('')
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
+  const [isOfflineFallback, setIsOfflineFallback] = useState<boolean>(false)
   const abortControllerRef = useRef<AbortController | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -149,6 +150,7 @@ export const AIChatDrawer: React.FC<Props> = ({
     if (modeChanged || sessionChanged) {
       abortControllerRef.current?.abort()
       setIsStreaming(false)
+      setIsOfflineFallback(false)
       setMessages([])
       setInputQuery('')
 
@@ -271,6 +273,9 @@ export const AIChatDrawer: React.FC<Props> = ({
           )
         )
       },
+      onFallback: () => {
+        setIsOfflineFallback(true)
+      },
     }
 
     if (isUmum) {
@@ -298,6 +303,7 @@ export const AIChatDrawer: React.FC<Props> = ({
 
   const handleResetChat = () => {
     handleStopStreaming()
+    setIsOfflineFallback(false)
     setMessages([])
   }
 
@@ -340,9 +346,20 @@ export const AIChatDrawer: React.FC<Props> = ({
                       AI Gemini
                     </span>
                   </div>
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-slate-400 leading-none mt-1">
-                    {isUmum ? 'Mode Edukasi Umum' : 'Konsultasi Terpersonalisasi'}
-                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-slate-400 leading-none">
+                      {isUmum ? 'Mode Edukasi Umum' : 'Konsultasi Terpersonalisasi'}
+                    </span>
+                    {isOfflineFallback && (
+                      <span
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-700 border border-amber-300/60 animate-in fade-in"
+                        title="Backend tidak terjangkau — respons dihasilkan dari basis pengetahuan lokal (offline)"
+                      >
+                        <AlertCircleIcon className="w-3 h-3 text-amber-600" strokeWidth={2.5} />
+                        Mode Simulasi
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

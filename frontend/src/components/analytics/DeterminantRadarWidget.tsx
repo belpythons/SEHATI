@@ -16,96 +16,171 @@ interface Props {
 }
 
 export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
-  // bblrHistory & motherEducation are NOT stored in Prisma schema — they only exist
-  // in sessionStorage for the submitting user. For shared links, these will be undefined.
-  // In that case we show a neutral "Data tidak tersedia" state (score 50, gray) instead
-  // of silently defaulting to a healthy or unhealthy value.
-  const bblrKnown = typeof record.bblrHistory === 'boolean'
-  const motherEdKnown = typeof record.motherEducation === 'boolean'
+  // --- Calculate individual dimension scores (0-100) based on approved mapping table ---
 
-  // Convert boolean & categorical factors to 0-100 impact index for radar visualization
-  // Subject labels are optimized for compact mobile screen widths (375px/414px)
+  // 1. Pola Makan Components
+  // exclusiveAsi: 1=Eksklusif (95), 2=Tidak/Formula (30), 3=Belum 6 Bln (70)
+  const scoreAsi =
+    record.exclusiveAsi === 1 ? 95 :
+    record.exclusiveAsi === 2 ? 30 :
+    record.exclusiveAsi === 3 ? 70 : 50
+
+  // mpasiAge: 1=<6bln (35), 2=Tepat 6bln (95), 3=>6bln (40), 4=Belum MPASI (65)
+  const scoreMpasi =
+    record.mpasiAge === 1 ? 35 :
+    record.mpasiAge === 2 ? 95 :
+    record.mpasiAge === 3 ? 40 :
+    record.mpasiAge === 4 ? 65 : 50
+
+  // animalProtein: [1..5], 5=Sangat Jarang (15), 1 item (55), 2 items (75), >=3 items (95)
+  const proteins = Array.isArray(record.animalProtein) ? record.animalProtein : []
+  const scoreProtein =
+    proteins.includes(5) ? 15 :
+    proteins.length >= 3 ? 95 :
+    proteins.length === 2 ? 75 :
+    proteins.length === 1 ? 55 : 50
+
+  // Composite Pola Makan: Worst-case of ASI, MPASI, Protein
+  const scorePolaMakan = Math.min(scoreAsi, scoreMpasi, scoreProtein)
+  const statusPolaMakan =
+    scorePolaMakan >= 80 ? 'Optimal' :
+    scorePolaMakan >= 50 ? 'Cukup / Perlu Evaluasi' : 'Beresiko / Kurang'
+
+  // 2. Lingkungan Components
+  // cleanWaterAccess: 1=Kemasan (95), 2=PDAM (90), 3=Sumur Bor (65), 4=Sumur Gali (30)
+  const scoreAir =
+    record.cleanWaterAccess === 1 ? 95 :
+    record.cleanWaterAccess === 2 ? 90 :
+    record.cleanWaterAccess === 3 ? 65 :
+    record.cleanWaterAccess === 4 ? 30 : 50
+
+  // sanitationAccess: 1=Milik Sendiri (95), 2=Cemplung (50), 3=MCK (45), 4=Tidak Memiliki (15)
+  const scoreSanitasi =
+    record.sanitationAccess === 1 ? 95 :
+    record.sanitationAccess === 2 ? 50 :
+    record.sanitationAccess === 3 ? 45 :
+    record.sanitationAccess === 4 ? 15 : 50
+
+  // smokeExposure: 1=Bebas (90), 2=Terpapar (20)
+  const scoreRokok =
+    record.smokeExposure === 1 ? 90 :
+    record.smokeExposure === 2 ? 20 : 50
+
+  // Composite Lingkungan: Worst-case of Air, Sanitasi, Rokok
+  const scoreLingkungan = Math.min(scoreAir, scoreSanitasi, scoreRokok)
+  const statusLingkungan =
+    scoreLingkungan >= 80 ? 'Saniter & Sehat' :
+    scoreLingkungan >= 50 ? 'Cukup Layak' : 'Sanitasi / Paparan Buruk'
+
+  // 3. Bebas Diare: 1=Tidak/1x Ringan (90), 2=Sering >=2x (25)
+  const scoreDiare =
+    record.diarrheaHistory === 1 ? 90 :
+    record.diarrheaHistory === 2 ? 25 : 50
+  const statusDiare = record.diarrheaHistory === 1 ? 'Jarang / Bebas' : 'Ada Riwayat Diare'
+
+  // 4. Bebas BBLR: 1=Normal (90), 2=BBLR (25), 3=Tidak Tahu (50)
+  const scoreBblr =
+    record.bblrOption === 1 ? 90 :
+    record.bblrOption === 2 ? 25 : 50
+  const statusBblr =
+    record.bblrOption === 1 ? 'Berat Lahir Cukup' :
+    record.bblrOption === 2 ? 'Riwayat BBLR' : 'Tidak Diketahui'
+
+  // 5. Pend. Ibu: 1=SD (30), 2=SMP (50), 3=SMA (75), 4=Diploma/Sarjana (95)
+  const scorePendIbu =
+    record.motherEducation === 1 ? 30 :
+    record.motherEducation === 2 ? 50 :
+    record.motherEducation === 3 ? 75 :
+    record.motherEducation === 4 ? 95 : 50
+  const statusPendIbu =
+    record.motherEducation === 4 ? 'Tinggi (PT/Sarjana)' :
+    record.motherEducation === 3 ? 'Menengah (SMA)' :
+    record.motherEducation === 2 ? 'Dasar (SMP)' :
+    record.motherEducation === 1 ? 'Dasar (SD)' : 'Data Tidak Tersedia'
+
+  // 6. Ekonomi: Quintile 1..5 -> 20..100
+  const scoreEkonomi = Math.min(100, Math.max(20, (record.economicQuintile || 3) * 20))
+  const statusEkonomi = `Kuintil ${record.economicQuintile || 3}`
+
+  // 7. Posyandu: 1=Rutin+KIA (95), 2=Kadang (55), 3=Tidak Pernah (20)
+  const scorePosyandu =
+    record.posyanduKia === 1 ? 95 :
+    record.posyanduKia === 2 ? 55 :
+    record.posyanduKia === 3 ? 20 : 50
+  const statusPosyandu =
+    record.posyanduKia === 1 ? 'Rutin & Ada KIA' :
+    record.posyanduKia === 2 ? 'Kurang Rutin' : 'Tidak Aktif'
+
+  // --- 7-Axis Composite Radar Dataset ---
   const radarData = [
     {
-      subject: 'Sanitasi',
-      fullSubject: 'Akses Sanitasi',
-      value: record.sanitationAccess ? 90 : 25,
+      subject: 'Pola Makan',
+      fullSubject: 'Kualitas Pola Makan (ASI, MPASI, Protein Hewani)',
+      value: scorePolaMakan,
       fullMark: 100,
-      status: record.sanitationAccess ? 'Baik' : 'Beresiko',
-      available: true,
+      status: statusPolaMakan,
     },
     {
-      subject: 'Air Bersih',
-      fullSubject: 'Akses Air Bersih',
-      value: record.cleanWaterAccess ? 95 : 30,
+      subject: 'Lingkungan',
+      fullSubject: 'Kondisi Lingkungan (Air Bersih, Jamban, Bebas Rokok)',
+      value: scoreLingkungan,
       fullMark: 100,
-      status: record.cleanWaterAccess ? 'Baik' : 'Beresiko',
-      available: true,
-    },
-    {
-      subject: 'Bebas Rokok',
-      fullSubject: 'Bebas Asap Rokok',
-      value: !record.smokeExposure ? 90 : 20,
-      fullMark: 100,
-      status: !record.smokeExposure ? 'Bebas Asap' : 'Paparan Tinggi',
-      available: true,
-    },
-    {
-      subject: 'ASI Ekskl.',
-      fullSubject: 'ASI Eksklusif',
-      value: record.exclusiveAsi ? 95 : 35,
-      fullMark: 100,
-      status: record.exclusiveAsi ? 'Lengkap' : 'Tidak Eksklusif',
-      available: true,
+      status: statusLingkungan,
     },
     {
       subject: 'Bebas Diare',
-      fullSubject: 'Bebas Riwayat Diare',
-      value: !record.diarrheaHistory ? 90 : 25,
+      fullSubject: 'Ketahanan dari Infeksi Diare (3 Bulan Terakhir)',
+      value: scoreDiare,
       fullMark: 100,
-      status: !record.diarrheaHistory ? 'Jarang / Sehat' : 'Ada Riwayat',
-      available: true,
+      status: statusDiare,
     },
     {
       subject: 'Bebas BBLR',
-      fullSubject: 'Bebas Riwayat BBLR',
-      value: bblrKnown ? (!record.bblrHistory ? 90 : 25) : 50,
+      fullSubject: 'Riwayat Berat Lahir (BBLR)',
+      value: scoreBblr,
       fullMark: 100,
-      status: bblrKnown
-        ? (!record.bblrHistory ? 'Berat Lahir Cukup' : 'Riwayat BBLR')
-        : 'Data tidak tersedia',
-      available: bblrKnown,
+      status: statusBblr,
     },
     {
       subject: 'Pend. Ibu',
-      fullSubject: 'Tingkat Pendidikan Ibu',
-      value: motherEdKnown ? (record.motherEducation ? 90 : 35) : 50,
+      fullSubject: 'Jenjang Pendidikan Ibu',
+      value: scorePendIbu,
       fullMark: 100,
-      status: motherEdKnown
-        ? (record.motherEducation ? 'Tamat SMA+' : 'Dasar / Menengah')
-        : 'Data tidak tersedia',
-      available: motherEdKnown,
+      status: statusPendIbu,
     },
     {
       subject: 'Ekonomi',
-      fullSubject: 'Kuintil Sosial Ekonomi',
-      value: (record.economicQuintile || 3) * 20,
+      fullSubject: 'Kuintil Sosial Ekonomi Keluarga',
+      value: scoreEkonomi,
       fullMark: 100,
-      status: `Kuintil ${record.economicQuintile || 3}`,
-      available: true,
+      status: statusEkonomi,
+    },
+    {
+      subject: 'Posyandu',
+      fullSubject: 'Keaktifan Posyandu & Kepemilikan Buku KIA',
+      value: scorePosyandu,
+      fullMark: 100,
+      status: statusPosyandu,
     },
   ]
 
   const dominantFactors = record.dominantFactors || []
 
   const factorLabels: Record<string, string> = {
-    AKSES_SANITASI_BURUK: 'Akses Sanitasi / Jamban Belum Sehat',
-    PAPARAN_ASAP_ROKOK: 'Paparan Asap Rokok di Lingkungan Rumah',
-    AKSES_AIR_MINUM_TERBATAS: 'Keterbatasan Akses Air Minum Layak',
-    TIDAK_ASI_EKSKLUSIF: 'Tidak Memperoleh ASI Eksklusif Adekuat',
-    RIWAYAT_INFEKSI_DIARE: 'Riwayat Infeksi Diare Berulang',
-    KUINTIL_EKONOMI_RENDAH: 'Kuintil Sosial Ekonomi Rendah',
     RIWAYAT_BBLR: 'Riwayat Berat Badan Lahir Rendah (BBLR)',
+    TIDAK_ASI_EKSKLUSIF: 'Tidak Memperoleh ASI Eksklusif Adekuat',
+    MPASI_TERLALU_DINI: 'Pemberian MPASI Terlalu Dini (<6 Bulan)',
+    MPASI_TERLAMBAT: 'Pemberian MPASI Terlambat (>6 Bulan)',
+    PROTEIN_HEWANI_SANGAT_KURANG: 'Asupan Protein Hewani Sangat Terbatas',
+    PROTEIN_HEWANI_TERBATAS: 'Keragaman Protein Hewani Rendah',
+    AKSES_AIR_MINUM_TERBATAS: 'Keterbatasan Akses Air Minum Layak',
+    AKSES_SANITASI_BURUK: 'Akses Sanitasi / Jamban Belum Sehat',
+    AKSES_SANITASI_TERBATAS: 'Akses Sanitasi Terbatas / Jamban Cemplung',
+    PAPARAN_ASAP_ROKOK: 'Paparan Asap Rokok di Lingkungan Rumah',
+    PENDIDIKAN_IBU_RENDAH: 'Tingkat Pendidikan Ibu Dasar (≤SD)',
+    KUINTIL_EKONOMI_RENDAH: 'Kuintil Sosial Ekonomi Rendah',
+    RIWAYAT_INFEKSI_DIARE: 'Riwayat Infeksi Diare Berulang',
+    POSYANDU_TIDAK_AKTIF: 'Tidak Aktif Mengunjungi Posyandu / Tanpa KIA',
     INDIKASI_PERAWAKAN_PENDEK_TBU: 'Indikasi Perawakan Pendek (TB/U)',
   }
 
@@ -122,7 +197,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
               Radar Determinan Stunting
             </h3>
             <p className="text-xs text-slate-500">
-              Analisis Multi-Faktor Lingkungan & Pola Asuh
+              Analisis Komposit Multi-Faktor Lingkungan & Pola Asuh
             </p>
           </div>
         </div>
@@ -134,7 +209,7 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
           <RadarChart
             cx="50%"
             cy="50%"
-            outerRadius="58%"
+            outerRadius="60%"
             margin={{ top: 10, right: 18, bottom: 10, left: 18 }}
             data={radarData}
           >
@@ -153,12 +228,8 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
             />
             <Tooltip
               formatter={(val: any, _name: any, item: any) => [
-                item.payload.available
-                  ? `${val}/100 (${item.payload.status})`
-                  : `— (${item.payload.status})`,
-                item.payload.available
-                  ? item.payload.fullSubject || 'Skor Kualitas'
-                  : '⚠ Tidak Tersimpan di Database',
+                `${val}/100 (${item.payload.status})`,
+                item.payload.fullSubject || 'Skor Kualitas',
               ]}
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -170,14 +241,6 @@ export const DeterminantRadarWidget: React.FC<Props> = ({ record }) => {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-
-      {/* Notice when BBLR / Mother Education data is unavailable */}
-      {(!bblrKnown || !motherEdKnown) && (
-        <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-[11px] text-slate-500 mb-3">
-          <span className="font-semibold text-slate-600">ⓘ </span>
-          Data <strong>Riwayat BBLR</strong> dan <strong>Pendidikan Ibu</strong> tidak tersimpan di database backend — sumbu abu-abu (50) menandakan data tidak tersedia pada tautan yang dibagikan.
-        </div>
-      )}
 
       {/* Dominant Risk Factors List */}
       <div className="mt-3 pt-3 border-t border-slate-100">

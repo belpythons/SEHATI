@@ -14,6 +14,8 @@ import {
   MeasurementPositionType,
   ScreeningFormData,
   ScreeningSubmitPayload,
+  PERSONA_SUBMIT_MAP,
+  GENDER_SUBMIT_MAP,
 } from '../types/screening'
 import { getClientToken } from '../hooks/useSessionToken'
 import { screeningService } from '../services/screeningService'
@@ -39,24 +41,142 @@ const BONTANG_KELURAHAN = [
   'Tanjung Laut Indah',
 ]
 
+const TOTAL_STEPS = 4
+
 const INITIAL_FORM_DATA: ScreeningFormData = {
   persona: 'ORANG_TUA',
+  isOutsideBontang: false,
   kelurahan: '',
   gender: 'L',
   ageMonths: '',
   measurementPosition: 'Terlentang',
   weightKg: '',
   heightCm: '',
-  bblrHistory: null,
+  // Step 3
+  bblrOption: null,
   exclusiveAsi: null,
-  mpasiHistory: null,
+  mpasiAge: null,
+  animalProtein: [],
+  // Step 4
   cleanWaterAccess: null,
   sanitationAccess: null,
   smokeExposure: null,
-  economicQuintile: 3,
   motherEducation: null,
+  economicQuintile: 3,
   diarrheaHistory: null,
+  posyanduKia: null,
 }
+
+/* ── Radio/Checkbox option types ── */
+interface RadioOption { value: number; label: string; desc?: string }
+
+const BBLR_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Normal (≥ 2.500 gram)', desc: 'Berat lahir cukup sesuai standar klinis' },
+  { value: 2, label: 'BBLR (< 2.500 gram)', desc: 'Berat Badan Lahir Rendah' },
+  { value: 3, label: 'Tidak Tahu / Tidak Tercatat', desc: 'Informasi berat lahir tidak tersedia' },
+]
+
+const EXCLUSIVE_ASI_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'ASI Eksklusif 6 Bulan', desc: 'Hanya ASI saja selama 6 bulan pertama' },
+  { value: 2, label: 'Tidak Eksklusif / Formula', desc: 'Diselingi susu formula atau makanan lain sebelum 6 bulan' },
+  { value: 3, label: 'Belum 6 Bulan', desc: 'Bayi masih berusia di bawah 6 bulan' },
+]
+
+const MPASI_AGE_OPTIONS: RadioOption[] = [
+  { value: 1, label: '< 6 Bulan (Dini)', desc: 'MPASI diberikan sebelum usia 6 bulan' },
+  { value: 2, label: 'Tepat 6 Bulan (Ideal)', desc: 'Sesuai rekomendasi WHO' },
+  { value: 3, label: '> 6 Bulan (Terlambat)', desc: 'MPASI baru diberikan setelah lewat 6 bulan' },
+  { value: 4, label: 'Belum MPASI', desc: 'Bayi masih dalam fase ASI eksklusif' },
+]
+
+const ANIMAL_PROTEIN_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Ikan' },
+  { value: 2, label: 'Telur' },
+  { value: 3, label: 'Daging (Ayam/Sapi)' },
+  { value: 4, label: 'Susu / Produk Olahan' },
+  { value: 5, label: 'Sangat Jarang / Hampir Tidak Ada' },
+]
+
+const CLEAN_WATER_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Air Kemasan / Isi Ulang', desc: 'Sumber air terlindungi dan terjamin kualitasnya' },
+  { value: 2, label: 'PDAM', desc: 'Air perpipaan dari perusahaan daerah' },
+  { value: 3, label: 'Sumur Bor (Terlindungi)', desc: 'Air tanah dalam dengan pompa' },
+  { value: 4, label: 'Sumur Gali / Mata Air / Hujan', desc: 'Sumber air tidak terlindungi, risiko kontaminasi tinggi' },
+]
+
+const SANITATION_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Milik Sendiri (Leher Angsa + Septic Tank)', desc: 'Jamban sehat sesuai standar kesehatan' },
+  { value: 2, label: 'Cemplung (Tanpa Septic Tank)', desc: 'Jamban tanpa pengolahan limbah tertutup' },
+  { value: 3, label: 'MCK Umum / Bersama', desc: 'Fasilitas sanitasi bersama di lingkungan' },
+  { value: 4, label: 'Tidak Memiliki Jamban', desc: 'Tidak ada akses fasilitas sanitasi' },
+]
+
+const SMOKE_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Bebas Asap Rokok', desc: 'Tidak ada anggota keluarga yang merokok di dalam rumah' },
+  { value: 2, label: 'Terpapar Asap Rokok', desc: 'Ada anggota keluarga yang merokok di lingkungan rumah' },
+]
+
+const MOTHER_EDUCATION_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Tidak Tamat / Tamat SD', desc: 'Pendidikan dasar' },
+  { value: 2, label: 'SMP / Sederajat', desc: 'Pendidikan menengah pertama' },
+  { value: 3, label: 'SMA / SMK / Sederajat', desc: 'Pendidikan menengah atas' },
+  { value: 4, label: 'Diploma / Sarjana / Lebih Tinggi', desc: 'Pendidikan tinggi' },
+]
+
+const DIARRHEA_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Tidak Pernah / 1x Ringan', desc: 'Riwayat diare minimal dalam 3 bulan terakhir' },
+  { value: 2, label: 'Sering / Berulang (≥ 2 kali)', desc: 'Episode diare berulang yang menghambat penyerapan gizi' },
+]
+
+const POSYANDU_KIA_OPTIONS: RadioOption[] = [
+  { value: 1, label: 'Rutin Posyandu + Punya Buku KIA', desc: 'Pemantauan tumbuh kembang konsisten' },
+  { value: 2, label: 'Kadang-kadang ke Posyandu', desc: 'Kunjungan tidak rutin' },
+  { value: 3, label: 'Tidak Pernah / Jarang', desc: 'Tidak ada pemantauan posyandu' },
+]
+
+const PERSONA_CARDS = [
+  { value: 'ORANG_TUA' as PersonaType, label: 'Orang Tua', desc: 'Pemeriksaan mandiri untuk anak tercinta' },
+  { value: 'KADER_POSYANDU' as PersonaType, label: 'Kader Posyandu', desc: 'Pencatatan skrining posyandu balita' },
+  { value: 'TENAGA_KESEHATAN' as PersonaType, label: 'Nakes / Bidan', desc: 'Penilaian klinis tenaga kesehatan' },
+  { value: 'SURVEYOR' as PersonaType, label: 'Surveyor', desc: 'Pengumpulan data stunting terintegrasi' },
+]
+
+/* ── Reusable Radio Group ── */
+const IntegerRadioGroup: React.FC<{
+  label: string
+  desc: string
+  options: RadioOption[]
+  value: number | null
+  onChange: (val: number) => void
+}> = ({ label, desc, options, value, onChange }) => (
+  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+    <div>
+      <p className="font-semibold text-slate-800 text-sm">{label} <span className="text-red-500">*</span></p>
+      <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+    </div>
+    <div className="space-y-2">
+      {options.map((opt) => {
+        const isSelected = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            aria-pressed={isSelected}
+            className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
+              isSelected
+                ? 'border-blue-600 bg-blue-50/50 text-blue-800 font-semibold shadow-sm'
+                : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+            }`}
+          >
+            <span className="font-medium">{opt.label}</span>
+            {opt.desc && <span className="block text-xs text-slate-500 mt-0.5 font-normal">{opt.desc}</span>}
+          </button>
+        )
+      })}
+    </div>
+  </div>
+)
 
 export const QuestionnairePage: React.FC = () => {
   const navigate = useNavigate()
@@ -81,7 +201,7 @@ export const QuestionnairePage: React.FC = () => {
         hasChanges = true
       }
 
-      if (incomingPersona && ['ORANG_TUA', 'KADER_POSYANDU', 'SURVEYOR'].includes(incomingPersona)) {
+      if (incomingPersona && ['ORANG_TUA', 'KADER_POSYANDU', 'TENAGA_KESEHATAN', 'SURVEYOR'].includes(incomingPersona)) {
         newData.persona = incomingPersona
         hasChanges = true
       }
@@ -100,6 +220,23 @@ export const QuestionnairePage: React.FC = () => {
     setErrorMessage(null)
   }
 
+  /** Toggle animalProtein with mutual exclusivity for option 5 */
+  const toggleProtein = (val: number) => {
+    setFormData((prev) => {
+      let next: number[]
+      if (val === 5) {
+        // Option 5 selected → clear 1-4
+        next = prev.animalProtein.includes(5) ? [] : [5]
+      } else {
+        // Option 1-4 selected → remove 5 if present, toggle this option
+        const without5 = prev.animalProtein.filter((v) => v !== 5)
+        next = without5.includes(val) ? without5.filter((v) => v !== val) : [...without5, val]
+      }
+      return { ...prev, animalProtein: next }
+    })
+    setErrorMessage(null)
+  }
+
   // Step 1 Validation (Persona & Kelurahan)
   const validateStep1 = (): boolean => {
     if (!formData.persona) {
@@ -107,7 +244,11 @@ export const QuestionnairePage: React.FC = () => {
       return false
     }
     if (!formData.kelurahan) {
-      setErrorMessage('Pilih kelurahan domisili di Kota Bontang.')
+      setErrorMessage(formData.isOutsideBontang ? 'Masukkan nama kelurahan domisili.' : 'Pilih kelurahan domisili di Kota Bontang.')
+      return false
+    }
+    if (formData.isOutsideBontang && formData.kelurahan.length < 2) {
+      setErrorMessage('Nama kelurahan minimal 2 karakter.')
       return false
     }
     return true
@@ -137,20 +278,39 @@ export const QuestionnairePage: React.FC = () => {
     return true
   }
 
-  // Step 3 Validation (Determinan Lingkungan & Pola Asuh)
+  // Step 3 Validation (Riwayat Kelahiran & Pola Makan)
   const validateStep3 = (): boolean => {
-    const requiredBooleans = [
-      formData.bblrHistory,
-      formData.exclusiveAsi,
-      formData.mpasiHistory,
+    if (formData.bblrOption === null) {
+      setErrorMessage('Pilih riwayat berat badan lahir balita.')
+      return false
+    }
+    if (formData.exclusiveAsi === null) {
+      setErrorMessage('Pilih status pemberian ASI eksklusif.')
+      return false
+    }
+    if (formData.mpasiAge === null) {
+      setErrorMessage('Pilih usia pemberian MPASI.')
+      return false
+    }
+    if (formData.animalProtein.length === 0) {
+      setErrorMessage('Pilih minimal satu sumber protein hewani atau opsi "Sangat Jarang".')
+      return false
+    }
+    return true
+  }
+
+  // Step 4 Validation (Lingkungan & Sosial-Ekonomi)
+  const validateStep4 = (): boolean => {
+    const required: (number | null)[] = [
       formData.cleanWaterAccess,
       formData.sanitationAccess,
       formData.smokeExposure,
       formData.motherEducation,
       formData.diarrheaHistory,
+      formData.posyanduKia,
     ]
-    if (requiredBooleans.some((val) => val === null)) {
-      setErrorMessage('Mohon pilih salah satu opsi yang tersedia.')
+    if (required.some((val) => val === null)) {
+      setErrorMessage('Mohon lengkapi semua pertanyaan pada halaman ini.')
       return false
     }
     if (!formData.economicQuintile || formData.economicQuintile < 1 || formData.economicQuintile > 5) {
@@ -164,7 +324,8 @@ export const QuestionnairePage: React.FC = () => {
     setErrorMessage(null)
     if (step === 1 && !validateStep1()) return
     if (step === 2 && !validateStep2()) return
-    if (step < 3) setStep(step + 1)
+    if (step === 3 && !validateStep3()) return
+    if (step < TOTAL_STEPS) setStep(step + 1)
   }
 
   const prevStep = () => {
@@ -183,32 +344,32 @@ export const QuestionnairePage: React.FC = () => {
 
   const handleSubmit = async () => {
     setErrorMessage(null)
-    if (!validateStep3()) return
+    if (!validateStep4()) return
 
     // Ensure client session token via canonical helper
     const clientToken = getClientToken()
 
     const payload: ScreeningSubmitPayload = {
       clientToken,
-      persona: formData.persona as PersonaType,
+      persona: PERSONA_SUBMIT_MAP[formData.persona as PersonaType],
+      isOutsideBontang: formData.isOutsideBontang,
       kelurahan: formData.kelurahan,
-      gender: formData.gender as GenderType,
+      gender: GENDER_SUBMIT_MAP[formData.gender as GenderType],
       ageMonths: Number(formData.ageMonths),
       weightKg: Number(formData.weightKg),
       heightCm: Number(formData.heightCm),
-      exclusiveAsi: Boolean(formData.exclusiveAsi),
-      sanitationAccess: Boolean(formData.sanitationAccess),
-      cleanWaterAccess: Boolean(formData.cleanWaterAccess),
-      smokeExposure: Boolean(formData.smokeExposure),
+      bblrOption: formData.bblrOption!,
+      exclusiveAsi: formData.exclusiveAsi!,
+      mpasiAge: formData.mpasiAge!,
+      animalProtein: formData.animalProtein,
+      cleanWaterAccess: formData.cleanWaterAccess!,
+      sanitationAccess: formData.sanitationAccess!,
+      smokeExposure: formData.smokeExposure!,
+      motherEducation: formData.motherEducation!,
       economicQuintile: Number(formData.economicQuintile),
-      diarrheaHistory: Boolean(formData.diarrheaHistory),
-      bblrHistory: Boolean(formData.bblrHistory),
-      motherEducation: Boolean(formData.motherEducation),
-      // NOTE/TODO: Payload sends rawMetadata containing mpasiHistory and measurementPosition.
-      // Backend screening.controller.ts currently writes rawMetadata from mlResult instead of screeningData.
-      // Once backend merges screeningData.rawMetadata, this payload will automatically persist properly.
+      diarrheaHistory: formData.diarrheaHistory!,
+      posyanduKia: formData.posyanduKia!,
       rawMetadata: {
-        mpasiHistory: Boolean(formData.mpasiHistory),
         measurementPosition: formData.measurementPosition,
       },
       sourceType: 'PWA_DIRECT_USER',
@@ -218,24 +379,15 @@ export const QuestionnairePage: React.FC = () => {
     try {
       if (!navigator.onLine) {
         // SCENARIO 1: Device is genuinely offline
-        // 1. Generate immediate client-side approximation so user can still see interim growth analysis
         const mockRes = await mockScreeningApi.submit(payload)
-        
-        // 2. Enqueue payload into IndexedDB with mockShareHash mapping for auto-sync upgrade
         await enqueueSubmission(payload, mockRes.shareHash)
 
         const enrichedOfflineResponse = {
           ...mockRes,
           isMockData: true,
           dataSource: 'mock' as const,
-          data: {
-            ...mockRes.data,
-            bblrHistory: Boolean(formData.bblrHistory),
-            motherEducation: Boolean(formData.motherEducation),
-          },
         }
 
-        // 3. Store in sessionStorage for local offline viewing
         sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedOfflineResponse))
         screeningService.clearDraft()
 
@@ -253,11 +405,6 @@ export const QuestionnairePage: React.FC = () => {
           ...liveRes,
           isMockData: false,
           dataSource: 'live' as const,
-          data: {
-            ...liveRes.data,
-            bblrHistory: Boolean(formData.bblrHistory),
-            motherEducation: Boolean(formData.motherEducation),
-          },
         }
 
         sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedLiveResponse))
@@ -266,21 +413,13 @@ export const QuestionnairePage: React.FC = () => {
       } catch (backendError) {
         console.warn('[SEHATI] Live backend unreachable, buffering to offline queue and activating simulation:', backendError)
         
-        // 1. Fallback to mock simulation for uninterrupted demo UX
         const mockRes = await mockScreeningApi.submit(payload)
-
-        // 2. Buffer to IndexedDB for retry with mockShareHash mapping
         await enqueueSubmission(payload, mockRes.shareHash)
         
         const enrichedMockResponse = {
           ...mockRes,
           isMockData: true,
           dataSource: 'mock' as const,
-          data: {
-            ...mockRes.data,
-            bblrHistory: Boolean(formData.bblrHistory),
-            motherEducation: Boolean(formData.motherEducation),
-          },
         }
 
         sessionStorage.setItem('sehati_active_screening', JSON.stringify(enrichedMockResponse))
@@ -311,10 +450,10 @@ export const QuestionnairePage: React.FC = () => {
           </button>
           <div className="flex items-center gap-2">
             <span className="text-xs sm:text-sm font-medium text-slate-600">
-              Langkah {step} dari 3
+              Langkah {step} dari {TOTAL_STEPS}
             </span>
             <div className="flex gap-1.5 ml-2">
-              {[1, 2, 3].map((s) => (
+              {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
                 <div
                   key={s}
                   className={`h-2 rounded-full transition-all duration-300 ${
@@ -355,7 +494,7 @@ export const QuestionnairePage: React.FC = () => {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
           <AnimatePresence mode="wait">
-            {/* STEP 1: Seleksi Persona & Domisili */}
+            {/* ════════ STEP 1: Persona & Domisili ════════ */}
             {step === 1 && (
               <motion.div
                 key="step1"
@@ -370,39 +509,23 @@ export const QuestionnairePage: React.FC = () => {
                     Langkah 1: Seleksi Persona & Domisili
                   </h2>
                   <p className="text-sm text-slate-500 mt-1">
-                    Tentukan peran Anda dan wilayah kelurahan domisili di Kota Bontang.
+                    Tentukan peran Anda dan wilayah kelurahan domisili.
                   </p>
                 </div>
 
-                {/* Persona Selection */}
+                {/* Persona Selection — 4 cards */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-700">
                     Pilih Peran / Persona Anda <span className="text-red-500">*</span>
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      {
-                        value: 'ORANG_TUA',
-                        label: 'Orang Tua',
-                        desc: 'Pemeriksaan mandiri untuk anak tercinta',
-                      },
-                      {
-                        value: 'KADER_POSYANDU',
-                        label: 'Kader Posyandu',
-                        desc: 'Pencatatan skrining posyandu balita',
-                      },
-                      {
-                        value: 'SURVEYOR',
-                        label: 'Surveyor / Nakes',
-                        desc: 'Pengumpulan data stunting terintegrasi',
-                      },
-                    ].map((p) => {
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {PERSONA_CARDS.map((p) => {
                       const isSelected = formData.persona === p.value
                       return (
                         <button
                           key={p.value}
                           type="button"
-                          onClick={() => updateField('persona', p.value as PersonaType)}
+                          onClick={() => updateField('persona', p.value)}
                           aria-pressed={isSelected}
                           className={`text-left cursor-pointer rounded-xl p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                             isSelected
@@ -425,30 +548,59 @@ export const QuestionnairePage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Kelurahan Selection */}
+                {/* isOutsideBontang Toggle */}
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60">
+                  <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                    <input
+                      type="checkbox"
+                      checked={formData.isOutsideBontang}
+                      onChange={(e) => {
+                        updateField('isOutsideBontang', e.target.checked)
+                        updateField('kelurahan', '') // reset kelurahan on toggle
+                      }}
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-slate-700">Domisili di luar Kota Bontang</span>
+                      <span className="block text-xs text-slate-500">Centang jika balita berdomisili di luar wilayah Kota Bontang</span>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Kelurahan Selection — conditional */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Pilih Kelurahan di Kota Bontang <span className="text-red-500">*</span>
+                    {formData.isOutsideBontang ? 'Nama Kelurahan / Desa Domisili' : 'Pilih Kelurahan di Kota Bontang'} <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={formData.kelurahan}
-                    onChange={(e) => updateField('kelurahan', e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  >
-                    <option value="" disabled>
-                      -- Pilih Kelurahan Domisili --
-                    </option>
-                    {BONTANG_KELURAHAN.map((kel) => (
-                      <option key={kel} value={kel}>
-                        Kelurahan {kel}
+                  {formData.isOutsideBontang ? (
+                    <input
+                      type="text"
+                      value={formData.kelurahan}
+                      onChange={(e) => updateField('kelurahan', e.target.value)}
+                      placeholder="Ketik nama kelurahan / desa (min. 2 karakter)"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    />
+                  ) : (
+                    <select
+                      value={formData.kelurahan}
+                      onChange={(e) => updateField('kelurahan', e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    >
+                      <option value="" disabled>
+                        -- Pilih Kelurahan Domisili --
                       </option>
-                    ))}
-                  </select>
+                      {BONTANG_KELURAHAN.map((kel) => (
+                        <option key={kel} value={kel}>
+                          Kelurahan {kel}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 2: Data Fisik & Antropometri Balita */}
+            {/* ════════ STEP 2: Data Fisik & Antropometri Balita ════════ */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -528,25 +680,15 @@ export const QuestionnairePage: React.FC = () => {
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      {
-                        value: 'Terlentang',
-                        label: 'Terlentang (Panjang Badan)',
-                        desc: 'Rekomendasi untuk usia < 24 bulan',
-                      },
-                      {
-                        value: 'Berdiri',
-                        label: 'Berdiri (Tinggi Badan)',
-                        desc: 'Rekomendasi untuk usia ≥ 24 bulan',
-                      },
+                      { value: 'Terlentang', label: 'Terlentang (Panjang Badan)', desc: 'Rekomendasi untuk usia < 24 bulan' },
+                      { value: 'Berdiri', label: 'Berdiri (Tinggi Badan)', desc: 'Rekomendasi untuk usia ≥ 24 bulan' },
                     ].map((pos) => {
                       const isSelected = formData.measurementPosition === pos.value
                       return (
                         <button
                           key={pos.value}
                           type="button"
-                          onClick={() =>
-                            updateField('measurementPosition', pos.value as MeasurementPositionType)
-                          }
+                          onClick={() => updateField('measurementPosition', pos.value as MeasurementPositionType)}
                           aria-pressed={isSelected}
                           className={`text-left cursor-pointer rounded-xl p-3 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
                             isSelected
@@ -605,7 +747,7 @@ export const QuestionnairePage: React.FC = () => {
               </motion.div>
             )}
 
-            {/* STEP 3: Determinan Lingkungan & Pola Asuh */}
+            {/* ════════ STEP 3: Riwayat Kelahiran & Pola Makan ════════ */}
             {step === 3 && (
               <motion.div
                 key="step3"
@@ -613,101 +755,129 @@ export const QuestionnairePage: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-6"
+                className="space-y-5"
               >
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                    Langkah 3: Determinan Lingkungan & Pola Asuh
+                    Langkah 3: Riwayat Kelahiran & Pola Makan
                   </h2>
                   <p className="text-sm text-slate-500 mt-1">
-                    Informasi determinan pemicu stunting untuk model Naïve Bayes & Gemini AI.
+                    Informasi riwayat kelahiran dan pola pemberian makan balita.
                   </p>
                 </div>
 
-                {/* Boolean Questions Grid */}
-                <div className="space-y-4">
-                  {[
-                    {
-                      key: 'bblrHistory' as const,
-                      label: 'Riwayat BBLR (Berat Badan Lahir Rendah < 2.5 kg)',
-                      desc: 'Apakah balita lahir dengan berat badan di bawah 2.500 gram?',
-                    },
-                    {
-                      key: 'exclusiveAsi' as const,
-                      label: 'Pemberian ASI Eksklusif (0–6 Bulan)',
-                      desc: 'Apakah balita hanya diberikan ASI saja selama 6 bulan pertama?',
-                    },
-                    {
-                      key: 'mpasiHistory' as const,
-                      label: 'Pemberian MPASI Tepat Waktu & Bergizi',
-                      desc: 'Apakah balita mendapatkan Makanan Pendamping ASI adekuat mulai usia 6 bulan?',
-                    },
-                    {
-                      key: 'cleanWaterAccess' as const,
-                      label: 'Akses Air Minum Bersih & Layak',
-                      desc: 'Apakah rumah tangga menggunakan sumber air bersih/perpipaan yang terlindungi?',
-                    },
-                    {
-                      key: 'sanitationAccess' as const,
-                      label: 'Akses Sanitasi / Jamban Sehat',
-                      desc: 'Apakah rumah tangga memiliki fasilitas jamban dengan septic tank tertutup?',
-                    },
-                    {
-                      key: 'smokeExposure' as const,
-                      label: 'Paparan Asap Rokok di Dalam Rumah',
-                      desc: 'Apakah ada anggota keluarga yang merokok di dalam lingkungan rumah?',
-                    },
-                    {
-                      key: 'diarrheaHistory' as const,
-                      label: 'Riwayat Diare Berulang (1–3 Bulan Terakhir)',
-                      desc: 'Apakah balita mengalami episode diare dalam beberapa bulan terakhir?',
-                    },
-                    {
-                      key: 'motherEducation' as const,
-                      label: 'Pendidikan Ibu (Tamat SMA / Sederajat ke Atas)',
-                      desc: 'Apakah ibu balita menamatkan jenjang pendidikan menengah atas atau perguruan tinggi?',
-                    },
-                  ].map((q) => {
-                    const value = formData[q.key]
-                    return (
-                      <div
-                        key={q.key}
-                        className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div className="max-w-md">
-                          <p className="font-semibold text-slate-800 text-sm">{q.label}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{q.desc}</p>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => updateField(q.key, true)}
-                            aria-pressed={value === true}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                              value === true
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                            }`}
-                          >
-                            Ya
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => updateField(q.key, false)}
-                            aria-pressed={value === false}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                              value === false
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                            }`}
-                          >
-                            Tidak
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
+                <IntegerRadioGroup
+                  label="Riwayat Berat Badan Lahir"
+                  desc="Apakah balita pernah didiagnosis lahir dengan BBLR?"
+                  options={BBLR_OPTIONS}
+                  value={formData.bblrOption}
+                  onChange={(v) => updateField('bblrOption', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Pemberian ASI Eksklusif (0–6 Bulan)"
+                  desc="Apakah balita hanya diberikan ASI saja selama 6 bulan pertama?"
+                  options={EXCLUSIVE_ASI_OPTIONS}
+                  value={formData.exclusiveAsi}
+                  onChange={(v) => updateField('exclusiveAsi', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Usia Pemberian MPASI Pertama Kali"
+                  desc="Kapan Makanan Pendamping ASI pertama kali diberikan?"
+                  options={MPASI_AGE_OPTIONS}
+                  value={formData.mpasiAge}
+                  onChange={(v) => updateField('mpasiAge', v)}
+                />
+
+                {/* Animal Protein — Multi-Select with Mutual Exclusivity */}
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                  <div>
+                    <p className="font-semibold text-slate-800 text-sm">Keragaman Protein Hewani Harian <span className="text-red-500">*</span></p>
+                    <p className="text-xs text-slate-500 mt-0.5">Pilih sumber protein hewani yang rutin dikonsumsi balita (bisa lebih dari satu).</p>
+                  </div>
+                  <div className="space-y-2">
+                    {ANIMAL_PROTEIN_OPTIONS.map((opt) => {
+                      const isChecked = formData.animalProtein.includes(opt.value)
+                      const isDisabled = opt.value !== 5 && formData.animalProtein.includes(5)
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => toggleProtein(opt.value)}
+                          disabled={isDisabled}
+                          className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 flex items-center gap-3 ${
+                            isChecked
+                              ? 'border-blue-600 bg-blue-50/50 text-blue-800 font-semibold shadow-sm'
+                              : isDisabled
+                              ? 'border-slate-100 bg-slate-100 text-slate-400 cursor-not-allowed'
+                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                          }`}
+                        >
+                          <div className={`w-4.5 h-4.5 rounded border-2 flex items-center justify-center shrink-0 ${
+                            isChecked ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'
+                          }`}>
+                            {isChecked && <CheckCircle2 className="w-3 h-3 text-white" />}
+                          </div>
+                          <span className="font-medium">{opt.label}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
+              </motion.div>
+            )}
+
+            {/* ════════ STEP 4: Lingkungan & Sosial-Ekonomi ════════ */}
+            {step === 4 && (
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-5"
+              >
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                    Langkah 4: Lingkungan & Sosial-Ekonomi
+                  </h2>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Determinan lingkungan, sanitasi, dan sosial-ekonomi untuk model Naïve Bayes & Gemini AI.
+                  </p>
+                </div>
+
+                <IntegerRadioGroup
+                  label="Sumber Air Minum Utama Rumah Tangga"
+                  desc="Pilih sumber air minum yang paling sering digunakan sehari-hari."
+                  options={CLEAN_WATER_OPTIONS}
+                  value={formData.cleanWaterAccess}
+                  onChange={(v) => updateField('cleanWaterAccess', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Akses Sanitasi / Jamban"
+                  desc="Pilih jenis fasilitas sanitasi yang digunakan rumah tangga."
+                  options={SANITATION_OPTIONS}
+                  value={formData.sanitationAccess}
+                  onChange={(v) => updateField('sanitationAccess', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Paparan Asap Rokok di Dalam Rumah"
+                  desc="Apakah ada anggota keluarga yang merokok di lingkungan rumah?"
+                  options={SMOKE_OPTIONS}
+                  value={formData.smokeExposure}
+                  onChange={(v) => updateField('smokeExposure', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Pendidikan Terakhir Ibu"
+                  desc="Jenjang pendidikan terakhir yang ditamatkan oleh ibu balita."
+                  options={MOTHER_EDUCATION_OPTIONS}
+                  value={formData.motherEducation}
+                  onChange={(v) => updateField('motherEducation', v)}
+                />
 
                 {/* Economic Quintile */}
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60">
@@ -749,6 +919,22 @@ export const QuestionnairePage: React.FC = () => {
                     })}
                   </div>
                 </div>
+
+                <IntegerRadioGroup
+                  label="Riwayat Diare Berulang (1–3 Bulan Terakhir)"
+                  desc="Apakah balita mengalami episode diare dalam beberapa bulan terakhir?"
+                  options={DIARRHEA_OPTIONS}
+                  value={formData.diarrheaHistory}
+                  onChange={(v) => updateField('diarrheaHistory', v)}
+                />
+
+                <IntegerRadioGroup
+                  label="Keaktifan Posyandu & Kepemilikan Buku KIA"
+                  desc="Seberapa rutin balita dibawa ke Posyandu dan apakah memiliki Buku KIA?"
+                  options={POSYANDU_KIA_OPTIONS}
+                  value={formData.posyanduKia}
+                  onChange={(v) => updateField('posyanduKia', v)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -769,7 +955,7 @@ export const QuestionnairePage: React.FC = () => {
 
             <div className="flex-1" />
 
-            {step < 3 ? (
+            {step < TOTAL_STEPS ? (
               <button
                 type="button"
                 onClick={nextStep}
@@ -804,4 +990,3 @@ export const QuestionnairePage: React.FC = () => {
     </div>
   )
 }
-

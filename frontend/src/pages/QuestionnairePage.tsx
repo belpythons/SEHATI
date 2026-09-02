@@ -149,10 +149,10 @@ const IntegerRadioGroup: React.FC<{
   value: number | null
   onChange: (val: number) => void
 }> = ({ label, desc, options, value, onChange }) => (
-  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+  <div className="p-4 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)] space-y-3">
     <div>
-      <p className="font-semibold text-slate-800 text-sm">{label} <span className="text-red-500">*</span></p>
-      <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+      <p className="font-semibold text-[var(--color-ink)] text-sm">{label} <span className="text-red-500">*</span></p>
+      <p className="text-xs text-[var(--color-ink-2)] mt-0.5">{desc}</p>
     </div>
     <div className="space-y-2">
       {options.map((opt) => {
@@ -163,14 +163,13 @@ const IntegerRadioGroup: React.FC<{
             type="button"
             onClick={() => onChange(opt.value)}
             aria-pressed={isSelected}
-            className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-              isSelected
-                ? 'border-blue-600 bg-blue-50/50 text-blue-800 font-semibold shadow-sm'
-                : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
-            }`}
+            className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+              ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)] text-[var(--color-ink)] font-semibold'
+              : 'border-[var(--color-rule)] text-[var(--color-ink-2)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
+              }`}
           >
             <span className="font-medium">{opt.label}</span>
-            {opt.desc && <span className="block text-xs text-slate-500 mt-0.5 font-normal">{opt.desc}</span>}
+            {opt.desc && <span className="block text-xs text-[var(--color-ink-2)] mt-0.5 font-normal">{opt.desc}</span>}
           </button>
         )
       })}
@@ -412,10 +411,10 @@ export const QuestionnairePage: React.FC = () => {
         navigate(`/analytics/${liveRes.shareHash}`)
       } catch (backendError) {
         console.warn('[SEHATI] Live backend unreachable, buffering to offline queue and activating simulation:', backendError)
-        
+
         const mockRes = await mockScreeningApi.submit(payload)
         await enqueueSubmission(payload, mockRes.shareHash)
-        
+
         const enrichedMockResponse = {
           ...mockRes,
           isMockData: true,
@@ -437,34 +436,39 @@ export const QuestionnairePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Navbar */}
-      <nav className="glass-nav sticky top-0 z-30 px-4 sm:px-6 py-3 bg-white/90 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Kembali ke Beranda</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm font-medium text-slate-600">
-              Langkah {step} dari {TOTAL_STEPS}
-            </span>
-            <div className="flex gap-1.5 ml-2">
-              {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
-                <div
-                  key={s}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    s === step
-                      ? 'w-6 bg-blue-600'
+    <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex flex-col font-sans selection:bg-slate-900 selection:text-white">
+      {/* Top Navbar — Hallmark pill */}
+      <nav className="sticky top-0 z-30 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-2 pointer-events-none">
+        <div className="max-w-3xl mx-auto flex justify-center pointer-events-auto">
+          <div className="bg-white/95 backdrop-blur-md rounded-full px-2.5 sm:px-3 py-2 flex items-center justify-between border border-[var(--color-rule)] shadow-sm w-full">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-1.5 sm:gap-2 text-[var(--color-ink-2)] hover:text-[var(--color-ink)] transition-colors font-medium text-sm rounded-full px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-2 shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4 shrink-0" />
+              <span className="hidden sm:inline">Kembali ke Beranda</span>
+              <span className="sm:hidden">Beranda</span>
+            </button>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <span className="hidden sm:inline text-xs sm:text-sm font-medium text-[var(--color-ink-2)]">
+                Langkah {step} dari {TOTAL_STEPS}
+              </span>
+              <span className="sm:hidden text-xs font-medium text-[var(--color-ink-2)]">
+                {step}/{TOTAL_STEPS}
+              </span>
+              <div className="flex gap-1.5 ml-1">
+                {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
+                  <div
+                    key={s}
+                    className={`h-2 rounded-full transition-all duration-300 ${s === step
+                      ? 'w-6 bg-[var(--color-navy)]'
                       : s < step
-                      ? 'w-2 bg-blue-300'
-                      : 'w-2 bg-slate-200'
-                  }`}
-                />
-              ))}
+                        ? 'w-2 bg-[var(--color-teal)]'
+                        : 'w-2 bg-[var(--color-rule)]'
+                      }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -472,7 +476,7 @@ export const QuestionnairePage: React.FC = () => {
 
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed top-16 right-4 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium animate-in fade-in slide-in-from-top-2">
+        <div className="fixed top-16 right-4 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-sm flex items-center gap-2 text-sm font-medium animate-in fade-in slide-in-from-top-2">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMessage}</span>
         </div>
@@ -485,6 +489,7 @@ export const QuestionnairePage: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-red-700 text-sm font-medium"
           >
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600" />
@@ -492,7 +497,7 @@ export const QuestionnairePage: React.FC = () => {
           </motion.div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div className="bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-6 sm:p-8">
           <AnimatePresence mode="wait">
             {/* ════════ STEP 1: Persona & Domisili ════════ */}
             {step === 1 && (
@@ -501,21 +506,21 @@ export const QuestionnairePage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
                     Langkah 1: Seleksi Persona & Domisili
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
                     Tentukan peran Anda dan wilayah kelurahan domisili.
                   </p>
                 </div>
 
                 {/* Persona Selection — 4 cards */}
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1">
                     Pilih Peran / Persona Anda <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -527,21 +532,20 @@ export const QuestionnairePage: React.FC = () => {
                           type="button"
                           onClick={() => updateField('persona', p.value)}
                           aria-pressed={isSelected}
-                          className={`text-left cursor-pointer rounded-xl p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                            isSelected
-                              ? 'border-blue-600 bg-blue-50/50 shadow-sm'
-                              : 'border-slate-200 hover:border-slate-300 bg-white'
-                          }`}
+                          className={`text-left cursor-pointer rounded-xl p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+                            ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)]'
+                            : 'border-[var(--color-rule)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-slate-800 text-sm">
+                            <span className="font-semibold text-[var(--color-ink)] text-sm">
                               {p.label}
                             </span>
                             {isSelected && (
-                              <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                              <CheckCircle2 className="w-5 h-5 text-[var(--color-navy)]" />
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">{p.desc}</p>
+                          <p className="text-xs text-[var(--color-ink-2)] mt-1">{p.desc}</p>
                         </button>
                       )
                     })}
@@ -549,7 +553,7 @@ export const QuestionnairePage: React.FC = () => {
                 </div>
 
                 {/* isOutsideBontang Toggle */}
-                <div className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60">
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
                   <label className="flex items-center gap-2.5 cursor-pointer flex-1">
                     <input
                       type="checkbox"
@@ -558,18 +562,18 @@ export const QuestionnairePage: React.FC = () => {
                         updateField('isOutsideBontang', e.target.checked)
                         updateField('kelurahan', '') // reset kelurahan on toggle
                       }}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 text-[var(--color-navy)] focus:ring-[var(--color-navy)] cursor-pointer"
                     />
                     <div>
-                      <span className="text-sm font-medium text-slate-700">Domisili di luar Kota Bontang</span>
-                      <span className="block text-xs text-slate-500">Centang jika balita berdomisili di luar wilayah Kota Bontang</span>
+                      <span className="text-sm font-medium text-[var(--color-ink)]">Domisili di luar Kota Bontang</span>
+                      <span className="block text-xs text-[var(--color-ink-2)]">Centang jika balita berdomisili di luar wilayah Kota Bontang</span>
                     </div>
                   </label>
                 </div>
 
                 {/* Kelurahan Selection — conditional */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                     {formData.isOutsideBontang ? 'Nama Kelurahan / Desa Domisili' : 'Pilih Kelurahan di Kota Bontang'} <span className="text-red-500">*</span>
                   </label>
                   {formData.isOutsideBontang ? (
@@ -578,13 +582,13 @@ export const QuestionnairePage: React.FC = () => {
                       value={formData.kelurahan}
                       onChange={(e) => updateField('kelurahan', e.target.value)}
                       placeholder="Ketik nama kelurahan / desa (min. 2 karakter)"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-navy)] focus:border-[var(--color-navy)] transition-all"
                     />
                   ) : (
                     <select
                       value={formData.kelurahan}
                       onChange={(e) => updateField('kelurahan', e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-navy)] focus:border-[var(--color-navy)] transition-all"
                     >
                       <option value="" disabled>
                         -- Pilih Kelurahan Domisili --
@@ -607,14 +611,14 @@ export const QuestionnairePage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
                     Langkah 2: Data Fisik & Antropometri Balita
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
                     Masukkan data pengukuran fisik sesuai standar WHO.
                   </p>
                 </div>
@@ -622,7 +626,7 @@ export const QuestionnairePage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {/* Gender */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                       Jenis Kelamin <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -637,11 +641,10 @@ export const QuestionnairePage: React.FC = () => {
                             type="button"
                             onClick={() => updateField('gender', g.value as GenderType)}
                             aria-pressed={isSelected}
-                            className={`cursor-pointer rounded-xl p-3 text-center border-2 transition-all font-medium text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                              isSelected
-                                ? 'border-blue-600 bg-blue-50/50 text-blue-700 font-semibold'
-                                : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
-                            }`}
+                            className={`cursor-pointer rounded-xl p-3 text-center border-2 transition-all font-medium text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+                              ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)] text-[var(--color-ink)] font-semibold'
+                              : 'border-[var(--color-rule)] text-[var(--color-ink-2)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
+                              }`}
                           >
                             {g.label}
                           </button>
@@ -652,7 +655,7 @@ export const QuestionnairePage: React.FC = () => {
 
                   {/* Age Months */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                       Usia Balita (Bulan) <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -667,15 +670,15 @@ export const QuestionnairePage: React.FC = () => {
                       min="0"
                       max="59"
                       placeholder="0 - 59 bulan"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[var(--color-rule)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-navy)] focus:border-[var(--color-navy)] transition-all"
                     />
-                    <span className="text-xs text-slate-400 mt-1 block">Rentang: 0 hingga 59 bulan</span>
+                    <span className="text-xs text-[var(--color-ink-2)] mt-1 block">Rentang: 0 hingga 59 bulan</span>
                   </div>
                 </div>
 
                 {/* Measurement Position */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                     Posisi Pengukuran Tinggi/Panjang Badan <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -690,14 +693,13 @@ export const QuestionnairePage: React.FC = () => {
                           type="button"
                           onClick={() => updateField('measurementPosition', pos.value as MeasurementPositionType)}
                           aria-pressed={isSelected}
-                          className={`text-left cursor-pointer rounded-xl p-3 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                            isSelected
-                              ? 'border-blue-600 bg-blue-50/50 text-blue-700 font-semibold'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
-                          }`}
+                          className={`text-left cursor-pointer rounded-xl p-3 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+                            ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)] text-[var(--color-ink)] font-semibold'
+                            : 'border-[var(--color-rule)] text-[var(--color-ink-2)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
+                            }`}
                         >
                           <div className="font-semibold text-sm">{pos.label}</div>
-                          <div className="text-xs text-slate-500 mt-0.5">{pos.desc}</div>
+                          <div className="text-xs text-[var(--color-ink-2)] mt-0.5">{pos.desc}</div>
                         </button>
                       )
                     })}
@@ -707,7 +709,7 @@ export const QuestionnairePage: React.FC = () => {
                 {/* Weight & Height */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                       Berat Badan (kg) <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -720,13 +722,13 @@ export const QuestionnairePage: React.FC = () => {
                         updateField('weightKg', e.target.value === '' ? '' : parseFloat(e.target.value))
                       }
                       placeholder="Contoh: 9.5"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[var(--color-rule)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-navy)] focus:border-[var(--color-navy)] transition-all"
                     />
-                    <span className="text-xs text-slate-400 mt-1 block">Rentang valid: 1.0 - 30.0 kg</span>
+                    <span className="text-xs text-[var(--color-ink-2)] mt-1 block">Rentang valid: 1.0 - 30.0 kg</span>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
                       Tinggi / Panjang Badan (cm) <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -739,9 +741,9 @@ export const QuestionnairePage: React.FC = () => {
                         updateField('heightCm', e.target.value === '' ? '' : parseFloat(e.target.value))
                       }
                       placeholder="Contoh: 78.2"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[var(--color-rule)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-navy)] focus:border-[var(--color-navy)] transition-all"
                     />
-                    <span className="text-xs text-slate-400 mt-1 block">Rentang valid: 30.0 - 130.0 cm</span>
+                    <span className="text-xs text-[var(--color-ink-2)] mt-1 block">Rentang valid: 30.0 - 130.0 cm</span>
                   </div>
                 </div>
               </motion.div>
@@ -754,14 +756,14 @@ export const QuestionnairePage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-5"
               >
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
                     Langkah 3: Riwayat Kelahiran & Pola Makan
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
                     Informasi riwayat kelahiran dan pola pemberian makan balita.
                   </p>
                 </div>
@@ -791,10 +793,10 @@ export const QuestionnairePage: React.FC = () => {
                 />
 
                 {/* Animal Protein — Multi-Select with Mutual Exclusivity */}
-                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                <div className="p-4 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)] space-y-3">
                   <div>
-                    <p className="font-semibold text-slate-800 text-sm">Keragaman Protein Hewani Harian <span className="text-red-500">*</span></p>
-                    <p className="text-xs text-slate-500 mt-0.5">Pilih sumber protein hewani yang rutin dikonsumsi balita (bisa lebih dari satu).</p>
+                    <p className="font-semibold text-[var(--color-ink)] text-sm">Keragaman Protein Hewani Harian <span className="text-red-500">*</span></p>
+                    <p className="text-xs text-[var(--color-ink-2)] mt-0.5">Pilih sumber protein hewani yang rutin dikonsumsi balita (bisa lebih dari satu).</p>
                   </div>
                   <div className="space-y-2">
                     {ANIMAL_PROTEIN_OPTIONS.map((opt) => {
@@ -806,17 +808,15 @@ export const QuestionnairePage: React.FC = () => {
                           type="button"
                           onClick={() => toggleProtein(opt.value)}
                           disabled={isDisabled}
-                          className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 flex items-center gap-3 ${
-                            isChecked
-                              ? 'border-blue-600 bg-blue-50/50 text-blue-800 font-semibold shadow-sm'
-                              : isDisabled
-                              ? 'border-slate-100 bg-slate-100 text-slate-400 cursor-not-allowed'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
-                          }`}
+                          className={`w-full text-left cursor-pointer rounded-lg p-3 border-2 transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 flex items-center gap-3 ${isChecked
+                            ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)] text-[var(--color-ink)] font-semibold'
+                            : isDisabled
+                              ? 'border-[var(--color-rule)] bg-slate-100 text-slate-400 cursor-not-allowed'
+                              : 'border-[var(--color-rule)] text-[var(--color-ink-2)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
+                            }`}
                         >
-                          <div className={`w-4.5 h-4.5 rounded border-2 flex items-center justify-center shrink-0 ${
-                            isChecked ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'
-                          }`}>
+                          <div className={`w-4.5 h-4.5 rounded border-2 flex items-center justify-center shrink-0 ${isChecked ? 'bg-[var(--color-navy)] border-[var(--color-navy)]' : 'border-[var(--color-rule)] bg-[var(--color-paper)]'
+                            }`}>
                             {isChecked && <CheckCircle2 className="w-3 h-3 text-white" />}
                           </div>
                           <span className="font-medium">{opt.label}</span>
@@ -835,14 +835,14 @@ export const QuestionnairePage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-5"
               >
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
                     Langkah 4: Lingkungan & Sosial-Ekonomi
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
                     Determinan lingkungan, sanitasi, dan sosial-ekonomi untuk model Naïve Bayes & Gemini AI.
                   </p>
                 </div>
@@ -880,12 +880,12 @@ export const QuestionnairePage: React.FC = () => {
                 />
 
                 {/* Economic Quintile */}
-                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60">
+                <div className="p-4 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
                   <div className="mb-2">
-                    <label className="block text-sm font-semibold text-slate-800">
+                    <label className="block text-sm font-semibold text-[var(--color-ink)]">
                       Kuintil Status Ekonomi Rumah Tangga (1–5) <span className="text-red-500">*</span>
                     </label>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[var(--color-ink-2)]">
                       Klasifikasi tingkat pengeluaran/kesejahteraan keluarga (1: Termiskin s/d 5: Terkaya).
                     </p>
                   </div>
@@ -904,11 +904,10 @@ export const QuestionnairePage: React.FC = () => {
                           type="button"
                           onClick={() => updateField('economicQuintile', item.q)}
                           aria-pressed={isSelected}
-                          className={`py-2 px-1 rounded-xl text-center border-2 transition-all text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 ${
-                            isSelected
-                              ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                          }`}
+                          className={`py-2 px-1 rounded-xl text-center border-2 transition-all text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+                            ? 'border-[var(--color-navy)] bg-[var(--color-navy)] text-white'
+                            : 'border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink-2)] hover:border-[var(--color-ink-2)]/40'
+                            }`}
                         >
                           <div>Q{item.q}</div>
                           <div className="text-[10px] font-normal truncate mt-0.5 hidden sm:block">
@@ -940,13 +939,13 @@ export const QuestionnairePage: React.FC = () => {
           </AnimatePresence>
 
           {/* Action Navigation Buttons */}
-          <div className="flex flex-wrap items-center gap-3 mt-8 pt-6 border-t border-slate-100">
+          <div className="flex flex-wrap items-center gap-3 mt-8 pt-6 border-t border-[var(--color-rule)]">
             {step > 1 && (
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={prevStep}
-                className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-5 py-2.5 rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] hover:bg-[var(--color-paper-2)] font-medium text-sm transition-colors flex items-center gap-2 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Sebelumnya</span>
@@ -959,7 +958,7 @@ export const QuestionnairePage: React.FC = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-semibold text-sm shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
+                className="px-6 py-2.5 rounded-full bg-[#1e293b] text-white hover:bg-[#0f172a] font-medium text-sm transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-2"
               >
                 <span>Selanjutnya</span>
                 <ArrowRight className="w-4 h-4" />
@@ -969,7 +968,7 @@ export const QuestionnairePage: React.FC = () => {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleSubmit}
-                className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-semibold text-sm shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 disabled:opacity-75 cursor-pointer"
+                className="px-6 py-2.5 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 font-medium text-sm transition-colors flex items-center gap-2 disabled:opacity-75 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
               >
                 {isSubmitting ? (
                   <>

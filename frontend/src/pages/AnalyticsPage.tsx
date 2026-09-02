@@ -215,33 +215,33 @@ export const AnalyticsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-[var(--color-paper)] flex items-center justify-center font-sans">
         <div className="text-center p-8">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <h3 className="font-bold text-slate-800 text-lg">Memuat Dashboard Analitik...</h3>
-          <p className="text-sm text-slate-500 mt-1">Mengolah data Z-Score dan inferensi risiko Naïve Bayes</p>
+          <div className="w-12 h-12 border-4 border-[var(--color-navy)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h3 className="font-display font-medium text-[var(--color-ink)] text-xl">Memuat Dashboard Analitik...</h3>
+          <p className="text-sm text-[var(--color-ink-2)] mt-1">Mengolah data Z-Score dan inferensi risiko Naïve Bayes</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[var(--color-paper)] flex flex-col font-sans selection:bg-[#1e293b] selection:text-white">
       {/* Header Navbar */}
-      <header className="glass-nav sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-3.5 sm:px-6 py-2 sm:py-3">
+      <header className="sticky top-0 z-30 bg-[var(--color-paper)]/90 backdrop-blur-md border-b border-[var(--color-rule)] px-3.5 sm:px-6 py-2 sm:py-3">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4">
           {/* Left Side: Back to Home Link & Dashboard Title */}
           <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3">
             <Link
               to="/"
-              className="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 font-medium text-xs sm:text-sm transition-colors py-1 px-2 rounded-lg hover:bg-slate-100/80 shrink-0"
+              className="flex items-center gap-1.5 text-[var(--color-ink-2)] hover:text-[var(--color-ink)] font-medium text-xs sm:text-sm transition-colors py-1 px-2 rounded-lg hover:bg-[var(--color-paper-2)] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]"
               title="Kembali ke Beranda"
             >
-              <ArrowLeft className="w-4 h-4 text-slate-500 shrink-0" />
+              <ArrowLeft className="w-4 h-4 text-[var(--color-ink-2)] shrink-0" />
               <span>Kembali ke Beranda</span>
             </Link>
 
-            <span className="text-xs text-slate-300 hidden md:inline">|</span>
+            <span className="text-xs text-[var(--color-rule)] hidden md:inline">|</span>
 
             <div className="hidden md:flex items-center gap-2 shrink-0">
               <img
@@ -249,7 +249,7 @@ export const AnalyticsPage: React.FC = () => {
                 alt="SEHATI"
                 className="w-5 h-5 object-contain shrink-0"
               />
-              <span className="text-xs font-semibold text-slate-600">
+              <span className="text-xs font-semibold text-[var(--color-ink-2)]">
                 Dashboard Analitik & Konsultasi
               </span>
             </div>
@@ -258,7 +258,7 @@ export const AnalyticsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/questionnaire')}
-              className="sm:hidden px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+              className="sm:hidden px-3.5 py-1.5 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium text-xs transition-all flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Skrining Baru</span>
@@ -266,16 +266,16 @@ export const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Right Side: Data Source Status Badge & Desktop Skrining Baru Button */}
-          <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+          <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-[var(--color-rule)]">
             {/* Live vs Mock Data Source Indicator Badge */}
             {dataSource === 'live' ? (
-              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span>Live Backend API</span>
               </span>
             ) : (
-              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--color-paper-2)] text-[var(--color-ink-2)] border border-[var(--color-rule)] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[var(--color-teal)] shrink-0" />
                 <span>Mode Simulasi (Mock Data)</span>
               </span>
             )}
@@ -284,7 +284,7 @@ export const AnalyticsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/questionnaire')}
-              className="hidden sm:flex px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+              className="hidden sm:flex px-4 py-1.5 rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium text-xs transition-all items-center gap-1.5 shadow-xs cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Skrining Baru</span>
@@ -297,33 +297,33 @@ export const AnalyticsPage: React.FC = () => {
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1">
         {/* Child Profile Overview Header Banner */}
         {record && (
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-6 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-6 shadow-xs mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[var(--color-paper-2)] border border-[var(--color-rule)] flex items-center justify-center shrink-0 text-[var(--color-navy)]">
                 <Baby className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                  <h1 className="text-lg sm:text-xl font-display font-medium text-[var(--color-ink)] leading-snug">
                     Balita ({record.gender === 'L' || record.gender === 'Laki-Laki' ? 'Laki-laki' : 'Perempuan'}), {record.ageMonths} Bulan
                   </h1>
-                  <span className="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200 shrink-0">
+                  <span className="font-mono text-[11px] sm:text-xs px-2 py-0.5 rounded-md bg-[var(--color-paper-2)] text-[var(--color-ink-2)] font-medium border border-[var(--color-rule)] shrink-0">
                     #{record.shareHash}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-y-1 gap-x-3 sm:gap-x-4 mt-1.5 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-y-1 gap-x-3 sm:gap-x-4 mt-1.5 text-xs text-[var(--color-ink-2)]">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-[var(--color-ink-2)] shrink-0" />
                     <span className="truncate">
                       {record.isOutsideBontang ? `Kel./Desa ${record.kelurahan} (Luar Bontang)` : `Kel. ${record.kelurahan}, Bontang`}
                     </span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <User className="w-3.5 h-3.5 text-[var(--color-ink-2)] shrink-0" />
                     <span>Persona: {record.persona}</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <Calendar className="w-3.5 h-3.5 text-[var(--color-ink-2)] shrink-0" />
                     <span>
                       {new Date(record.createdAt).toLocaleDateString('id-ID', {
                         day: 'numeric',
@@ -337,19 +337,19 @@ export const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Quick Diagnostic Metrics Grid */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-50/80 border border-slate-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 bg-[var(--color-paper-2)] border border-[var(--color-rule)] rounded-xl p-2.5 sm:p-3 shrink-0">
               <div className="text-center px-1 sm:px-2">
-                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">TB / PB</div>
-                <div className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 whitespace-nowrap">{record.heightCm} cm</div>
+                <div className="font-mono text-[9px] sm:text-[10px] uppercase font-semibold text-[var(--color-ink-2)] tracking-wider">TB / PB</div>
+                <div className="text-xs sm:text-sm font-bold text-[var(--color-ink)] mt-0.5 whitespace-nowrap">{record.heightCm} cm</div>
               </div>
-              <div className="text-center px-1 sm:px-2 border-x border-slate-200">
-                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">Berat Badan</div>
-                <div className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 whitespace-nowrap">{record.weightKg} kg</div>
+              <div className="text-center px-1 sm:px-2 border-x border-[var(--color-rule)]">
+                <div className="font-mono text-[9px] sm:text-[10px] uppercase font-semibold text-[var(--color-ink-2)] tracking-wider">Berat Badan</div>
+                <div className="text-xs sm:text-sm font-bold text-[var(--color-ink)] mt-0.5 whitespace-nowrap">{record.weightKg} kg</div>
               </div>
               <div className="text-center px-1 sm:px-2">
-                <div className="text-[9px] sm:text-[10px] uppercase font-semibold text-slate-400">Z-Score TB/U</div>
+                <div className="font-mono text-[9px] sm:text-[10px] uppercase font-semibold text-[var(--color-ink-2)] tracking-wider">Z-Score TB/U</div>
                 <div
-                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-600'
+                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-700'
                     }`}
                 >
                   {record.zScore > 0 ? `+${record.zScore}` : record.zScore} SD
@@ -360,12 +360,12 @@ export const AnalyticsPage: React.FC = () => {
         )}
 
         {/* Drag and Drop Instructions Tip */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] sm:text-xs text-slate-400 mb-3 px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] sm:text-xs text-[var(--color-ink-2)] mb-3 px-1">
           <span>Tata Letak Widget Interaktif (Tekan & tahan ikon di pojok kanan atas untuk menggeser)</span>
           <button
             type="button"
             onClick={() => setWidgetOrder(DEFAULT_WIDGET_ORDER)}
-            className="hover:text-blue-600 font-medium transition-colors cursor-pointer self-start sm:self-auto"
+            className="hover:text-[var(--color-ink)] font-medium transition-colors cursor-pointer self-start sm:self-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] rounded px-1"
           >
             Reset Susunan Default
           </button>

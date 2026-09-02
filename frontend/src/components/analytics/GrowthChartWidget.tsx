@@ -50,32 +50,32 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
   const currentStatus = isTBU ? (record.statusGiziTBU || 'Normal') : (record.statusGiziBBU || 'Normal')
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm">
+    <div className="flex flex-col h-full bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-5 shadow-xs">
       {/* Header & Mode Switch */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+            <span className="p-1.5 rounded-lg bg-[var(--color-paper-2)] text-[var(--color-navy)] border border-[var(--color-rule)]">
               <TrendingUp className="w-4 h-4" />
             </span>
-            <h3 className="font-bold text-slate-800 text-base">
+            <h3 className="font-display font-medium text-[var(--color-ink)] text-base sm:text-lg">
               Kurva Pertumbuhan Baku WHO
             </h3>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[var(--color-ink-2)] mt-0.5">
             Standar Deviasi (SD) Antropometri Balita WHO 2006
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex w-full sm:w-auto bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+        <div className="flex w-full sm:w-auto bg-[var(--color-paper-2)] p-1 rounded-xl text-xs font-semibold border border-[var(--color-rule)]">
           <button
             type="button"
             onClick={() => setActiveTab('TBU')}
-            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] ${
               isTBU
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[var(--color-paper)] text-[var(--color-ink)] font-bold shadow-xs'
+                : 'text-[var(--color-ink-2)] hover:text-[var(--color-ink)]'
             }`}
           >
             Tinggi/Usia (TB/U)
@@ -83,10 +83,10 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
           <button
             type="button"
             onClick={() => setActiveTab('BBU')}
-            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] ${
               !isTBU
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[var(--color-paper)] text-[var(--color-ink)] font-bold shadow-xs'
+                : 'text-[var(--color-ink-2)] hover:text-[var(--color-ink)]'
             }`}
           >
             Berat/Usia (BB/U)
@@ -95,15 +95,15 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
       </div>
 
       {/* Score Summary Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-xl p-2.5 sm:p-3 mb-3 text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[var(--color-paper-2)] border border-[var(--color-rule)] rounded-xl p-2.5 sm:p-3 mb-3 text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-slate-700">Posisi Balita:</span>
-          <span className="font-bold text-slate-900">
+          <span className="font-semibold text-[var(--color-ink-2)]">Posisi Balita:</span>
+          <span className="font-bold text-[var(--color-ink)]">
             {record.ageMonths} bln / {currentValue} {isTBU ? 'cm' : 'kg'}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-slate-500">Z-Score:</span>
+          <span className="text-[var(--color-ink-2)]">Z-Score:</span>
           <span
             className={`font-bold px-2 py-0.5 rounded-full ${
               currentZScore < -2.0
@@ -225,7 +225,7 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-2 text-[11px] text-slate-400 text-center">
+      <div className="mt-2 text-[11px] text-[var(--color-ink-2)] text-center">
         Titik biru menunjukkan posisi pengukuran antropometri balita saat ini.
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { mlServiceMessages } from "../constants/messages";
+
 // ML Prediction Input
 export interface MLPredictionResponse {
   zScore: number;
@@ -20,83 +22,55 @@ export interface MLPredictionInput {
   heightCm: number;
 }
 
-// Private helper function 
+const ML_SERVICE_URL =
+  process.env.ML_SERVICE_URL || "http://ml-service:8000/api/v1/predict";
+
+const ML_TIMEOUT_MS = Number(process.env.ML_TIMEOUT_MS) || 10000;
+
+// Private helper function
 const mapToMLPayload = (data: MLPredictionInput) => {
-  // ageMonths: data.ageMonths,
-  // gender: data.gender === "Laki-Laki" ? "L" : "P",
-  // weightKg: data.weightKg,
-  // heightCm: data.heightCm,
-  const payload = {
+  const gender = data.gender === "Laki-Laki" ? "L" : "P";
+  return {
     ageMonths: data.ageMonths,
-    gender: data.gender === 'Laki-Laki' ? 'L' : 'P',
+    gender,
     weightKg: data.weightKg,
     heightCm: data.heightCm,
   };
-
-  console.log('Mapping Gender:',{
-    inputGender: data.gender,
-    outputGender: payload.gender,
-  })
-  return payload;
 };
-
 
 export const mlClient = {
   async predict(screeningData: MLPredictionInput): Promise<MLPredictionResponse> {
-    // console.log("Data masuk ke ML client:", screeningData)
     const mlPayload = mapToMLPayload(screeningData);
-    // console.log("payload final yang dikirim ke FastAPI:", mlPayload)
 
-    // const response = await fetch("http://ml-service:8000/api/v1/predict", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(mlPayload),
-    // });
-
-    // if (!response.ok) {
-    //   const errorBody = await response.text();
-    //   throw new Error(`ML service error: ${response.status} - ${errorBody}`);
-    // }
-
-    // return response.json();
-
-    // mock data untuk testing
-    // return {
-    //   zScore: 0.5,
-    //   zScoreWAZ: 0.3,
-    //   zScoreWHZ: 0.2,
-    //   statusGiziTBU: "Normal",
-    //   statusGiziBBU: "Normal",
-    //   statusGiziBBTB: "Normal",
-    //   riskTier: "LOW",
-    //   riskScore: 0.2,
-    //   dominantFactors: ["Berat badan ideal", "Tinggi badan normal"],
-    // };
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), ML_TIMEOUT_MS);
 
     try {
-      const response = await fetch("http://ml-service:8000/api/v1/predict", {
-        method: "POST", 
+      const response = await fetch(ML_SERVICE_URL, {
+        method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(mlPayload)
+        body: JSON.stringify(mlPayload),
+        signal: controller.signal,
       });
-      
-      // console.log("Status HTTP:", response.status);
 
-      if (!response.ok){
+      if (!response.ok) {
         const errorBody = await response.text();
-        // console.log("Response Error:", errorBody);
-        throw new Error(`Ml service:" ${response.status} - ${errorBody}`);
-      } 
+        throw new Error(`ML service error: ${response.status} - ${errorBody}`);
+      }
       const result = await response.json();
-      // console.log("Hasil Prediksi", result);
       return result;
     } catch (error) {
-      // console.error("Gagal koneksi ke ML service", error)
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(mlServiceMessages.timeout);
+      }
+      if (error instanceof TypeError) {
+        throw new Error(mlServiceMessages.mlUnreachable);
+      }
       throw error;
+    } finally {
+      clearTimeout(timeout);
     }
   },
 };

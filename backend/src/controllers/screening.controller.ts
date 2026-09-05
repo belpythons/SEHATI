@@ -7,9 +7,8 @@ import { Request, Response, NextFunction } from "express";
 import { screeningSchema } from "../validations/screening.schema";
 import { findOrCreateSession } from "../services/session.service";
 import { mlClient } from "../services/mlClient.service";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../utils/prisma";
 import { ZodError } from "zod";
-import { logger } from "../utils/logger";
 
 
 

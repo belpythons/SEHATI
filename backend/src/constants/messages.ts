@@ -107,6 +107,12 @@ export const ingestMessages = {
   emptyRecords: "File tidak mengandung data apa pun.",
   sessionMissing: "Tidak ada sesi aktif untuk mengimpor data.",
   ingestionFailed: "Gagal memproses impor data. Silakan coba lagi.",
+  invalidNumericValues: "Terdapat data angka (usia, berat, atau tinggi badan) yang tidak valid pada baris data.",
+  fileTooLarge: "Ukuran file terlalu besar. Maksimal ukuran file adalah 10 MB.",
+  csvHeaderInvalid: "Header atau kolom pada file CSV tidak sesuai dengan format yang ditentukan.",
+  rowValidationError: "Gagal memproses baris {row}: data tidak lengkap atau format salah.",
+  partiallyCompleted: "Proses impor selesai dengan beberapa data gagal diproses.",
+  persistenceFailed: "Gagal menyimpan data batch ke database.",
 };
 
 export const mlServiceMessages = {
@@ -114,6 +120,8 @@ export const mlServiceMessages = {
   connectionRefused: "Tidak dapat terhubung ke layanan ML.",
   invalidResponse: "Respons dari layanan ML tidak valid.",
   timeout: "Layanan ML melebihi batas waktu respons.",
+  missingRequiredFields: "Respon dari layanan ML tidak lengkap (data Z-Score atau Risk Tier tidak ditemukan).",
+  mlUnreachable: "Layanan analisis ML tidak dapat dijangkau. Pastikan service FastAPI telah berjalan.",
 };
 
 export const healthMessages = {

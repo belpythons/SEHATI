@@ -76,6 +76,8 @@ export const screeningMessages = {
 
   riskTierInvalid: "riskTier harus salah satu dari: LOW, MODERATE, atau HIGH.",
   riskScoreRange: "riskScore harus antara 0.0 dan 1.0.",
+
+  attributeRequired: (field: string) => `Atribut '${field}' wajib diisi dan tidak boleh kosong.`,
 };
 
 export const sessionMessages = {

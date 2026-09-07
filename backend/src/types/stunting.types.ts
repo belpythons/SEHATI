@@ -20,9 +20,9 @@ export interface FormScreeningInput {
 export type RiskTier = 'LOW' | 'MODERATE' | 'HIGH';
 
 export interface StuntingEvaluationResult {
-  zScore: number;
-  zScoreWAZ: number;
-  zScoreWHZ: number;
+  zScoreTBU: number;
+  zScoreBBU: number;
+  zScoreBBTB: number;
   statusGiziTBU: string;
   statusGiziBBU: string;
   statusGiziBBTB: string;

@@ -8,8 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/AnonymousSession.js'
-export type * from './models/ScreeningRecord.js'
-export type * from './models/HealthKnowledgeBase.js'
-export type * from './models/IngestionBatchLog.js'
-export type * from './commonInputTypes.js'
+export type * from './models/AnonymousSession'
+export type * from './models/ScreeningRecord'
+export type * from './models/HealthKnowledgeBase'
+export type * from './models/IngestionBatchLog'
+export type * from './commonInputTypes'

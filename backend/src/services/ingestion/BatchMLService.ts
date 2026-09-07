@@ -36,15 +36,15 @@ export class BatchMlService {
       });
 
       // validasi ML
-      if (mlResult.zScore === undefined || mlResult.riskTier === undefined) {
+      if (mlResult.zScoreTBU === undefined || mlResult.riskTier === undefined) {
         throw new Error(mlServiceMessages.missingRequiredFields);
       }
 
       return {
         ...row,
-        zScore: mlResult.zScore,
-        zScoreWAZ: mlResult.zScoreWAZ ?? null,
-        zScoreWHZ: mlResult.zScoreWHZ ?? null,
+        zScore: mlResult.zScoreTBU,
+        zScoreWAZ: mlResult.zScoreBBU ?? null,
+        zScoreWHZ: mlResult.zScoreBBTB ?? null,
         statusGiziTBU: mlResult.statusGiziTBU ?? null,
         statusGiziBBU: mlResult.statusGiziBBU ?? null,
         statusGiziBBTB: mlResult.statusGiziBBTB ?? null,

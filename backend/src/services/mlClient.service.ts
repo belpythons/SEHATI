@@ -47,6 +47,11 @@ const mapToMLPayload = (data: MLPredictionInput) => {
     throw new Error(screeningMessages.genderInvalid);
   }
 
+  const bblrVal = data.bblrOption ?? data.bblrHistory;
+  if(bblrVal === undefined || bblrVal === null){
+    throw new Error(screeningMessages.attributeRequired("bblrOption"));
+  }
+
   const requiredFields: (keyof MLPredictionInput)[] = [
     "ageMonths",
     "weightKg",
@@ -76,10 +81,10 @@ const mapToMLPayload = (data: MLPredictionInput) => {
     gender,
     weightKg: data.weightKg,
     heightCm: data.heightCm,
-
-    bblrHistory: Number(data.bblrOption),
+    bblrHistory: Number(bblrVal),
     exclusiveAsi: Number(data.exclusiveAsi),
     mpasiAge: Number(data.mpasiAge),
+    animalProtein: Array.isArray(data.animalProtein) ? data.animalProtein.map(Number) : [],
     cleanWaterAccess: Number(data.cleanWaterAccess),
     sanitationAccess: Number(data.sanitationAccess),
     smokeExposure: Number(data.smokeExposure),

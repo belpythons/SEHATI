@@ -98,6 +98,7 @@ model ScreeningRecord {
   gender           String
   weightKg         Float
   heightCm         Float
+  isOutsideBontang Boolean
 
   zScore           Float            // Z-Score TB/U
   zScoreWAZ        Float?           // Z-Score BB/U

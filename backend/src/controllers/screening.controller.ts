@@ -7,9 +7,12 @@ import { Request, Response, NextFunction } from "express";
 import { screeningSchema } from "../validations/screening.schema";
 import { findOrCreateSession } from "../services/session.service";
 import { mlClient } from "../services/mlClient.service";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../utils/prisma";
 import { ZodError } from "zod";
-import { logger } from "../utils/logger";
+import { createScreeningSchema } from "../validators/screening.validator";
+import { commonMessages, screeningMessages } from "../constants/messages";
+import { ScreeningService } from "../services/screening.service";
+import z from "zod";
 
 
 
@@ -104,12 +107,14 @@ export const submitScreening = async (
 
     // Memanggil Ml Service
     // console.log("Memanggil ML Service")
-    const prediction = await mlClient.predict({
-      ageMonths: validateData.ageMonths,
-      gender: validateData.gender,
-      weightKg: validateData.weightKg,
-      heightCm: validateData.heightCm
-    }) 
+    const prediction = await mlClient.predict(
+      // ageMonths: validateData.ageMonths,
+      // gender: validateData.gender,
+      // weightKg: validateData.weightKg,
+      // heightCm: validateData.heightCm,
+      // bblrOption: validateData.bblrOption
+      validateData
+    ) 
     // console.log("Ml service selesai dipanggil")
 
     // Simpan ke database
@@ -123,9 +128,9 @@ export const submitScreening = async (
         sourceType: "PWA_DIRECT_USER",
         // ...validateData,
         ...screeningData,
-        zScore: prediction.zScore,
-        zScoreWAZ: prediction.zScoreWAZ,
-        zScoreWHZ: prediction.zScoreWHZ,
+        zScore: prediction.zScoreTBU,
+        zScoreWAZ: prediction.zScoreBBU,
+        zScoreWHZ: prediction.zScoreBBTB,
         statusGiziTBU: prediction.statusGiziTBU,
         statusGiziBBU: prediction.statusGiziBBU,
         statusGiziBBTB: prediction.statusGiziBBTB,
@@ -169,5 +174,89 @@ export const submitScreening = async (
     
     // console.error("Error internal server", error);
     next(error);
+  }
+}
+
+
+export class screeningController {
+  static async submit (
+    req: Request,
+    res: Response,
+  )
+  : Promise<void>{
+    console.log("incoming payload:", JSON.stringify(req.body, null, 2));
+
+    try {
+      // memeriksa body request
+      const parseResult = createScreeningSchema.safeParse(req.body);
+
+      // jika tidak valid
+      if (!parseResult.success){
+        res.status(400).json({
+          success: false,
+          message: commonMessages.validationFailed,
+          error: z.treeifyError(parseResult.error)
+        });
+        return;
+      }
+      
+      console.log("Processing Screening service")
+
+      //data akan di olah oleh ml dan disimpan ke database
+      const record = await ScreeningService.submitScreening(parseResult.data);
+
+      console.log(`Record ID: ${record.id} | ShareHash: ${record.shareHash}`)
+
+      res.status(201).json({
+        success: true,
+        message: screeningMessages.screeningSuccess,
+        data: record,
+      })
+    } catch (error){
+
+      console.error("controller Error:", error);
+
+      const message = error instanceof Error ? error.message : commonMessages.internalServerError;
+      res.status(500).json({ success: false, message });
+    }
+  }
+
+  //proses get share hash
+  static async getByShareHash(
+    req: Request,
+    res: Response,
+  ): Promise<void>{
+
+    console.log("Looking up record")
+    
+    const { shareHash } = req.params;
+    try {
+
+      console.log("Looking up record")
+
+      // pengecekan apakah benar benar string
+      if (!shareHash || typeof shareHash !== "string"){
+        res.status(400).json({
+          success: false,
+          message: screeningMessages.shareHashNotFound
+        })
+        return;
+      }
+
+      const record = await ScreeningService.getScreeningByShareHash(shareHash);
+
+      console.log(`Record ID: ${record.id}`)
+
+      res.status(200).json({
+        success: true,
+        data: record,
+      });
+    } catch (error){
+
+      console.error(`[Sharehash Not Found] Hash: ${shareHash}`, error);
+      
+      const message = error instanceof Error ? error.message : commonMessages.notFound;
+      res.status(404).json({ success: false, message });
+    }
   }
 }

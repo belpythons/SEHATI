@@ -14,7 +14,7 @@ export const childMeasurementSchema = z.object({
         error: screeningMessages.ageMonthsInteger,
     }).min(0, {
         error: screeningMessages.ageMonthsRange,
-    }).max(239, {
+    }).max(59, {
         error: screeningMessages.ageMonthsRange,
     }),
 

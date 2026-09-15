@@ -37,6 +37,7 @@ import { NutritionTableWidget } from '../components/analytics/NutritionTableWidg
 import { ShareableLinkWidget } from '../components/analytics/ShareableLinkWidget'
 import { DraggableWidget } from '../components/analytics/DraggableWidget'
 import { WidgetErrorBoundary } from '../components/analytics/WidgetErrorBoundary'
+import { getStatusGiziTBUTextColor } from '../lib/nutritionStatus'
 
 const DEFAULT_WIDGET_ORDER = [
   'growth-chart',
@@ -238,7 +239,8 @@ export const AnalyticsPage: React.FC = () => {
               title="Kembali ke Beranda"
             >
               <ArrowLeft className="w-4 h-4 text-[var(--color-ink-2)] shrink-0" />
-              <span>Kembali ke Beranda</span>
+              <span className="hidden sm:inline">Kembali ke Beranda</span>
+              <span className="sm:hidden">Beranda</span>
             </Link>
 
             <span className="text-xs text-[var(--color-rule)] hidden md:inline">|</span>
@@ -349,8 +351,10 @@ export const AnalyticsPage: React.FC = () => {
               <div className="text-center px-1 sm:px-2">
                 <div className="font-mono text-[9px] sm:text-[10px] uppercase font-semibold text-[var(--color-ink-2)] tracking-wider">Z-Score TB/U</div>
                 <div
-                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${record.zScore < -2.0 ? 'text-red-600' : 'text-emerald-700'
-                    }`}
+                  className={`text-xs sm:text-sm font-bold mt-0.5 whitespace-nowrap ${getStatusGiziTBUTextColor(
+                    record.statusGiziTBU,
+                    record.zScore
+                  )}`}
                 >
                   {record.zScore > 0 ? `+${record.zScore}` : record.zScore} SD
                 </div>

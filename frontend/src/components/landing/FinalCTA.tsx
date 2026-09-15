@@ -1,6 +1,6 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { ArrowRight01Icon } from 'hugeicons-react'
-import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
 
 export const FinalCTA: React.FC = () => {
@@ -12,7 +12,7 @@ export const FinalCTA: React.FC = () => {
   }
 
   return (
-    <section className="py-32 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 overflow-hidden">
+    <section className="py-20 sm:py-32 px-5 sm:px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 overflow-hidden">
       <motion.div 
         initial="hidden"
         whileInView="show"
@@ -21,7 +21,7 @@ export const FinalCTA: React.FC = () => {
         className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end"
       >
         <div className="flex flex-col">
-          <motion.h2 variants={itemVariants} className="text-4xl md:text-6xl font-display font-medium tracking-tight text-slate-900 mb-6 leading-[1.05]">
+          <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl font-display font-medium tracking-tight text-slate-900 mb-6 leading-[1.08]">
             Siap memulai pemantauan presisi?
           </motion.h2>
           <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-600 font-light max-w-md">
@@ -31,9 +31,12 @@ export const FinalCTA: React.FC = () => {
         
         <div className="flex flex-col md:items-end justify-end">
           <motion.div variants={itemVariants}>
-            <Button size="lg" className="rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white px-10 h-14 text-base self-start md:self-end">
+            <Link
+              to="/questionnaire"
+              className="inline-flex items-center justify-center rounded-full bg-[#1e293b] hover:bg-[#0f172a] text-white px-10 h-14 text-base font-medium self-start md:self-end transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 shadow-xs cursor-pointer active:scale-98"
+            >
               Mulai Skrining <ArrowRight01Icon className="ml-2 w-5 h-5" />
-            </Button>
+            </Link>
           </motion.div>
           <motion.p variants={itemVariants} className="text-xs font-mono text-slate-400 mt-4 uppercase tracking-widest text-left md:text-right">
             GRATIS UNTUK FASILITAS KESEHATAN

@@ -34,7 +34,7 @@ export const GlobalChatLauncher: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           aria-label="Buka HATI — Asisten kesehatan SEHATI"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-3 bg-[#0f172a] hover:bg-[#1e293b] text-white py-2.5 px-3.5 pr-5 rounded-full border border-slate-700/50 shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2.5 sm:gap-3 bg-[#0f172a] hover:bg-[#1e293b] text-white py-2 px-3 pr-4 sm:py-2.5 sm:px-3.5 sm:pr-5 rounded-full border border-slate-700/50 shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
         >
           <img
             src="/icons/chat-avatar-64.png"

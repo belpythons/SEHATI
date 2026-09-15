@@ -83,7 +83,7 @@ export const ChatTeaserBubble: React.FC = () => {
           transition={{ type: 'spring', damping: 24, stiffness: 300 }}
           role="dialog"
           aria-label="Saran interaktif Asisten Kesehatan HATI"
-          className="fixed bottom-20 right-6 z-39 w-full max-w-[320px] bg-white border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-900/5 overflow-hidden"
+          className="fixed bottom-20 right-4 sm:right-6 left-4 sm:left-auto sm:max-w-[320px] bg-white border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-900/5 overflow-hidden z-39"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">

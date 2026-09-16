@@ -41,7 +41,7 @@ export const FooterSection: React.FC = () => {
               <ul className="space-y-4 text-sm font-medium text-slate-300">
                 <li><Link to="/questionnaire" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Skrining</Link></li>
                 <li><Link to="/analytics" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Dashboard Analitik</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Edukasi Gizi</Link></li>
+                <li><Link to="/#edukasi-gizi" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Edukasi Gizi</Link></li>
               </ul>
             </div>
             
@@ -49,9 +49,9 @@ export const FooterSection: React.FC = () => {
             <div className="space-y-4">
               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Tentang</h4>
               <ul className="space-y-4 text-sm font-medium text-slate-300">
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Tentang SEHATI</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Misi & Tujuan</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Kota Bontang</Link></li>
+                <li><Link to="/tentang" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Tentang SEHATI</Link></li>
+                <li><Link to="/misi-tujuan" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Misi & Tujuan</Link></li>
+                <li><Link to="/kota-bontang" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Kota Bontang</Link></li>
               </ul>
             </div>
             
@@ -59,9 +59,9 @@ export const FooterSection: React.FC = () => {
             <div className="space-y-4 col-span-2 md:col-span-1">
               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Bantuan</h4>
               <ul className="space-y-4 text-sm font-medium text-slate-300">
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Panduan Pengguna</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">FAQ</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Hubungi Kami</Link></li>
+                <li><Link to="/panduan" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Panduan Pengguna</Link></li>
+                <li><Link to="/faq" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">FAQ</Link></li>
+                <li><Link to="/kontak" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Hubungi Kami</Link></li>
               </ul>
             </div>
           </div>

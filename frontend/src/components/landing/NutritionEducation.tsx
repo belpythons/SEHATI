@@ -11,7 +11,7 @@ export const NutritionEducation: React.FC = () => {
   }
 
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 mb-12 overflow-hidden">
+    <section id="edukasi-gizi" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 mb-12 overflow-hidden">
       <motion.div
         initial="hidden"
         whileInView="show"

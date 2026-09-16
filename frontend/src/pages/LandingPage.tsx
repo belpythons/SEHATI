@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
 import { EditorialHero } from '../components/landing/EditorialHero'
 import { TrustProofSection } from '../components/landing/TrustProofSection'
@@ -11,6 +12,15 @@ import { FooterSection } from '../components/layout/FooterSection'
 export const LandingPage: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [canInstallPWA, setCanInstallPWA] = useState(false)
+  const location = useLocation()
+
+  // Scroll to hash anchor when navigating from another page (e.g. /#edukasi-gizi)
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.querySelector(location.hash)
+      el?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [location])
 
   useEffect(() => {
     // Listen for PWA installation prompt

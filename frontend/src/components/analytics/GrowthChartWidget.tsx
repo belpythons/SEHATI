@@ -12,6 +12,7 @@ import {
 } from 'recharts'
 import { ScreeningRecord } from '../../types/screening'
 import { TrendingUp, Activity, HelpCircle } from 'lucide-react'
+import { getStatusGiziTBUStyle, getStatusGiziBBUStyle } from '../../lib/nutritionStatus'
 
 interface Props {
   record: ScreeningRecord
@@ -48,6 +49,25 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
   const currentValue = isTBU ? record.heightCm : record.weightKg
   const currentZScore = isTBU ? record.zScore : (record.zScoreWAZ ?? 0)
   const currentStatus = isTBU ? (record.statusGiziTBU || 'Normal') : (record.statusGiziBBU || 'Normal')
+  const tbuBadgeStyle = getStatusGiziTBUStyle(record.statusGiziTBU, record.zScore)
+  const bbuBadgeStyle = getStatusGiziBBUStyle(record.statusGiziBBU, record.zScoreWAZ ?? 0)
+  const statusBadgeStyle = isTBU ? tbuBadgeStyle : bbuBadgeStyle
+
+  console.log('[GrowthChartWidget Debug]', {
+    activeTab,
+    isTBU,
+    'record.statusGiziTBU': record.statusGiziTBU,
+    'record.statusGiziBBU': record.statusGiziBBU,
+    'record.zScore': record.zScore,
+    'record.zScoreWAZ': record.zScoreWAZ,
+    currentValue,
+    currentZScore,
+    currentStatus,
+    tbuBadgeStyle,
+    bbuBadgeStyle,
+    statusBadgeStyle,
+    'classes match exactly': tbuBadgeStyle === bbuBadgeStyle,
+  })
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-5 shadow-xs">
@@ -105,13 +125,7 @@ export const GrowthChartWidget: React.FC<Props> = ({ record }) => {
         <div className="flex items-center gap-2">
           <span className="text-[var(--color-ink-2)]">Z-Score:</span>
           <span
-            className={`font-bold px-2 py-0.5 rounded-full ${
-              currentZScore < -2.0
-                ? 'bg-red-100 text-red-700'
-                : currentZScore > 2.0
-                ? 'bg-amber-100 text-amber-700'
-                : 'bg-emerald-100 text-emerald-700'
-            }`}
+            className={`font-bold px-2 py-0.5 rounded-full border ${statusBadgeStyle}`}
           >
             {currentZScore > 0 ? `+${currentZScore}` : currentZScore} SD ({currentStatus})
           </span>

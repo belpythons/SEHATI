@@ -497,7 +497,7 @@ export const QuestionnairePage: React.FC = () => {
           </motion.div>
         )}
 
-        <div className="bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-6 sm:p-8">
+        <div className="bg-[var(--color-paper)] rounded-2xl border border-[var(--color-rule)] p-4 sm:p-8">
           <AnimatePresence mode="wait">
             {/* ════════ STEP 1: Persona & Domisili ════════ */}
             {step === 1 && (
@@ -510,10 +510,10 @@ export const QuestionnairePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
                     Langkah 1: Seleksi Persona & Domisili
                   </h2>
-                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
+                  <p className="text-xs sm:text-sm text-[var(--color-ink-2)] mt-1">
                     Tentukan peran Anda dan wilayah kelurahan domisili.
                   </p>
                 </div>
@@ -523,7 +523,7 @@ export const QuestionnairePage: React.FC = () => {
                   <label className="block text-sm font-semibold text-[var(--color-ink)] mb-1">
                     Pilih Peran / Persona Anda <span className="text-red-500">*</span>
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
                     {PERSONA_CARDS.map((p) => {
                       const isSelected = formData.persona === p.value
                       return (
@@ -532,20 +532,20 @@ export const QuestionnairePage: React.FC = () => {
                           type="button"
                           onClick={() => updateField('persona', p.value)}
                           aria-pressed={isSelected}
-                          className={`text-left cursor-pointer rounded-xl p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
+                          className={`text-left cursor-pointer rounded-xl p-3 sm:p-4 border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-1 ${isSelected
                             ? 'border-[var(--color-navy)] bg-[var(--color-paper-3)]'
                             : 'border-[var(--color-rule)] hover:border-[var(--color-ink-2)]/40 bg-[var(--color-paper)]'
                             }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-[var(--color-ink)] text-sm">
+                            <span className="font-semibold text-[var(--color-ink)] text-xs sm:text-sm">
                               {p.label}
                             </span>
                             {isSelected && (
-                              <CheckCircle2 className="w-5 h-5 text-[var(--color-navy)]" />
+                              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-navy)] shrink-0" />
                             )}
                           </div>
-                          <p className="text-xs text-[var(--color-ink-2)] mt-1">{p.desc}</p>
+                          <p className="text-[11px] sm:text-xs text-[var(--color-ink-2)] mt-1 leading-snug">{p.desc}</p>
                         </button>
                       )
                     })}
@@ -553,8 +553,8 @@ export const QuestionnairePage: React.FC = () => {
                 </div>
 
                 {/* isOutsideBontang Toggle */}
-                <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
-                  <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                <div className="p-3 rounded-xl border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={formData.isOutsideBontang}
@@ -562,11 +562,11 @@ export const QuestionnairePage: React.FC = () => {
                         updateField('isOutsideBontang', e.target.checked)
                         updateField('kelurahan', '') // reset kelurahan on toggle
                       }}
-                      className="w-4 h-4 rounded border-slate-300 text-[var(--color-navy)] focus:ring-[var(--color-navy)] cursor-pointer"
+                      className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[var(--color-navy)] focus:ring-[var(--color-navy)] cursor-pointer shrink-0"
                     />
                     <div>
-                      <span className="text-sm font-medium text-[var(--color-ink)]">Domisili di luar Kota Bontang</span>
-                      <span className="block text-xs text-[var(--color-ink-2)]">Centang jika balita berdomisili di luar wilayah Kota Bontang</span>
+                      <span className="text-sm font-medium text-[var(--color-ink)] leading-tight block">Domisili di luar Kota Bontang</span>
+                      <span className="block text-xs text-[var(--color-ink-2)] mt-0.5 leading-snug">Centang jika balita berdomisili di luar wilayah Kota Bontang</span>
                     </div>
                   </label>
                 </div>

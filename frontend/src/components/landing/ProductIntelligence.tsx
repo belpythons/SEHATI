@@ -22,8 +22,8 @@ export const ProductIntelligence: React.FC = () => {
   }
 
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 mb-12">
-      <motion.div 
+    <section id="cara-kerja" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-slate-200/60 mt-12 mb-12">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
@@ -37,15 +37,15 @@ export const ProductIntelligence: React.FC = () => {
           Alur inteligensi SEHATI meminimalkan kesalahan manusia dan mempercepat pengambilan keputusan di tingkat Posyandu.
         </p>
       </motion.div>
-      
-      <motion.div 
+
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-100px" }}
         className="space-y-16 max-w-4xl"
       >
-        
+
         {/* Step 1 & 2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
           <motion.div variants={stepVariants} className="flex flex-col items-start">

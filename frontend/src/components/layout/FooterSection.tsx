@@ -10,7 +10,7 @@ export const FooterSection: React.FC = () => {
         <FavouriteIcon className="w-[400px] h-[400px] text-white" strokeWidth={0.5} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-12 relative z-10">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 mb-24">
           
@@ -22,7 +22,7 @@ export const FooterSection: React.FC = () => {
               className="w-12 h-12 mb-8"
             />
             
-            <h2 className="text-4xl md:text-5xl font-display font-medium text-white mb-6 leading-[1.1] tracking-tight max-w-lg">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-medium text-white mb-6 leading-[1.15] tracking-tight max-w-lg">
               Menjaga pertumbuhan hari ini, <br />
               untuk masa depan yang <span className="text-teal-400">lebih sehat.</span>
             </h2>
@@ -34,14 +34,14 @@ export const FooterSection: React.FC = () => {
           </div>
 
           {/* Navigation (6 cols) */}
-          <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-10">
+          <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10 sm:gap-10">
             {/* Nav Group 1 */}
             <div className="space-y-4">
               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Produk</h4>
               <ul className="space-y-4 text-sm font-medium text-slate-300">
                 <li><Link to="/questionnaire" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Skrining</Link></li>
                 <li><Link to="/analytics" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Dashboard Analitik</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Edukasi Gizi</Link></li>
+                <li><Link to="/#edukasi-gizi" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Edukasi Gizi</Link></li>
               </ul>
             </div>
             
@@ -49,9 +49,9 @@ export const FooterSection: React.FC = () => {
             <div className="space-y-4">
               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Tentang</h4>
               <ul className="space-y-4 text-sm font-medium text-slate-300">
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Tentang SEHATI</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Misi & Tujuan</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Kota Bontang</Link></li>
+                <li><Link to="/tentang" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Tentang SEHATI</Link></li>
+                <li><Link to="/misi-tujuan" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Misi & Tujuan</Link></li>
+                <li><Link to="/kota-bontang" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Kota Bontang</Link></li>
               </ul>
             </div>
             
@@ -59,9 +59,9 @@ export const FooterSection: React.FC = () => {
             <div className="space-y-4 col-span-2 md:col-span-1">
               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-6">Bantuan</h4>
               <ul className="space-y-4 text-sm font-medium text-slate-300">
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Panduan Pengguna</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">FAQ</Link></li>
-                <li><Link to="/" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Hubungi Kami</Link></li>
+                <li><Link to="/panduan" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Panduan Pengguna</Link></li>
+                <li><Link to="/faq" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">FAQ</Link></li>
+                <li><Link to="/kontak" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:text-white">Hubungi Kami</Link></li>
               </ul>
             </div>
           </div>

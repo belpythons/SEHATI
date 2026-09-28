@@ -1,13 +1,15 @@
-import { ingestMessages, mlServiceMessages } from "../../constants/messages";
-import { mlClient } from "../mlClient.service";
+import { ingestMessages } from "../../constants/messages";
+import { calculateZScores } from "../../domain/zscore/zscoreEngine";
+import { calculateRisk } from "../../domain/risk/weightedRiskEngine";
 
+/**
+ * Menghitung Z-Score & skor risiko in-process (zscoreEngine + weightedRiskEngine)
+ * — menggantikan pemanggilan ml-service (FastAPI) sepenuhnya, lihat FDD §5-6.
+ */
 export class BatchMlService {
-  static async enrichWithML(
-    row: any,
-    predict: typeof mlClient.predict = mlClient.predict
-  ): Promise<any> {
-    // Jika baris sudah membawa hasil komputasi ML (mis. dari sumber Riskesdas),
-    // tidak perlu menghitung ulang.
+  static async enrichWithML(row: any): Promise<any> {
+    // Jika baris sudah membawa hasil komputasi resmi (mis. dari sumber Riskesdas
+    // yang sudah punya Z-Score/status gizi Kemenkes), tidak perlu dihitung ulang.
     if (
       row.zScore !== undefined &&
       row.zScore !== null &&
@@ -22,40 +24,38 @@ export class BatchMlService {
     const weightKg = Number(row.weightKg);
     const heightCm = Number(row.heightCm);
 
-    // jika salah satu dari nilai ini bukan angka akan error
     if (isNaN(ageMonths) || isNaN(weightKg) || isNaN(heightCm)) {
       throw new Error(`${ingestMessages.invalidNumericValues} (data: ${JSON.stringify(row)})`);
     }
 
-    try {
-      const mlResult = await predict({
-        ageMonths,
-        gender: row.gender,
-        weightKg,
-        heightCm,
-      });
+    const zscore = calculateZScores({ ageMonths, gender: row.gender, weightKg, heightCm });
+    const risk = calculateRisk({
+      zScoreTBU: zscore.zScoreTBU,
+      bblrOption: Number(row.bblrOption),
+      exclusiveAsi: Number(row.exclusiveAsi),
+      mpasiAge: Number(row.mpasiAge),
+      animalProtein: Array.isArray(row.animalProtein) ? row.animalProtein : [],
+      cleanWaterAccess: Number(row.cleanWaterAccess),
+      sanitationAccess: Number(row.sanitationAccess),
+      smokeExposure: Number(row.smokeExposure),
+      motherEducation: Number(row.motherEducation),
+      economicQuintile: Number(row.economicQuintile),
+      diarrheaHistory: Number(row.diarrheaHistory),
+      posyanduKia: Number(row.posyanduKia),
+    });
 
-      // validasi ML
-      if (mlResult.zScoreTBU === undefined || mlResult.riskTier === undefined) {
-        throw new Error(mlServiceMessages.missingRequiredFields);
-      }
-
-      return {
-        ...row,
-        zScore: mlResult.zScoreTBU,
-        zScoreWAZ: mlResult.zScoreBBU ?? null,
-        zScoreWHZ: mlResult.zScoreBBTB ?? null,
-        statusGiziTBU: mlResult.statusGiziTBU ?? null,
-        statusGiziBBU: mlResult.statusGiziBBU ?? null,
-        statusGiziBBTB: mlResult.statusGiziBBTB ?? null,
-        riskTier: mlResult.riskTier,
-        riskScore: mlResult.riskScore,
-        dominantFactors: mlResult.dominantFactors ?? [],
-      };
-    } catch (error) {
-      const message = error instanceof Error && error.message ? error.message : String(error);
-      throw new Error(message);
-    }
+    return {
+      ...row,
+      zScore: zscore.zScoreTBU,
+      zScoreWAZ: zscore.zScoreWAZ,
+      zScoreWHZ: zscore.zScoreWHZ,
+      statusGiziTBU: zscore.statusGiziTBU,
+      statusGiziBBU: zscore.statusGiziBBU,
+      statusGiziBBTB: zscore.statusGiziBBTB,
+      riskTier: risk.riskTier,
+      riskScore: risk.riskScore,
+      dominantFactors: risk.dominantFactors,
+    };
   }
 }
 

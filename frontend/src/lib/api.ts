@@ -43,11 +43,9 @@ export const screeningApi = {
   },
 
   /**
-   * [PLACEHOLDER / FUTURE ENDPOINT]
-   * NOTE: Backend routes currently only expose POST /api/v1/screening/submit.
-   * Endpoint GET /api/v1/screening/share/:shareHash is not yet implemented on the backend.
-   * This method is prepared for future backend support; during development,
-   * screeningService routes shareHash lookups to the local mock/cache layer.
+   * Fetch screening result by shareHash from GET /api/v1/screening/share/:shareHash
+   * (Active in backend/src/routes/screening.routes.ts — cache-aside via Redis,
+   * falls back to the `screening_record_flat` DB view on cache miss.)
    */
   async getByShareHash(shareHash: string): Promise<ScreeningSubmitResponse> {
     const response = await apiClient.get<ScreeningSubmitResponse>(

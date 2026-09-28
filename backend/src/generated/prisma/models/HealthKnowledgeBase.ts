@@ -14,7 +14,11 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model HealthKnowledgeBase
- * 
+ * Konten edukasi statis (pedoman gizi/kesehatan) — SENGAJA berdiri sendiri
+ * tanpa relasi ke ScreeningRecord manapun. Ini tabel referensi/konten
+ * (seperti CMS), bukan data transaksional per-anak; chat controller memilih
+ * baris yang relevan secara dinamis berdasarkan riskTier & rentang umur saat
+ * itu, bukan lewat foreign key permanen.
  */
 export type HealthKnowledgeBaseModel = runtime.Types.Result.DefaultSelection<Prisma.$HealthKnowledgeBasePayload>
 

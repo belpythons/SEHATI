@@ -51,10 +51,14 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Kelurahan: 'Kelurahan',
   AnonymousSession: 'AnonymousSession',
+  IngestionBatchLog: 'IngestionBatchLog',
   ScreeningRecord: 'ScreeningRecord',
-  HealthKnowledgeBase: 'HealthKnowledgeBase',
-  IngestionBatchLog: 'IngestionBatchLog'
+  GrowthAssessment: 'GrowthAssessment',
+  ScreeningDeterminants: 'ScreeningDeterminants',
+  RiskAssessment: 'RiskAssessment',
+  HealthKnowledgeBase: 'HealthKnowledgeBase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -73,6 +77,16 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const KelurahanScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  district: 'district',
+  createdAt: 'createdAt'
+} as const
+
+export type KelurahanScalarFieldEnum = (typeof KelurahanScalarFieldEnum)[keyof typeof KelurahanScalarFieldEnum]
+
+
 export const AnonymousSessionScalarFieldEnum = {
   id: 'id',
   clientToken: 'clientToken',
@@ -84,6 +98,19 @@ export const AnonymousSessionScalarFieldEnum = {
 export type AnonymousSessionScalarFieldEnum = (typeof AnonymousSessionScalarFieldEnum)[keyof typeof AnonymousSessionScalarFieldEnum]
 
 
+export const IngestionBatchLogScalarFieldEnum = {
+  id: 'id',
+  sourceName: 'sourceName',
+  sourceType: 'sourceType',
+  totalRecords: 'totalRecords',
+  successCount: 'successCount',
+  failedCount: 'failedCount',
+  importedAt: 'importedAt'
+} as const
+
+export type IngestionBatchLogScalarFieldEnum = (typeof IngestionBatchLogScalarFieldEnum)[keyof typeof IngestionBatchLogScalarFieldEnum]
+
+
 export const ScreeningRecordScalarFieldEnum = {
   id: 'id',
   shareHash: 'shareHash',
@@ -91,18 +118,34 @@ export const ScreeningRecordScalarFieldEnum = {
   sourceType: 'sourceType',
   sourceBatchId: 'sourceBatchId',
   persona: 'persona',
-  kelurahan: 'kelurahan',
+  kelurahanId: 'kelurahanId',
+  externalLocationLabel: 'externalLocationLabel',
+  isOutsideBontang: 'isOutsideBontang',
   ageMonths: 'ageMonths',
   gender: 'gender',
   weightKg: 'weightKg',
   heightCm: 'heightCm',
-  isOutsideBontang: 'isOutsideBontang',
+  createdAt: 'createdAt'
+} as const
+
+export type ScreeningRecordScalarFieldEnum = (typeof ScreeningRecordScalarFieldEnum)[keyof typeof ScreeningRecordScalarFieldEnum]
+
+
+export const GrowthAssessmentScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   zScore: 'zScore',
   zScoreWAZ: 'zScoreWAZ',
   zScoreWHZ: 'zScoreWHZ',
   statusGiziTBU: 'statusGiziTBU',
   statusGiziBBU: 'statusGiziBBU',
-  statusGiziBBTB: 'statusGiziBBTB',
+  statusGiziBBTB: 'statusGiziBBTB'
+} as const
+
+export type GrowthAssessmentScalarFieldEnum = (typeof GrowthAssessmentScalarFieldEnum)[keyof typeof GrowthAssessmentScalarFieldEnum]
+
+
+export const ScreeningDeterminantsScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   bblrOption: 'bblrOption',
   exclusiveAsi: 'exclusiveAsi',
   mpasiAge: 'mpasiAge',
@@ -113,15 +156,22 @@ export const ScreeningRecordScalarFieldEnum = {
   motherEducation: 'motherEducation',
   economicQuintile: 'economicQuintile',
   diarrheaHistory: 'diarrheaHistory',
-  posyanduKia: 'posyanduKia',
+  posyanduKia: 'posyanduKia'
+} as const
+
+export type ScreeningDeterminantsScalarFieldEnum = (typeof ScreeningDeterminantsScalarFieldEnum)[keyof typeof ScreeningDeterminantsScalarFieldEnum]
+
+
+export const RiskAssessmentScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   riskTier: 'riskTier',
   riskScore: 'riskScore',
   dominantFactors: 'dominantFactors',
   rawMetadata: 'rawMetadata',
-  createdAt: 'createdAt'
+  engineVersion: 'engineVersion'
 } as const
 
-export type ScreeningRecordScalarFieldEnum = (typeof ScreeningRecordScalarFieldEnum)[keyof typeof ScreeningRecordScalarFieldEnum]
+export type RiskAssessmentScalarFieldEnum = (typeof RiskAssessmentScalarFieldEnum)[keyof typeof RiskAssessmentScalarFieldEnum]
 
 
 export const HealthKnowledgeBaseScalarFieldEnum = {
@@ -139,19 +189,6 @@ export const HealthKnowledgeBaseScalarFieldEnum = {
 } as const
 
 export type HealthKnowledgeBaseScalarFieldEnum = (typeof HealthKnowledgeBaseScalarFieldEnum)[keyof typeof HealthKnowledgeBaseScalarFieldEnum]
-
-
-export const IngestionBatchLogScalarFieldEnum = {
-  id: 'id',
-  sourceName: 'sourceName',
-  sourceType: 'sourceType',
-  totalRecords: 'totalRecords',
-  successCount: 'successCount',
-  failedCount: 'failedCount',
-  importedAt: 'importedAt'
-} as const
-
-export type IngestionBatchLogScalarFieldEnum = (typeof IngestionBatchLogScalarFieldEnum)[keyof typeof IngestionBatchLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -178,6 +215,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -185,12 +230,4 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

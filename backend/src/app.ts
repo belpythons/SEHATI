@@ -29,9 +29,12 @@ app.use("/api/v1/ingest", ingestRoutes);
 app.use("/api/v1/session", sessionRoutes);
 
 app.use(
-  (err: Error, req: Request, res: Response, next: NextFunction) => {
+  (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     logger.error(err.message, err.stack);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Terjadi kesalahan pada server." },
+    });
   }
 );
 

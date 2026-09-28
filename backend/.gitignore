@@ -41,3 +41,8 @@ Thumbs.db
 .agents/
 .claude/
 .windsurf/
+
+# Dataset sumber mentah (besar, bukan kode — lihat FDD §10 & scripts/README)
+data/sources/*.xlsx
+scripts/who-source/*.xlsx
+scripts/who-source/who_lms_extracted.json

@@ -6,7 +6,12 @@
   "scripts": {
     "test": "tsx --test \"src/**/*.test.ts\"",
     "dev": "tsx watch src/server.ts",
-    "build": "tsx"
+    "build": "tsx",
+    "selfcheck:zscore": "tsx scripts/selfcheck-zscore.ts",
+    "selfcheck:risk": "tsx scripts/selfcheck-risk.ts",
+    "selfcheck:riskesdas-mapper": "tsx scripts/selfcheck-riskesdas-mapper.ts",
+    "seed:riskesdas": "tsx scripts/seedRiskesdas.ts",
+    "seed:knowledge-base": "tsx scripts/seedHealthKnowledgeBase.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,24 +25,23 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.2",
-    "express-validator": "^7.3.2",
     "helmet": "^8.3.0",
+    "ioredis": "^5.4.1",
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
     "pg": "^8.23.0",
+    "rate-limit-redis": "^4.2.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/express-validator": "^2.20.33",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.2.0",
     "@types/node": "^26.2.0",
-    "nodemon": "^3.1.14",
     "prisma": "^7.9.1",
     "rimraf": "^6.1.3",
-    "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   },

@@ -14,7 +14,12 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model AnonymousSession
- * 
+ * Identitas anonim per perangkat/browser (UUID di localStorage, TANPA
+ * login/password — sesuai prinsip Zero-Login Friction PRD). Satu sesi bisa
+ * memiliki banyak ScreeningRecord dari waktu ke waktu (mis. orang tua yang
+ * sama mengukur ulang balitanya tiap bulan). `persona` di sini adalah nilai
+ * TERKINI/TERAKHIR sesi tsb — nilai persona pada saat submission tertentu
+ * tetap tersimpan apa adanya di `ScreeningRecord.persona` masing-masing.
  */
 export type AnonymousSessionModel = runtime.Types.Result.DefaultSelection<Prisma.$AnonymousSessionPayload>
 
@@ -315,14 +320,6 @@ export type AnonymousSessionMinOrderByAggregateInput = {
 export type AnonymousSessionScalarRelationFilter = {
   is?: Prisma.AnonymousSessionWhereInput
   isNot?: Prisma.AnonymousSessionWhereInput
-}
-
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
 }
 
 export type AnonymousSessionCreateNestedOneWithoutScreeningsInput = {

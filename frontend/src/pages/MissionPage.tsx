@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Target02Icon, BookOpen01Icon, Share05Icon } from 'hugeicons-react'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
 import { FooterSection } from '../components/layout/FooterSection'
+import { accent } from '@/lib/utils'
 
 export const MissionPage: React.FC = () => {
   const transition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
@@ -37,7 +38,7 @@ export const MissionPage: React.FC = () => {
         'Mendemokratisasi akses terhadap teknologi skrining berstandar medis melalui platform yang bersifat offline-ready, gratis, dan dirancang untuk wilayah dengan keterbatasan infrastruktur digital dimulai dari Kota Bontang, Kalimantan Timur.',
       color: 'navy',
     },
-  ]
+  ] as const
 
   return (
     <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex flex-col font-sans selection:bg-slate-900 selection:text-white">
@@ -145,8 +146,8 @@ export const MissionPage: React.FC = () => {
                   className="bg-white rounded-2xl border border-slate-200/50 p-8 flex flex-col"
                 >
                   <div className="flex items-center justify-between mb-8">
-                    <div className={`bg-${target.color}/10 p-3 rounded-full inline-flex`}>
-                      <target.icon className={`w-6 h-6 text-${target.color}`} strokeWidth={1.5} />
+                    <div className={`${accent[target.color].chip} p-3 rounded-full inline-flex`}>
+                      <target.icon className={`w-6 h-6 ${accent[target.color].text}`} strokeWidth={1.5} />
                     </div>
                     <span className="font-mono text-sm text-slate-300">{target.number}</span>
                   </div>

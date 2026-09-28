@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { NoteIcon, ChartLineData03Icon, MessageMultiple01Icon } from 'hugeicons-react'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
 import { FooterSection } from '../components/layout/FooterSection'
+import { accent } from '@/lib/utils'
 
 const steps = [
   {
@@ -48,7 +49,7 @@ const steps = [
     color: 'navy',
     cta: null,
   },
-]
+] as const
 
 export const UserGuidePage: React.FC = () => {
   const transition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
@@ -115,8 +116,8 @@ export const UserGuidePage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                   {/* Left: number + icon */}
                   <div className="md:col-span-3 flex flex-row md:flex-col items-start gap-4">
-                    <div className={`bg-${step.color}/10 p-3 rounded-full inline-flex`}>
-                      <step.icon className={`w-6 h-6 text-${step.color}`} strokeWidth={1.5} />
+                    <div className={`${accent[step.color].chip} p-3 rounded-full inline-flex`}>
+                      <step.icon className={`w-6 h-6 ${accent[step.color].text}`} strokeWidth={1.5} />
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-4xl md:text-5xl font-display font-light text-slate-200 tracking-tighter">

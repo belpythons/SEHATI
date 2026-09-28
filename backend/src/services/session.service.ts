@@ -1,11 +1,12 @@
 import { prisma } from "../utils/prisma";
+import { normalizePersona } from "../utils/normalizePersona";
 
 export const findOrCreateSession = async (clientToken: string, persona: string) => {
-  console.log("mencari atau membuat sesion untuk token:", clientToken)
+  const canonicalPersona = normalizePersona(persona);
   const session = await prisma.anonymousSession.upsert({
     where: { clientToken },
-    update: { persona },
-    create: { clientToken, persona },
+    update: { persona: canonicalPersona },
+    create: { clientToken, persona: canonicalPersona },
   });
   // console.log("Sesi berhasil:", {
   //   sessionId: session.id,

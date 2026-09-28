@@ -29,8 +29,8 @@ export * from "./enums"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more AnonymousSessions
- * const anonymousSessions = await prisma.anonymousSession.findMany()
+ * // Fetch zero or more Kelurahans
+ * const kelurahans = await prisma.kelurahan.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -40,22 +40,71 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
+ * Model Kelurahan
+ * Daftar kelurahan Kota Bontang (15 kelurahan riil) — dipakai sebagai lookup
+ * relasional pengganti string bebas. Screening dari luar Bontang (atau data
+ * riset nasional seperti Riskesdas) TIDAK punya baris di sini — lihat
+ * `ScreeningRecord.externalLocationLabel`.
+ */
+export type Kelurahan = Prisma.KelurahanModel
+/**
  * Model AnonymousSession
- * 
+ * Identitas anonim per perangkat/browser (UUID di localStorage, TANPA
+ * login/password — sesuai prinsip Zero-Login Friction PRD). Satu sesi bisa
+ * memiliki banyak ScreeningRecord dari waktu ke waktu (mis. orang tua yang
+ * sama mengukur ulang balitanya tiap bulan). `persona` di sini adalah nilai
+ * TERKINI/TERAKHIR sesi tsb — nilai persona pada saat submission tertentu
+ * tetap tersimpan apa adanya di `ScreeningRecord.persona` masing-masing.
  */
 export type AnonymousSession = Prisma.AnonymousSessionModel
 /**
+ * Model IngestionBatchLog
+ * Log audit tiap batch impor (CSV/Riskesdas). `id` DISUPLAI APLIKASI (bukan
+ * auto-generate) — nilainya sama persis dengan `ScreeningRecord.sourceBatchId`
+ * milik baris-baris hasil batch tsb, sehingga relasinya nyata & bisa di-JOIN
+ * (sebelum revisi ini, keduanya adalah dua ID acak terpisah yang tidak pernah
+ * benar-benar berhubungan — bug yang diperbaiki di sini).
+ */
+export type IngestionBatchLog = Prisma.IngestionBatchLogModel
+/**
  * Model ScreeningRecord
- * 
+ * Entitas INTI satu kali skrining: identitas, lokasi, dan antropometri
+ * mentah (input pengguna). Hasil hitung WHO, jawaban kuesioner determinan,
+ * dan skor risiko sengaja DIPISAH ke tabel anak 1:1 (`GrowthAssessment`,
+ * `ScreeningDeterminants`, `RiskAssessment`) supaya tabel ini tetap ramping
+ * dan gampang dibaca walau datanya nanti jadi ratusan ribu baris. Endpoint
+ * API tetap mengembalikan gabungan semua tabel ini sebagai satu objek datar
+ * (lihat VIEW `screening_record_flat`) — kontrak frontend tidak berubah.
  */
 export type ScreeningRecord = Prisma.ScreeningRecordModel
 /**
+ * Model GrowthAssessment
+ * Hasil hitung Z-Score WHO 2006 (OUTPUT turunan, bukan input) — dipisah dari
+ * ScreeningRecord karena ini nilai yang DIHITUNG mesin (zscoreEngine), bukan
+ * dikumpulkan langsung dari pengguna.
+ */
+export type GrowthAssessment = Prisma.GrowthAssessmentModel
+/**
+ * Model ScreeningDeterminants
+ * Jawaban mentah 11 pertanyaan kuesioner determinan lingkungan/pola asuh —
+ * input pengguna, dipisah dari hasil komputasi supaya jelas mana data yang
+ * "diisi orang" vs "dihitung mesin".
+ */
+export type ScreeningDeterminants = Prisma.ScreeningDeterminantsModel
+/**
+ * Model RiskAssessment
+ * Output mesin skor risiko (weightedRiskEngine — lihat FDD §6). `engineVersion`
+ * mencatat versi algoritma yang menghasilkan baris ini, supaya kalau
+ * metodologinya berubah lagi di masa depan (sudah pernah terjadi sekali:
+ * Naive Bayes -> weighted-rule), data lama tetap bisa ditelusuri asalnya.
+ */
+export type RiskAssessment = Prisma.RiskAssessmentModel
+/**
  * Model HealthKnowledgeBase
- * 
+ * Konten edukasi statis (pedoman gizi/kesehatan) — SENGAJA berdiri sendiri
+ * tanpa relasi ke ScreeningRecord manapun. Ini tabel referensi/konten
+ * (seperti CMS), bukan data transaksional per-anak; chat controller memilih
+ * baris yang relevan secara dinamis berdasarkan riskTier & rentang umur saat
+ * itu, bukan lewat foreign key permanen.
  */
 export type HealthKnowledgeBase = Prisma.HealthKnowledgeBaseModel
-/**
- * Model IngestionBatchLog
- * 
- */
-export type IngestionBatchLog = Prisma.IngestionBatchLogModel

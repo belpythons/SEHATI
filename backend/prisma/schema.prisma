@@ -3,8 +3,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -15,10 +15,28 @@ enum DataSourceType {
   EXTERNAL_HEALTH_API
 }
 
+/// Daftar kelurahan Kota Bontang (15 kelurahan riil) — dipakai sebagai lookup
+/// relasional pengganti string bebas. Screening dari luar Bontang (atau data
+/// riset nasional seperti Riskesdas) TIDAK punya baris di sini — lihat
+/// `ScreeningRecord.externalLocationLabel`.
+model Kelurahan {
+  id         String            @id @default(uuid())
+  name       String            @unique
+  district   String // Kecamatan: Bontang Utara/Selatan/Barat
+  createdAt  DateTime          @default(now())
+  screenings ScreeningRecord[]
+}
+
+/// Identitas anonim per perangkat/browser (UUID di localStorage, TANPA
+/// login/password — sesuai prinsip Zero-Login Friction PRD). Satu sesi bisa
+/// memiliki banyak ScreeningRecord dari waktu ke waktu (mis. orang tua yang
+/// sama mengukur ulang balitanya tiap bulan). `persona` di sini adalah nilai
+/// TERKINI/TERAKHIR sesi tsb — nilai persona pada saat submission tertentu
+/// tetap tersimpan apa adanya di `ScreeningRecord.persona` masing-masing.
 model AnonymousSession {
   id          String            @id @default(uuid())
   clientToken String            @unique
-  persona     String            @default("ORANG_TUA")
+  persona     String            @default("Orang Tua / Anggota Keluarga Balita")
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   screenings  ScreeningRecord[]
@@ -26,53 +44,125 @@ model AnonymousSession {
   @@index([clientToken])
 }
 
+/// Log audit tiap batch impor (CSV/Riskesdas). `id` DISUPLAI APLIKASI (bukan
+/// auto-generate) — nilainya sama persis dengan `ScreeningRecord.sourceBatchId`
+/// milik baris-baris hasil batch tsb, sehingga relasinya nyata & bisa di-JOIN
+/// (sebelum revisi ini, keduanya adalah dua ID acak terpisah yang tidak pernah
+/// benar-benar berhubungan — bug yang diperbaiki di sini).
+model IngestionBatchLog {
+  id           String            @id
+  sourceName   String
+  sourceType   DataSourceType
+  totalRecords Int
+  successCount Int
+  failedCount  Int
+  importedAt   DateTime          @default(now())
+  screenings   ScreeningRecord[]
+}
+
+/// Entitas INTI satu kali skrining: identitas, lokasi, dan antropometri
+/// mentah (input pengguna). Hasil hitung WHO, jawaban kuesioner determinan,
+/// dan skor risiko sengaja DIPISAH ke tabel anak 1:1 (`GrowthAssessment`,
+/// `ScreeningDeterminants`, `RiskAssessment`) supaya tabel ini tetap ramping
+/// dan gampang dibaca walau datanya nanti jadi ratusan ribu baris. Endpoint
+/// API tetap mengembalikan gabungan semua tabel ini sebagai satu objek datar
+/// (lihat VIEW `screening_record_flat`) — kontrak frontend tidak berubah.
 model ScreeningRecord {
-  id               String           @id @default(uuid())
-  shareHash        String           @unique @default(nanoid(10))
-  sessionId        String
-  session          AnonymousSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sourceType       DataSourceType   @default(PWA_DIRECT_USER)
-  sourceBatchId    String?
-  persona          String
-  kelurahan        String
-  ageMonths        Int
-  gender           String
-  weightKg         Float
-  heightCm         Float
-  isOutsideBontang Boolean
+  id            String            @id @default(uuid())
+  shareHash     String            @unique @default(nanoid(10))
+  sessionId     String
+  session       AnonymousSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sourceType    DataSourceType    @default(PWA_DIRECT_USER)
+  sourceBatchId String?
+  batch         IngestionBatchLog? @relation(fields: [sourceBatchId], references: [id])
 
-  zScore           Float            // Z-Score TB/U
-  zScoreWAZ        Float?           // Z-Score BB/U
-  zScoreWHZ        Float?           // Z-Score BB/TB
-  statusGiziTBU    String?          // Severely Stunted, Stunted, Normal, Tinggi
-  statusGiziBBU    String?          // Severely Underweight, Underweight, Normal, BB Lebih
-  statusGiziBBTB   String?          // Severely Wasted, Wasted, Normal, Risk Overweight, Overweight
+  /// Peran pengisi PADA SAAT submission ini (lihat catatan di AnonymousSession
+  /// soal kenapa ini tidak selalu sama dengan AnonymousSession.persona).
+  /// Dikunci CHECK constraint di level DB (lihat migration) ke 4 nilai resmi.
+  persona String
 
-  bblrOption       Int              // 1=Normal (>=2500g), 2=BBLR (<2500g), 3=Tidak Tahu
-  exclusiveAsi     Int              // 1=ASI Eksklusif, 2=Tidak Eksklusif / Formula, 3=Belum 6 Bulan
-  mpasiAge         Int              // 1=<6 Bln (Dini), 2=Tepat 6 Bln, 3=>6 Bln (Terlambat), 4=Belum MPASI
-  animalProtein    Int[]            // Array [1=Ikan, 2=Telur, 3=Daging, 4=Susu, 5=Sangat Jarang]
-  cleanWaterAccess Int              // 1=Kemasan/Isi Ulang, 2=PDAM, 3=Sumur Bor, 4=Sumur Gali/Mata Air/Hujan
-  sanitationAccess Int              // 1=Milik Sendiri (Leher Angsa + Septic Tank), 2=Cemplung, 3=MCK Umum, 4=Tidak Memiliki
-  smokeExposure    Int              // 1=Bebas Asap Rokok, 2=Terpapar Asap Rokok
-  motherEducation  Int              // 1=Tidak Tamat/Tamat SD, 2=SMP, 3=SMA/SMK, 4=Diploma/Sarjana
-  economicQuintile Int              // 1=Kuintil 1, 2=Kuintil 2, 3=Kuintil 3, 4=Kuintil 4, 5=Kuintil 5
-  diarrheaHistory  Int              // 1=Tidak Pernah/1x Ringan, 2=Sering/Berulang (>=2x)
-  posyanduKia      Int              // 1=Rutin Posyandu + Ada KIA, 2=Kadang-kadang, 3=Tidak Pernah/Jarang
+  kelurahanId           String?
+  kelurahan             Kelurahan? @relation(fields: [kelurahanId], references: [id])
+  /// Dipakai saat isOutsideBontang=true ATAU data eksternal (mis. Riskesdas
+  /// nasional) — kelurahanId dibiarkan null, label bebas disimpan di sini.
+  externalLocationLabel String?
+  isOutsideBontang       Boolean
 
-  // Prediksi Risiko & Output AI
-  riskTier         String           // LOW, MODERATE, HIGH
-  riskScore        Float            // 0.0 - 1.0
-  dominantFactors  String[]
-  rawMetadata      Json?
-  createdAt        DateTime         @default(now())
+  ageMonths Int
+  /// Dikunci CHECK constraint ke 'Laki-Laki' | 'Perempuan' (lihat migration).
+  gender    String
+  weightKg  Float
+  heightCm  Float
+
+  createdAt DateTime @default(now())
+
+  growth       GrowthAssessment?
+  determinants ScreeningDeterminants?
+  risk         RiskAssessment?
 
   @@index([sessionId])
   @@index([shareHash])
-  @@index([kelurahan])
+  @@index([kelurahanId])
+}
+
+/// Hasil hitung Z-Score WHO 2006 (OUTPUT turunan, bukan input) — dipisah dari
+/// ScreeningRecord karena ini nilai yang DIHITUNG mesin (zscoreEngine), bukan
+/// dikumpulkan langsung dari pengguna.
+model GrowthAssessment {
+  screeningRecordId String          @id
+  screening         ScreeningRecord @relation(fields: [screeningRecordId], references: [id], onDelete: Cascade)
+
+  zScore    Float // Z-Score TB/U (Height-for-Age)
+  zScoreWAZ Float? // Z-Score BB/U (Weight-for-Age)
+  zScoreWHZ Float? // Z-Score BB/TB (Weight-for-Height)
+
+  statusGiziTBU  String? // Sangat Pendek | Pendek | Normal | Tinggi
+  statusGiziBBU  String? // Severely Underweight | Underweight | Normal | Risiko BB Lebih
+  statusGiziBBTB String? // Severely Wasted | Wasted | Normal | Overweight/Obesitas
+}
+
+/// Jawaban mentah 11 pertanyaan kuesioner determinan lingkungan/pola asuh —
+/// input pengguna, dipisah dari hasil komputasi supaya jelas mana data yang
+/// "diisi orang" vs "dihitung mesin".
+model ScreeningDeterminants {
+  screeningRecordId String          @id
+  screening         ScreeningRecord @relation(fields: [screeningRecordId], references: [id], onDelete: Cascade)
+
+  bblrOption       Int // 1=Normal(>=2500g) 2=BBLR(<2500g) 3=Tidak Tahu
+  exclusiveAsi     Int // 1=Eksklusif 2=Tidak/Formula 3=Belum 6 Bulan
+  mpasiAge         Int // 1=<6Bln(Dini) 2=Tepat 6Bln 3=>6Bln(Terlambat) 4=Belum MPASI
+  animalProtein    Int[] // [1=Ikan 2=Telur 3=Daging 4=Susu 5=Sangat Jarang]
+  cleanWaterAccess Int // 1=Kemasan 2=PDAM 3=Sumur Bor 4=Sumur Gali/Mata Air/Hujan
+  sanitationAccess Int // 1=Milik Sendiri 2=Cemplung 3=MCK 4=Tidak Memiliki
+  smokeExposure    Int // 1=Bebas 2=Terpapar
+  motherEducation  Int // 1=SD 2=SMP 3=SMA/SMK 4=Diploma/Sarjana
+  economicQuintile Int // 1-5 (1=termiskin)
+  diarrheaHistory  Int // 1=Tidak Pernah/1x Ringan 2=Sering/Berulang(>=2x)
+  posyanduKia      Int // 1=Rutin+KIA 2=Kadang-kadang 3=Tidak Pernah/Jarang
+}
+
+/// Output mesin skor risiko (weightedRiskEngine — lihat FDD §6). `engineVersion`
+/// mencatat versi algoritma yang menghasilkan baris ini, supaya kalau
+/// metodologinya berubah lagi di masa depan (sudah pernah terjadi sekali:
+/// Naive Bayes -> weighted-rule), data lama tetap bisa ditelusuri asalnya.
+model RiskAssessment {
+  screeningRecordId String          @id
+  screening         ScreeningRecord @relation(fields: [screeningRecordId], references: [id], onDelete: Cascade)
+
+  riskTier        String // LOW | MODERATE | HIGH
+  riskScore       Float // 0.0 - 1.0
+  dominantFactors String[]
+  rawMetadata     Json?
+  engineVersion   String   @default("weighted-v1")
+
   @@index([riskTier])
 }
 
+/// Konten edukasi statis (pedoman gizi/kesehatan) — SENGAJA berdiri sendiri
+/// tanpa relasi ke ScreeningRecord manapun. Ini tabel referensi/konten
+/// (seperti CMS), bukan data transaksional per-anak; chat controller memilih
+/// baris yang relevan secara dinamis berdasarkan riskTier & rentang umur saat
+/// itu, bukan lewat foreign key permanen.
 model HealthKnowledgeBase {
   id                      String   @id @default(uuid())
   topicTitle              String
@@ -88,14 +178,4 @@ model HealthKnowledgeBase {
 
   @@index([category])
   @@index([targetRiskTier])
-}
-
-model IngestionBatchLog {
-  id           String         @id @default(uuid())
-  sourceName   String
-  sourceType   DataSourceType
-  totalRecords Int
-  successCount Int
-  failedCount  Int
-  importedAt   DateTime       @default(now())
 }

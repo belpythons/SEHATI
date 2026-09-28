@@ -14,7 +14,11 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model IngestionBatchLog
- * 
+ * Log audit tiap batch impor (CSV/Riskesdas). `id` DISUPLAI APLIKASI (bukan
+ * auto-generate) — nilainya sama persis dengan `ScreeningRecord.sourceBatchId`
+ * milik baris-baris hasil batch tsb, sehingga relasinya nyata & bisa di-JOIN
+ * (sebelum revisi ini, keduanya adalah dua ID acak terpisah yang tidak pernah
+ * benar-benar berhubungan — bug yang diperbaiki di sini).
  */
 export type IngestionBatchLogModel = runtime.Types.Result.DefaultSelection<Prisma.$IngestionBatchLogPayload>
 
@@ -240,6 +244,7 @@ export type IngestionBatchLogWhereInput = {
   successCount?: Prisma.IntFilter<"IngestionBatchLog"> | number
   failedCount?: Prisma.IntFilter<"IngestionBatchLog"> | number
   importedAt?: Prisma.DateTimeFilter<"IngestionBatchLog"> | Date | string
+  screenings?: Prisma.ScreeningRecordListRelationFilter
 }
 
 export type IngestionBatchLogOrderByWithRelationInput = {
@@ -250,6 +255,7 @@ export type IngestionBatchLogOrderByWithRelationInput = {
   successCount?: Prisma.SortOrder
   failedCount?: Prisma.SortOrder
   importedAt?: Prisma.SortOrder
+  screenings?: Prisma.ScreeningRecordOrderByRelationAggregateInput
 }
 
 export type IngestionBatchLogWhereUniqueInput = Prisma.AtLeast<{
@@ -263,6 +269,7 @@ export type IngestionBatchLogWhereUniqueInput = Prisma.AtLeast<{
   successCount?: Prisma.IntFilter<"IngestionBatchLog"> | number
   failedCount?: Prisma.IntFilter<"IngestionBatchLog"> | number
   importedAt?: Prisma.DateTimeFilter<"IngestionBatchLog"> | Date | string
+  screenings?: Prisma.ScreeningRecordListRelationFilter
 }, "id">
 
 export type IngestionBatchLogOrderByWithAggregationInput = {
@@ -294,23 +301,25 @@ export type IngestionBatchLogScalarWhereWithAggregatesInput = {
 }
 
 export type IngestionBatchLogCreateInput = {
-  id?: string
+  id: string
   sourceName: string
   sourceType: $Enums.DataSourceType
   totalRecords: number
   successCount: number
   failedCount: number
   importedAt?: Date | string
+  screenings?: Prisma.ScreeningRecordCreateNestedManyWithoutBatchInput
 }
 
 export type IngestionBatchLogUncheckedCreateInput = {
-  id?: string
+  id: string
   sourceName: string
   sourceType: $Enums.DataSourceType
   totalRecords: number
   successCount: number
   failedCount: number
   importedAt?: Date | string
+  screenings?: Prisma.ScreeningRecordUncheckedCreateNestedManyWithoutBatchInput
 }
 
 export type IngestionBatchLogUpdateInput = {
@@ -321,6 +330,7 @@ export type IngestionBatchLogUpdateInput = {
   successCount?: Prisma.IntFieldUpdateOperationsInput | number
   failedCount?: Prisma.IntFieldUpdateOperationsInput | number
   importedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  screenings?: Prisma.ScreeningRecordUpdateManyWithoutBatchNestedInput
 }
 
 export type IngestionBatchLogUncheckedUpdateInput = {
@@ -331,10 +341,11 @@ export type IngestionBatchLogUncheckedUpdateInput = {
   successCount?: Prisma.IntFieldUpdateOperationsInput | number
   failedCount?: Prisma.IntFieldUpdateOperationsInput | number
   importedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  screenings?: Prisma.ScreeningRecordUncheckedUpdateManyWithoutBatchNestedInput
 }
 
 export type IngestionBatchLogCreateManyInput = {
-  id?: string
+  id: string
   sourceName: string
   sourceType: $Enums.DataSourceType
   totalRecords: number
@@ -405,6 +416,124 @@ export type IngestionBatchLogSumOrderByAggregateInput = {
   failedCount?: Prisma.SortOrder
 }
 
+export type IngestionBatchLogNullableScalarRelationFilter = {
+  is?: Prisma.IngestionBatchLogWhereInput | null
+  isNot?: Prisma.IngestionBatchLogWhereInput | null
+}
+
+export type EnumDataSourceTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DataSourceType
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type IngestionBatchLogCreateNestedOneWithoutScreeningsInput = {
+  create?: Prisma.XOR<Prisma.IngestionBatchLogCreateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedCreateWithoutScreeningsInput>
+  connectOrCreate?: Prisma.IngestionBatchLogCreateOrConnectWithoutScreeningsInput
+  connect?: Prisma.IngestionBatchLogWhereUniqueInput
+}
+
+export type IngestionBatchLogUpdateOneWithoutScreeningsNestedInput = {
+  create?: Prisma.XOR<Prisma.IngestionBatchLogCreateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedCreateWithoutScreeningsInput>
+  connectOrCreate?: Prisma.IngestionBatchLogCreateOrConnectWithoutScreeningsInput
+  upsert?: Prisma.IngestionBatchLogUpsertWithoutScreeningsInput
+  disconnect?: Prisma.IngestionBatchLogWhereInput | boolean
+  delete?: Prisma.IngestionBatchLogWhereInput | boolean
+  connect?: Prisma.IngestionBatchLogWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.IngestionBatchLogUpdateToOneWithWhereWithoutScreeningsInput, Prisma.IngestionBatchLogUpdateWithoutScreeningsInput>, Prisma.IngestionBatchLogUncheckedUpdateWithoutScreeningsInput>
+}
+
+export type IngestionBatchLogCreateWithoutScreeningsInput = {
+  id: string
+  sourceName: string
+  sourceType: $Enums.DataSourceType
+  totalRecords: number
+  successCount: number
+  failedCount: number
+  importedAt?: Date | string
+}
+
+export type IngestionBatchLogUncheckedCreateWithoutScreeningsInput = {
+  id: string
+  sourceName: string
+  sourceType: $Enums.DataSourceType
+  totalRecords: number
+  successCount: number
+  failedCount: number
+  importedAt?: Date | string
+}
+
+export type IngestionBatchLogCreateOrConnectWithoutScreeningsInput = {
+  where: Prisma.IngestionBatchLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.IngestionBatchLogCreateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedCreateWithoutScreeningsInput>
+}
+
+export type IngestionBatchLogUpsertWithoutScreeningsInput = {
+  update: Prisma.XOR<Prisma.IngestionBatchLogUpdateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedUpdateWithoutScreeningsInput>
+  create: Prisma.XOR<Prisma.IngestionBatchLogCreateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedCreateWithoutScreeningsInput>
+  where?: Prisma.IngestionBatchLogWhereInput
+}
+
+export type IngestionBatchLogUpdateToOneWithWhereWithoutScreeningsInput = {
+  where?: Prisma.IngestionBatchLogWhereInput
+  data: Prisma.XOR<Prisma.IngestionBatchLogUpdateWithoutScreeningsInput, Prisma.IngestionBatchLogUncheckedUpdateWithoutScreeningsInput>
+}
+
+export type IngestionBatchLogUpdateWithoutScreeningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceName?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  totalRecords?: Prisma.IntFieldUpdateOperationsInput | number
+  successCount?: Prisma.IntFieldUpdateOperationsInput | number
+  failedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  importedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IngestionBatchLogUncheckedUpdateWithoutScreeningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceName?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  totalRecords?: Prisma.IntFieldUpdateOperationsInput | number
+  successCount?: Prisma.IntFieldUpdateOperationsInput | number
+  failedCount?: Prisma.IntFieldUpdateOperationsInput | number
+  importedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type IngestionBatchLogCountOutputType
+ */
+
+export type IngestionBatchLogCountOutputType = {
+  screenings: number
+}
+
+export type IngestionBatchLogCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  screenings?: boolean | IngestionBatchLogCountOutputTypeCountScreeningsArgs
+}
+
+/**
+ * IngestionBatchLogCountOutputType without action
+ */
+export type IngestionBatchLogCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IngestionBatchLogCountOutputType
+   */
+  select?: Prisma.IngestionBatchLogCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * IngestionBatchLogCountOutputType without action
+ */
+export type IngestionBatchLogCountOutputTypeCountScreeningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScreeningRecordWhereInput
+}
 
 
 export type IngestionBatchLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -415,6 +544,8 @@ export type IngestionBatchLogSelect<ExtArgs extends runtime.Types.Extensions.Int
   successCount?: boolean
   failedCount?: boolean
   importedAt?: boolean
+  screenings?: boolean | Prisma.IngestionBatchLog$screeningsArgs<ExtArgs>
+  _count?: boolean | Prisma.IngestionBatchLogCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ingestionBatchLog"]>
 
 export type IngestionBatchLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -448,10 +579,18 @@ export type IngestionBatchLogSelectScalar = {
 }
 
 export type IngestionBatchLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sourceName" | "sourceType" | "totalRecords" | "successCount" | "failedCount" | "importedAt", ExtArgs["result"]["ingestionBatchLog"]>
+export type IngestionBatchLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  screenings?: boolean | Prisma.IngestionBatchLog$screeningsArgs<ExtArgs>
+  _count?: boolean | Prisma.IngestionBatchLogCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type IngestionBatchLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type IngestionBatchLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $IngestionBatchLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "IngestionBatchLog"
-  objects: {}
+  objects: {
+    screenings: Prisma.$ScreeningRecordPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     sourceName: string
@@ -854,6 +993,7 @@ readonly fields: IngestionBatchLogFieldRefs;
  */
 export interface Prisma__IngestionBatchLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  screenings<T extends Prisma.IngestionBatchLog$screeningsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.IngestionBatchLog$screeningsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScreeningRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -907,6 +1047,10 @@ export type IngestionBatchLogFindUniqueArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionBatchLog to fetch.
    */
   where: Prisma.IngestionBatchLogWhereUniqueInput
@@ -925,6 +1069,10 @@ export type IngestionBatchLogFindUniqueOrThrowArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionBatchLog to fetch.
    */
   where: Prisma.IngestionBatchLogWhereUniqueInput
@@ -942,6 +1090,10 @@ export type IngestionBatchLogFindFirstArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the IngestionBatchLog
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
   /**
    * Filter, which IngestionBatchLog to fetch.
    */
@@ -991,6 +1143,10 @@ export type IngestionBatchLogFindFirstOrThrowArgs<ExtArgs extends runtime.Types.
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * Filter, which IngestionBatchLog to fetch.
    */
   where?: Prisma.IngestionBatchLogWhereInput
@@ -1038,6 +1194,10 @@ export type IngestionBatchLogFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the IngestionBatchLog
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
   /**
    * Filter, which IngestionBatchLogs to fetch.
    */
@@ -1087,6 +1247,10 @@ export type IngestionBatchLogCreateArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * The data needed to create a IngestionBatchLog.
    */
   data: Prisma.XOR<Prisma.IngestionBatchLogCreateInput, Prisma.IngestionBatchLogUncheckedCreateInput>
@@ -1134,6 +1298,10 @@ export type IngestionBatchLogUpdateArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the IngestionBatchLog
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
   /**
    * The data needed to update a IngestionBatchLog.
    */
@@ -1201,6 +1369,10 @@ export type IngestionBatchLogUpsertArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * The filter to search for the IngestionBatchLog to update in case it exists.
    */
   where: Prisma.IngestionBatchLogWhereUniqueInput
@@ -1227,6 +1399,10 @@ export type IngestionBatchLogDeleteArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  /**
    * Filter which IngestionBatchLog to delete.
    */
   where: Prisma.IngestionBatchLogWhereUniqueInput
@@ -1247,6 +1423,30 @@ export type IngestionBatchLogDeleteManyArgs<ExtArgs extends runtime.Types.Extens
 }
 
 /**
+ * IngestionBatchLog.screenings
+ */
+export type IngestionBatchLog$screeningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScreeningRecord
+   */
+  select?: Prisma.ScreeningRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScreeningRecord
+   */
+  omit?: Prisma.ScreeningRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScreeningRecordInclude<ExtArgs> | null
+  where?: Prisma.ScreeningRecordWhereInput
+  orderBy?: Prisma.ScreeningRecordOrderByWithRelationInput | Prisma.ScreeningRecordOrderByWithRelationInput[]
+  cursor?: Prisma.ScreeningRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScreeningRecordScalarFieldEnum | Prisma.ScreeningRecordScalarFieldEnum[]
+}
+
+/**
  * IngestionBatchLog without action
  */
 export type IngestionBatchLogDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1258,4 +1458,8 @@ export type IngestionBatchLogDefaultArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the IngestionBatchLog
    */
   omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
 }

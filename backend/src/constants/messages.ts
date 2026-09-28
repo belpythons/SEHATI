@@ -117,15 +117,6 @@ export const ingestMessages = {
   persistenceFailed: "Gagal menyimpan data batch ke database.",
 };
 
-export const mlServiceMessages = {
-  predictFailed: "Layanan ML gagal melakukan kalkulasi Z-Score.",
-  connectionRefused: "Tidak dapat terhubung ke layanan ML.",
-  invalidResponse: "Respons dari layanan ML tidak valid.",
-  timeout: "Layanan ML melebihi batas waktu respons.",
-  missingRequiredFields: "Respon dari layanan ML tidak lengkap (data Z-Score atau Risk Tier tidak ditemukan).",
-  mlUnreachable: "Layanan analisis ML tidak dapat dijangkau. Pastikan service FastAPI telah berjalan.",
-};
-
 export const healthMessages = {
   ok: "Layanan berjalan normal.",
   dbConnected: "Koneksi database terhubung.",

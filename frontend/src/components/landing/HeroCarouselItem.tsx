@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { HeroSlide } from '@/data/heroCarouselData';
+import { FirstDaysArc, FishSprig, GrowthCurve } from '@/components/illustrations';
 
 // Backgrounds derived from SEHATI design tokens (--color-navy / --color-teal / --color-sage)
 // Navy  (hue 250): dark authoritative slate — primary CTA slide
@@ -11,6 +13,16 @@ const backgroundStyles: Record<HeroSlide['background'], string> = {
   navy: 'bg-gradient-to-br from-[oklch(30%_0.05_250)] via-[oklch(24%_0.04_250)] to-[oklch(18%_0.03_250)]',
   teal: 'bg-gradient-to-br from-[oklch(52%_0.09_195)] via-[oklch(42%_0.07_198)] to-[oklch(32%_0.05_200)]',
   sage: 'bg-gradient-to-br from-[oklch(52%_0.08_125)] via-[oklch(42%_0.07_128)] to-[oklch(32%_0.05_130)]',
+};
+
+// Decorative motif per slide. Absolutely positioned inside the already
+// overflow-hidden card, so the copy layout is untouched.
+const slideArt: Record<NonNullable<HeroSlide['art']>, ReactNode> = {
+  arc: <FirstDaysArc className="h-full w-full" />,
+  // The page's single idle loop (Hallmark E6): 4s, transform + opacity only,
+  // static under prefers-reduced-motion.
+  curve: <GrowthCurve className="h-full w-full" animated />,
+  sprig: <FishSprig className="h-full w-full" />,
 };
 
 interface HeroCarouselItemProps {
@@ -26,15 +38,21 @@ export function HeroCarouselItem({ slide, index, total }: HeroCarouselItemProps)
       aria-roledescription="slide"
       aria-label={`Slide ${index + 1} dari ${total}`}
       className={cn(
-        'flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl p-7 text-[oklch(98%_0.005_250)] select-none md:p-9',
+        'relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl p-7 text-[oklch(98%_0.005_250)] select-none md:p-9',
         backgroundStyles[slide.background]
       )}
     >
-      <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/70">
+      {slide.art && (
+        <div className="pointer-events-none absolute -bottom-8 -right-8 h-48 w-48 text-white/15 md:h-56 md:w-56">
+          {slideArt[slide.art]}
+        </div>
+      )}
+
+      <span className="relative font-mono text-[11px] uppercase tracking-[0.15em] text-white/70">
         {slide.eyebrow}
       </span>
 
-      <div className="space-y-3">
+      <div className="relative space-y-3">
         <h3 className="font-display text-[28px] leading-[1.15] md:text-[34px]">
           {slide.title}
         </h3>
@@ -49,7 +67,7 @@ export function HeroCarouselItem({ slide, index, total }: HeroCarouselItemProps)
           draggable={false}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#1e293b] transition-colors hover:bg-white/90"
+          className="relative inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#1e293b] transition-colors hover:bg-white/90"
         >
           {slide.ctaLabel}
           <span aria-hidden="true">→</span>

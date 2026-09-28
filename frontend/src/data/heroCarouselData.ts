@@ -5,13 +5,16 @@ export interface HeroSlide {
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  /** brand color identifier used to style the slide background — no images needed */
+  /** brand color identifier used to style the slide background gradient */
   background: 'navy' | 'teal' | 'sage';
+  /** hand-built SVG motif rendered as a decorative layer behind the copy */
+  art?: 'arc' | 'curve' | 'sprig';
 }
 
 export const heroSlides: HeroSlide[] = [
   {
     id: 'deteksi-dini-stunting',
+    art: 'arc',
     eyebrow: 'Deteksi Dini Stunting',
     title: 'Deteksi dini, tumbuh lebih pasti.',
     description:
@@ -22,6 +25,7 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     id: 'standar-who-2006',
+    art: 'curve',
     eyebrow: 'Standar WHO 2006',
     title: 'Setiap ukuran punya makna.',
     description:
@@ -32,6 +36,7 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     id: 'pangan-lokal-bontang',
+    art: 'sprig',
     eyebrow: 'Pangan Lokal Bontang',
     title: 'Gizi seimbang dari dapur sendiri.',
     description:

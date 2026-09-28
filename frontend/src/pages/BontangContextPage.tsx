@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Location04Icon } from 'hugeicons-react'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
 import { FooterSection } from '../components/layout/FooterSection'
+import { BontangCoast } from '@/components/illustrations'
 
 const kecamatanData = [
   {
@@ -72,6 +73,11 @@ export const BontangContextPage: React.FC = () => {
             SEHATI dikembangkan secara khusus untuk konteks demografis dan geografis Kota Bontang, kota pesisir di pantai timur Kalimantan yang menghadapi tantangan stunting di atas rata-rata nasional.
           </motion.p>
         </section>
+
+        {/* Coastline strip — decorative, sets the geography before the data */}
+        <div className="px-4 sm:px-6 md:px-12 max-w-7xl mx-auto">
+          <BontangCoast className="w-full h-24 md:h-32 text-teal/40" />
+        </div>
 
         {/* Prevalence Stat */}
         <section className="px-4 sm:px-6 md:px-12 max-w-7xl mx-auto pb-20 border-t border-slate-200/60 pt-16">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { PersonaMark, GrowthCurve, FirstDaysArc, HomeWaterMark } from '@/components/illustrations'
 import {
   ArrowLeft,
   ArrowRight,
@@ -509,13 +510,16 @@ export const QuestionnairePage: React.FC = () => {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
-                    Langkah 1: Seleksi Persona & Domisili
-                  </h2>
-                  <p className="text-xs sm:text-sm text-[var(--color-ink-2)] mt-1">
-                    Tentukan peran Anda dan wilayah kelurahan domisili.
-                  </p>
+                <div className="flex items-start gap-4">
+                  <PersonaMark className="w-10 h-10 shrink-0 text-navy/30" />
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
+                      Langkah 1: Seleksi Persona & Domisili
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[var(--color-ink-2)] mt-1">
+                      Tentukan peran Anda dan wilayah kelurahan domisili.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Persona Selection — 4 cards */}
@@ -614,13 +618,16 @@ export const QuestionnairePage: React.FC = () => {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
-                <div>
-                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
-                    Langkah 2: Data Fisik & Antropometri Balita
-                  </h2>
-                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
-                    Masukkan data pengukuran fisik sesuai standar WHO.
-                  </p>
+                <div className="flex items-start gap-4">
+                  <GrowthCurve className="w-10 h-10 shrink-0 text-navy/30" />
+                  <div>
+                    <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
+                      Langkah 2: Data Fisik & Antropometri Balita
+                    </h2>
+                    <p className="text-sm text-[var(--color-ink-2)] mt-1">
+                      Masukkan data pengukuran fisik sesuai standar WHO.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -759,13 +766,16 @@ export const QuestionnairePage: React.FC = () => {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-5"
               >
-                <div>
-                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
-                    Langkah 3: Riwayat Kelahiran & Pola Makan
-                  </h2>
-                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
-                    Informasi riwayat kelahiran dan pola pemberian makan balita.
-                  </p>
+                <div className="flex items-start gap-4">
+                  <FirstDaysArc className="w-10 h-10 shrink-0 text-navy/30" />
+                  <div>
+                    <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
+                      Langkah 3: Riwayat Kelahiran & Pola Makan
+                    </h2>
+                    <p className="text-sm text-[var(--color-ink-2)] mt-1">
+                      Informasi riwayat kelahiran dan pola pemberian makan balita.
+                    </p>
+                  </div>
                 </div>
 
                 <IntegerRadioGroup
@@ -838,13 +848,16 @@ export const QuestionnairePage: React.FC = () => {
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-5"
               >
-                <div>
-                  <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
-                    Langkah 4: Lingkungan & Sosial-Ekonomi
-                  </h2>
-                  <p className="text-sm text-[var(--color-ink-2)] mt-1">
-                    Determinan lingkungan, sanitasi, dan sosial-ekonomi untuk model Naïve Bayes & Gemini AI.
-                  </p>
+                <div className="flex items-start gap-4">
+                  <HomeWaterMark className="w-10 h-10 shrink-0 text-navy/30" />
+                  <div>
+                    <h2 className="text-2xl font-display font-medium text-[var(--color-ink)] tracking-tight">
+                      Langkah 4: Lingkungan & Sosial-Ekonomi
+                    </h2>
+                    <p className="text-sm text-[var(--color-ink-2)] mt-1">
+                      Determinan lingkungan, sanitasi, dan sosial-ekonomi untuk model Naïve Bayes & Gemini AI.
+                    </p>
+                  </div>
                 </div>
 
                 <IntegerRadioGroup

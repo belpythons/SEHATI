@@ -15,7 +15,7 @@ export interface GenerateResponseParams {
   model?: string;
 }
 
-const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash"];
+const DEFAULT_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"];
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;

@@ -121,4 +121,13 @@ export default defineConfig({
       '@mock': path.resolve(import.meta.dirname, './mock_data.json'),
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    },
+  },
 })

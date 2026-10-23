@@ -278,9 +278,18 @@ export const AIChatDrawer: React.FC<Props> = ({
       },
     }
 
+    // Extract conversation history for multi-turn conversational grounding
+    const conversationHistory = messages
+      .filter((m) => m.text && !m.isStreaming)
+      .map((m) => ({
+        role: m.sender === 'user' ? ('user' as const) : ('model' as const),
+        text: m.text,
+      }))
+
     if (isUmum) {
       await chatService.streamChatUmum({
         query: textToSend,
+        history: conversationHistory,
         ...streamCallbacks,
       })
     } else {
@@ -288,6 +297,7 @@ export const AIChatDrawer: React.FC<Props> = ({
         sessionId: sessionId!,
         query: textToSend,
         record,
+        history: conversationHistory,
         ...streamCallbacks,
       })
     }

@@ -2,7 +2,7 @@ import "dotenv/config";
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
 import { logger } from "../utils/logger";
-import { redis } from "../config/redis";
+import { redis, isRedisReady } from "../config/redis";
 import { geminiService } from "../services/gemini.service";
 import { chatMessages } from "../constants/messages";
 
@@ -12,26 +12,35 @@ async function findGuidelines(riskTier: string, ageMonths: number): Promise<any[
   const cacheKey = `kb:${riskTier}:${ageMonths}`;
 
   try {
-    const cached = await redis.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (isRedisReady()) {
+      const cached = await redis.get(cacheKey);
+      if (cached) return JSON.parse(cached);
+    }
   } catch (err) {
     logger.warn("Redis tidak terjangkau saat baca cache HealthKnowledgeBase:", (err as Error).message);
   }
 
-  const guidelines = await prisma.healthKnowledgeBase.findMany({
-    where: {
-      targetAgeGroupMinMonths: { lte: ageMonths },
-      targetAgeGroupMaxMonths: { gte: ageMonths },
-      OR: [{ targetRiskTier: riskTier }, { targetRiskTier: "ALL" }],
-    },
-    take: 5,
-  });
+  try {
+    const guidelines = await prisma.healthKnowledgeBase.findMany({
+      where: {
+        targetAgeGroupMinMonths: { lte: ageMonths },
+        targetAgeGroupMaxMonths: { gte: ageMonths },
+        OR: [{ targetRiskTier: riskTier }, { targetRiskTier: "ALL" }],
+      },
+      take: 5,
+    });
 
-  redis
-    .set(cacheKey, JSON.stringify(guidelines), "EX", KB_CACHE_TTL_SECONDS)
-    .catch((err) => logger.warn("Gagal menulis cache HealthKnowledgeBase:", err.message));
+    if (isRedisReady()) {
+      redis
+        .set(cacheKey, JSON.stringify(guidelines), "EX", KB_CACHE_TTL_SECONDS)
+        .catch((err) => logger.warn("Gagal menulis cache HealthKnowledgeBase:", err.message));
+    }
 
-  return guidelines;
+    return guidelines;
+  } catch (dbErr: any) {
+    logger.warn("HealthKnowledgeBase query unavailable:", dbErr.message);
+    return [];
+  }
 }
 
 /**

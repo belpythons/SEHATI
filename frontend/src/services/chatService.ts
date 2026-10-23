@@ -13,6 +13,7 @@ export interface ChatStreamOptions {
   sessionId: string
   query: string
   record: ScreeningRecord | null
+  history?: Array<{ role: 'user' | 'model'; text: string }>
   onChunk: (chunk: string) => void
   onDone: () => void
   onError: (error: Error) => void
@@ -22,6 +23,7 @@ export interface ChatStreamOptions {
 
 export interface ChatUmumStreamOptions {
   query: string
+  history?: Array<{ role: 'user' | 'model'; text: string }>
   onChunk: (chunk: string) => void
   onDone: () => void
   onError: (error: Error) => void
@@ -183,7 +185,7 @@ export const chatService = {
    * POST /api/v1/chat/stream with child screening metrics context
    */
   async streamChat(options: ChatStreamOptions): Promise<void> {
-    const { sessionId, query, record, onChunk, onDone, onError, signal } = options
+    const { sessionId, query, record, history = [], onChunk, onDone, onError, signal } = options
 
     if (!sessionId) {
       onError(new Error('sessionId is required to ground AI consultation context.'))
@@ -196,6 +198,7 @@ export const chatService = {
       query,
       mode: 'personal',
       record,
+      history,
     }
 
     try {
@@ -221,12 +224,13 @@ export const chatService = {
    * POST /api/v1/chat/stream
    */
   async streamChatUmum(options: ChatUmumStreamOptions): Promise<void> {
-    const { query, onChunk, onDone, onError, signal } = options
+    const { query, history = [], onChunk, onDone, onError, signal } = options
 
     const endpointUrl = `${API_BASE_URL}/api/v1/chat/stream`
     const payload = {
       query,
       mode: 'umum',
+      history,
     }
 
     try {
@@ -257,7 +261,7 @@ function generateContextualAnswer(query: string, record: ScreeningRecord | null)
   const kel = record?.kelurahan ?? 'Kota Bontang'
   const zScore = record?.zScore ?? -1.5
   const isStunted = zScore < -2.0
-  const gender = record?.gender === 'L' ? 'laki-laki' : 'perempuan'
+  const gender = (record?.gender === 'L' || record?.gender === 'Laki-Laki') ? 'laki-laki' : 'perempuan'
 
   if (q.includes('bawis') || q.includes('resep') || q.includes('menu') || q.includes('makan') || q.includes('mpasi')) {
     return `Halo! Untuk balita ${gender} usia **${age} bulan** di **Kelurahan ${kel}**, berikut adalah panduan variasi menu gizi pangan lokal yang sangat dianjurkan:\n\n` +

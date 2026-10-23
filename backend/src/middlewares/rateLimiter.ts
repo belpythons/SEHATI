@@ -1,16 +1,10 @@
-import rateLimit from "express-rate-limit";
-import { RedisStore } from "rate-limit-redis";
-import { redis } from "../config/redis";
+import rateLimit, { MemoryStore } from "express-rate-limit";
 import { commonMessages } from "../constants/messages";
 
-// Store terpusat di Redis — supaya rate limit konsisten walau backend
-// dijalankan lebih dari satu instance (lihat FDD §7-8).
-const makeRedisStore = (prefix: string) =>
-  new RedisStore({
-    prefix,
-    sendCommand: (...args: string[]) =>
-      redis.call(args[0], ...args.slice(1)) as Promise<any>,
-  });
+// Store in-memory rate-limiter
+const makeStore = (_prefix: string) => {
+  return new MemoryStore();
+};
 
 export const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -18,7 +12,7 @@ export const rateLimiter = rateLimit({
   message: { success: false, error: { code: "RATE_LIMITED", message: commonMessages.rateLimitExceeded } },
   standardHeaders: true,
   legacyHeaders: false,
-  store: makeRedisStore("rl:default:"),
+  store: makeStore("rl:default:"),
 });
 
 export const ingestRateLimiter = rateLimit({
@@ -27,7 +21,7 @@ export const ingestRateLimiter = rateLimit({
   message: { success: false, error: { code: "RATE_LIMITED", message: commonMessages.rateLimitExceeded } },
   standardHeaders: true,
   legacyHeaders: false,
-  store: makeRedisStore("rl:ingest:"),
+  store: makeStore("rl:ingest:"),
 });
 
 export const submitRateLimiter = rateLimit({
@@ -36,7 +30,7 @@ export const submitRateLimiter = rateLimit({
   message: { success: false, error: { code: "RATE_LIMITED", message: commonMessages.rateLimitExceeded } },
   standardHeaders: true,
   legacyHeaders: false,
-  store: makeRedisStore("rl:submit:"),
+  store: makeStore("rl:submit:"),
 });
 
 export const chatRateLimiter = rateLimit({
@@ -45,5 +39,5 @@ export const chatRateLimiter = rateLimit({
   message: { success: false, error: { code: "RATE_LIMITED", message: commonMessages.rateLimitExceeded } },
   standardHeaders: true,
   legacyHeaders: false,
-  store: makeRedisStore("rl:chat:"),
+  store: makeStore("rl:chat:"),
 });

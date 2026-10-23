@@ -120,6 +120,19 @@ export async function getQueueCount(): Promise<number> {
 }
 
 /**
+ * Clear all queued offline submissions from IndexedDB
+ */
+export async function clearAllQueuedSubmissions(): Promise<void> {
+  const allKeys = await keys()
+  const queueKeys = allKeys.filter(
+    (key) => typeof key === 'string' && key.startsWith(QUEUE_PREFIX)
+  )
+  for (const key of queueKeys) {
+    await del(key)
+  }
+}
+
+/**
  * Flush the offline queue directly against the REAL backend API.
  * Automatically saves { localMockHash -> realShareHash } mapping.
  */
@@ -142,8 +155,19 @@ export async function flushQueue(): Promise<FlushResult> {
       if (entry.mockShareHash) {
         saveHashMapping(entry.mockShareHash, res.shareHash)
       }
-    } catch {
-      await incrementRetry(entry.id)
+    } catch (err: any) {
+      const status = err?.response?.status
+      // If error is HTTP 400/422 validation error, the queued payload is invalid or outdated
+      // Retrying will never succeed and just causes repeated console errors. Discard it.
+      if (status && status >= 400 && status < 500) {
+        console.warn(`[SEHATI Queue] Removing invalid offline entry ${entry.id} (HTTP ${status}):`, err?.response?.data)
+        await dequeueSubmission(entry.id)
+      } else if (entry.retryCount >= 3) {
+        console.warn(`[SEHATI Queue] Removing expired offline entry ${entry.id} after 3 failed retries.`)
+        await dequeueSubmission(entry.id)
+      } else {
+        await incrementRetry(entry.id)
+      }
       failed++
     }
   }

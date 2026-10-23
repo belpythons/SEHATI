@@ -27,6 +27,24 @@ apiClient.interceptors.response.use(
 )
 
 /**
+ * Session API matching backend /api/v1/session routes
+ */
+export const sessionApi = {
+  /**
+   * Create or retrieve anonymous session based on clientToken
+   */
+  async createOrGet(clientToken: string, persona?: string): Promise<{
+    success: boolean
+    sessionId: string
+    clientToken: string
+    persona: string
+  }> {
+    const response = await apiClient.post('/api/v1/session', { clientToken, persona })
+    return response.data
+  },
+}
+
+/**
  * Real backend API methods matching Backend API Gateway FDD & Prisma schema
  */
 export const screeningApi = {

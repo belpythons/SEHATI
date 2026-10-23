@@ -10,7 +10,6 @@ import { BontangContextPage } from './pages/BontangContextPage'
 import { UserGuidePage } from './pages/UserGuidePage'
 import { FAQPage } from './pages/FAQPage'
 import { ContactPage } from './pages/ContactPage'
-import { OfflineIndicator } from './components/pwa/OfflineIndicator'
 import { ChatDrawerProvider, useChatDrawer } from './components/chat/ChatDrawerContext'
 import { AIChatDrawer } from './components/chat/AIChatDrawer'
 import { GlobalChatLauncher } from './components/chat/GlobalChatLauncher'
@@ -23,9 +22,6 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      {/* PWA Offline Status Banner (Fase 5) */}
-      <OfflineIndicator />
-
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/questionnaire" element={<QuestionnairePage />} />

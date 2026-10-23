@@ -135,7 +135,7 @@ export const AnalyticsPage: React.FC = () => {
           )
           if (isMounted) {
             setRecord(fallback.data)
-            setDataSource('mock')
+            setDataSource(fallback.dataSource || (fallback.isMockData ? 'mock' : 'live'))
           }
         }
       } catch (err) {

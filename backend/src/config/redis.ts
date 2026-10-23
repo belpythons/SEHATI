@@ -1,17 +1,14 @@
-import Redis from "ioredis";
-import { logger } from "../utils/logger";
+/**
+ * Redis Configuration (Disabled)
+ *
+ * All rate-limiting and session/share caches operate purely in-memory
+ * without requiring an external Redis daemon.
+ */
 
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+export const isRedisReady = (): boolean => false;
 
-export const redis = new Redis(REDIS_URL, {
-  maxRetriesPerRequest: 3,
-  lazyConnect: false,
-});
-
-redis.on("error", (err) => {
-  logger.error("Redis connection error:", err.message);
-});
-
-redis.on("connect", () => {
-  logger.info(`Redis connected (${REDIS_URL})`);
-});
+export const redis = {
+  get: async (_key: string): Promise<string | null> => null,
+  set: async (_key: string, _value: string, ..._args: any[]): Promise<string> => "OK",
+  del: async (_key: string): Promise<number> => 0,
+};

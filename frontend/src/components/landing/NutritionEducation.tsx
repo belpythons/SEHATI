@@ -1,6 +1,6 @@
 import React from 'react'
-import { Apple01Icon } from 'hugeicons-react'
 import { motion } from 'framer-motion'
+import { FishSprig } from '@/components/illustrations'
 
 export const NutritionEducation: React.FC = () => {
   const transition = { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const }
@@ -23,7 +23,7 @@ export const NutritionEducation: React.FC = () => {
         {/* Left column: Visual Anchor */}
         <div className="md:col-span-4 flex flex-col justify-between">
           <motion.div variants={itemVariants} className="bg-sage/10 p-4 inline-flex rounded-full self-start mb-12">
-            <Apple01Icon className="w-8 h-8 text-sage" strokeWidth={1.5} />
+            <FishSprig className="w-8 h-8 text-sage" />
           </motion.div>
           <motion.div variants={itemVariants} className="hidden md:block border-l-2 border-slate-200 pl-4 h-full">
             <span className="font-mono text-xs text-slate-400 uppercase tracking-widest block mb-2">HATI Assistant</span>

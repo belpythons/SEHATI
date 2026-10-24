@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Mail01Icon, Location04Icon, CallIcon } from 'hugeicons-react'
 import { FloatingNavbar } from '../components/layout/FloatingNavbar'
 import { FooterSection } from '../components/layout/FooterSection'
+import { accent } from '@/lib/utils'
 
 const contactChannels = [
   {
@@ -29,7 +30,7 @@ const contactChannels = [
     description: 'Jl. Bessai Berinta, Bontang Baru, Kecamatan Bontang Utara, Kota Bontang, Kalimantan Timur 75331.',
     color: 'navy',
   },
-]
+] as const
 
 export const ContactPage: React.FC = () => {
   const transition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
@@ -93,8 +94,8 @@ export const ContactPage: React.FC = () => {
                 variants={cardVariants}
                 className="bg-white rounded-2xl border border-slate-200/50 p-8 flex flex-col"
               >
-                <div className={`bg-${channel.color}/10 p-3 rounded-full mb-6 inline-flex self-start`}>
-                  <channel.icon className={`w-6 h-6 text-${channel.color}`} strokeWidth={1.5} />
+                <div className={`${accent[channel.color].chip} p-3 rounded-full mb-6 inline-flex self-start`}>
+                  <channel.icon className={`w-6 h-6 ${accent[channel.color].text}`} strokeWidth={1.5} />
                 </div>
 
                 <h3 className="font-mono text-xs uppercase tracking-widest text-slate-400 mb-2">{channel.label}</h3>

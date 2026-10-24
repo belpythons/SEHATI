@@ -24,3 +24,10 @@ frontend/.env
 ml-service/venv/
 ml-service/__pycache__/
 ml-service/.env
+
+# Document drafts & Office files
+*.docx
+~$*.docx
+
+# Agent & IDE metadata
+.claude/

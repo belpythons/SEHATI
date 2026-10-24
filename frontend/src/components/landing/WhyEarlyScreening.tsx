@@ -1,6 +1,6 @@
 import React from 'react'
-import { Shield01Icon } from 'hugeicons-react'
 import { motion } from 'framer-motion'
+import { FirstDaysArc } from '@/components/illustrations'
 
 export const WhyEarlyScreening: React.FC = () => {
   const transition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
@@ -24,7 +24,7 @@ export const WhyEarlyScreening: React.FC = () => {
             }}
             className="bg-sage/10 p-3 rounded-full mb-8 inline-flex"
           >
-            <Shield01Icon className="w-8 h-8 text-sage" strokeWidth={1.5} />
+            <FirstDaysArc className="w-8 h-8 text-sage" />
           </motion.div>
           
           <motion.h2 

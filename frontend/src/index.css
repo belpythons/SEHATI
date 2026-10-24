@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
-@layer theme {
-  :root {
-    --color-paper: oklch(98% 0.005 250);
-    --color-paper-2: oklch(96% 0.006 250);
-    --color-paper-3: oklch(94% 0.008 250);
-    --color-ink: oklch(25% 0.015 250);
-    --color-ink-2: oklch(40% 0.020 250);
-    --color-navy: oklch(30% 0.05 250);
-    --color-teal: oklch(65% 0.08 170);
-    --color-sage: oklch(75% 0.06 140);
-    --color-rule: oklch(90% 0.01 250);
-  }
+/* Design tokens. MUST stay in @theme (not @layer theme): Tailwind v4 only
+   registers utilities -- bg-sage/10, text-teal, border-rule -- from @theme. */
+@theme {
+  --color-paper: oklch(98% 0.005 250);
+  --color-paper-2: oklch(96% 0.006 250);
+  --color-paper-3: oklch(94% 0.008 250);
+  --color-ink: oklch(25% 0.015 250);
+  --color-ink-2: oklch(40% 0.020 250);
+  --color-navy: oklch(30% 0.05 250);
+  --color-teal: oklch(65% 0.08 170);
+  --color-sage: oklch(75% 0.06 140);
+  --color-rule: oklch(90% 0.01 250);
 }
 
 @layer base {
@@ -73,3 +73,21 @@
 }
 .hl--teal { --hl: oklch(65% 0.08 170 / 0.4); }
 .hl--sage { --hl: oklch(75% 0.06 140 / 0.4); }
+/* Reduced motion: collapses CSS-driven motion (transitions, decorative loops).
+   Framer Motion runs on WAAPI and ignores this -- guard those with useReducedMotion(). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 150ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+  }
+
+  /* Functional motion keeps looping -- a spinner frozen after one turn reads
+     as a hung request. Skeletons pulse opacity only, no vestibular risk.
+     animate-ping is decorative and scales, so it stays stopped. */
+  .animate-spin,
+  .animate-pulse {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

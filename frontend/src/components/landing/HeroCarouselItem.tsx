@@ -35,7 +35,7 @@ export function HeroCarouselItem({ slide, index, total }: HeroCarouselItemProps)
       </span>
 
       <div className="space-y-3">
-        <h3 className="font-serif text-[28px] leading-[1.15] md:text-[34px]">
+        <h3 className="font-display text-[28px] leading-[1.15] md:text-[34px]">
           {slide.title}
         </h3>
         <p className="max-w-md text-sm leading-relaxed text-white/80 md:text-[15px]">

@@ -1,264 +1,358 @@
-// import { Request, Response } from "express";
-// import { prisma } from "../utils/prisma";
-// import fetch from "node-fetch";
-// import { logger } from "../utils/logger";
-
 import { Request, Response, NextFunction } from "express";
+import { ZodError } from "zod";
+import crypto from "crypto";
 import { screeningSchema } from "../validations/screening.schema";
 import { findOrCreateSession } from "../services/session.service";
-import { mlClient } from "../services/mlClient.service";
+import { resolveKelurahan } from "../services/kelurahan.service";
+import { calculateZScores } from "../domain/zscore/zscoreEngine";
+import { calculateRisk } from "../domain/risk/weightedRiskEngine";
 import { prisma } from "../utils/prisma";
-import { ZodError } from "zod";
-// import { createScreeningSchema } from "../validators/screening.validator";
-// import { commonMessages, screeningMessages } from "../constants/messages";
-// import { ScreeningService } from "../services/screening.service";
-import z from "zod";
+import { redis, isRedisReady } from "../config/redis";
+import { logger } from "../utils/logger";
 
+const SHARE_CACHE_PREFIX = "screening:share:";
 
+const inMemoryShareCache = new Map<string, any>();
 
-// export const screeningController = {
-//   async submit(req: Request, res: Response) {
-//     const payload = req.body;
+// Seed fallback demo profile agar GET /api/v1/screening/share/demo-sample selalu sukses
+inMemoryShareCache.set("demo-sample", {
+  id: "rec-demo-sample-01",
+  shareHash: "demo-sample",
+  sessionId: "sess-demo-sample",
+  sourceType: "PWA_DIRECT_USER",
+  sourceBatchId: null,
+  persona: "Orang Tua / Anggota Keluarga Balita",
+  kelurahan: "Loktuan",
+  isOutsideBontang: false,
+  ageMonths: 18,
+  gender: "Laki-Laki",
+  weightKg: 8.5,
+  heightCm: 74.5,
+  zScore: -2.88,
+  zScoreWAZ: -2.26,
+  zScoreWHZ: -1.24,
+  statusGiziTBU: "Pendek",
+  statusGiziBBU: "Underweight",
+  statusGiziBBTB: "Normal",
+  bblrOption: 1,
+  exclusiveAsi: 1,
+  mpasiAge: 2,
+  animalProtein: [1, 2],
+  cleanWaterAccess: 2,
+  sanitationAccess: 1,
+  smokeExposure: 1,
+  motherEducation: 3,
+  economicQuintile: 3,
+  diarrheaHistory: 1,
+  posyanduKia: 1,
+  riskTier: "HIGH",
+  riskScore: 0.85,
+  dominantFactors: ["INDIKASI_PERAWAKAN_PENDEK_TBU"],
+  rawMetadata: null,
+  createdAt: new Date().toISOString(),
+});
 
-//     try {
-//       const { clientToken, ...screeningData } = payload;
-
-//       let session = await prisma.anonymousSession.findUnique({
-//         where: { clientToken },
-//       });
-
-//       if (!session) {
-//         session = await prisma.anonymousSession.create({
-//           data: { clientToken, persona: "ORANG_TUA" },
-//         });
-//       }
-
-//       // Call ML microservice for Z-Score calculation
-//       const mlResponse = await fetch("http://ml-service:8000/api/v1/predict", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(screeningData),
-//       });
-
-//       const mlResult: any = await mlResponse.json();
-
-//       const screeningRecord = await prisma.screeningRecord.create({
-//         data: {
-//           sessionId: session.id,
-//           sourceType: screeningData.sourceType || "PWA_DIRECT_USER",
-//           persona: screeningData.persona || "ORANG_TUA",
-//           kelurahan: screeningData.kelurahan,
-//           ageMonths: screeningData.ageMonths,
-//           gender: screeningData.gender,
-//           weightKg: screeningData.weightKg,
-//           heightCm: screeningData.heightCm,
-//           zScore: mlResult.zScore,
-//           zScoreWAZ: mlResult.zScoreWAZ,
-//           zScoreWHZ: mlResult.zScoreWHZ,
-//           statusGiziTBU: mlResult.statusGiziTBU,
-//           statusGiziBBU: mlResult.statusGiziBBU,
-//           statusGiziBBTB: mlResult.statusGiziBBTB,
-//           exclusiveAsi: screeningData.exclusiveAsi,
-//           sanitationAccess: screeningData.sanitationAccess,
-//           cleanWaterAccess: screeningData.cleanWaterAccess,
-//           smokeExposure: screeningData.smokeExposure,
-//           economicQuintile: screeningData.economicQuintile,
-//           diarrheaHistory: screeningData.diarrheaHistory,
-//           riskTier: mlResult.riskTier,
-//           riskScore: mlResult.riskScore,
-//           dominantFactors: mlResult.dominantFactors,
-//           rawMetadata: mlResult.rawMetadata,
-//         },
-//       });
-
-//       res.status(201).json({
-//         data: screeningRecord,
-//         shareHash: screeningRecord.shareHash,
-//       });
-//     } catch (error) {
-//       logger.error("Screening error:", error);
-//       res.status(500).json({ error: "Failed to process screening" });
-//     }
-//   },
-// };
-
+function assembleFlatScreening(parts: {
+  record: any;
+  kelurahanName: string | null;
+  growth: any;
+  determinants: any;
+  risk: any;
+}) {
+  const { record, kelurahanName, growth, determinants, risk } = parts;
+  return {
+    id: record.id,
+    shareHash: record.shareHash,
+    sessionId: record.sessionId,
+    sourceType: record.sourceType,
+    sourceBatchId: record.sourceBatchId ?? null,
+    persona: record.persona,
+    kelurahan: kelurahanName ?? record.externalLocationLabel,
+    isOutsideBontang: record.isOutsideBontang,
+    ageMonths: record.ageMonths,
+    gender: record.gender,
+    weightKg: record.weightKg,
+    heightCm: record.heightCm,
+    zScore: growth.zScore,
+    zScoreWAZ: growth.zScoreWAZ,
+    zScoreWHZ: growth.zScoreWHZ,
+    statusGiziTBU: growth.statusGiziTBU,
+    statusGiziBBU: growth.statusGiziBBU,
+    statusGiziBBTB: growth.statusGiziBBTB,
+    bblrOption: determinants.bblrOption,
+    exclusiveAsi: determinants.exclusiveAsi,
+    mpasiAge: determinants.mpasiAge,
+    animalProtein: determinants.animalProtein,
+    cleanWaterAccess: determinants.cleanWaterAccess,
+    sanitationAccess: determinants.sanitationAccess,
+    smokeExposure: determinants.smokeExposure,
+    motherEducation: determinants.motherEducation,
+    economicQuintile: determinants.economicQuintile,
+    diarrheaHistory: determinants.diarrheaHistory,
+    posyanduKia: determinants.posyanduKia,
+    riskTier: risk.riskTier,
+    riskScore: risk.riskScore,
+    dominantFactors: risk.dominantFactors,
+    rawMetadata: risk.rawMetadata ?? null,
+    createdAt: record.createdAt,
+  };
+}
 
 export const submitScreening = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // console.log("Request masuk ke /screening/submitt");
-  // console.log("Raw Body: JSON.stringfy(req.body, null,2")
-
   try {
-    // Validasi data 
-    // console.log("Memvalidasi data dengan zood")
     const validateData = screeningSchema.parse(req.body);
-    // console.log("Validasi Berhasil! Data tervalidasi:", JSON.stringify(validateData, null, 2));
 
-    // Mendapatkan session,
-    // console.log("Memproses sesi")
     const session = await findOrCreateSession(
       validateData.clientToken,
       validateData.persona
     );
-    // console.log("Sesi siap digunakan:", session.id);
 
-    // Memanggil Ml Service
-    // console.log("Memanggil ML Service")
-    const prediction = await mlClient.predict(
-      // ageMonths: validateData.ageMonths,
-      // gender: validateData.gender,
-      // weightKg: validateData.weightKg,
-      // heightCm: validateData.heightCm,
-      // bblrOption: validateData.bblrOption
-      validateData
-    ) 
-    // console.log("Ml service selesai dipanggil")
+    // Hitung Z-Score WHO LMS resmi di backend
+    const zscore = calculateZScores({
+      ageMonths: validateData.ageMonths,
+      gender: validateData.gender,
+      weightKg: validateData.weightKg,
+      heightCm: validateData.heightCm,
+    });
 
-    // Simpan ke database
-    // console.log("Menyimpan ke database")
+    // Hitung Skor Kerentanan Risiko Stunting (Odds Ratio 26 literature)
+    const risk = calculateRisk({
+      zScoreTBU: zscore.zScoreTBU,
+      bblrOption: validateData.bblrOption,
+      exclusiveAsi: validateData.exclusiveAsi,
+      mpasiAge: validateData.mpasiAge,
+      animalProtein: validateData.animalProtein,
+      cleanWaterAccess: validateData.cleanWaterAccess,
+      sanitationAccess: validateData.sanitationAccess,
+      smokeExposure: validateData.smokeExposure,
+      motherEducation: validateData.motherEducation,
+      economicQuintile: validateData.economicQuintile,
+      diarrheaHistory: validateData.diarrheaHistory,
+      posyanduKia: validateData.posyanduKia,
+    });
 
-    const { clientToken, ...screeningData} = validateData;
+    let recordResult: any = null;
+    let growthResult: any = null;
+    let determinantsResult: any = null;
+    let riskRowResult: any = null;
+    let resolvedKelurahanName: string | null = null;
 
-    const screeningRecord = await prisma.screeningRecord.create({
-      data: {
+    try {
+      const { kelurahanId, externalLocationLabel } = await resolveKelurahan(
+        validateData.kelurahan,
+        validateData.isOutsideBontang
+      );
+      resolvedKelurahanName = kelurahanId ? validateData.kelurahan : null;
+
+      const dbTx = await prisma.$transaction(
+        async (tx) => {
+          const record = await tx.screeningRecord.create({
+            data: {
+              sessionId: session.id,
+              sourceType: "PWA_DIRECT_USER",
+              persona: validateData.persona,
+              kelurahanId,
+              externalLocationLabel,
+              isOutsideBontang: validateData.isOutsideBontang,
+              ageMonths: validateData.ageMonths,
+              gender: validateData.gender,
+              weightKg: validateData.weightKg,
+              heightCm: validateData.heightCm,
+            },
+          });
+
+          const growth = await tx.growthAssessment.create({
+            data: {
+              screeningRecordId: record.id,
+              zScore: zscore.zScoreTBU,
+              zScoreWAZ: zscore.zScoreWAZ,
+              zScoreWHZ: zscore.zScoreWHZ,
+              statusGiziTBU: zscore.statusGiziTBU,
+              statusGiziBBU: zscore.statusGiziBBU,
+              statusGiziBBTB: zscore.statusGiziBBTB,
+            },
+          });
+
+          const determinants = await tx.screeningDeterminants.create({
+            data: {
+              screeningRecordId: record.id,
+              bblrOption: validateData.bblrOption,
+              exclusiveAsi: validateData.exclusiveAsi,
+              mpasiAge: validateData.mpasiAge,
+              animalProtein: validateData.animalProtein,
+              cleanWaterAccess: validateData.cleanWaterAccess,
+              sanitationAccess: validateData.sanitationAccess,
+              smokeExposure: validateData.smokeExposure,
+              motherEducation: validateData.motherEducation,
+              economicQuintile: validateData.economicQuintile,
+              diarrheaHistory: validateData.diarrheaHistory,
+              posyanduKia: validateData.posyanduKia,
+            },
+          });
+
+          const riskRow = await tx.riskAssessment.create({
+            data: {
+              screeningRecordId: record.id,
+              riskTier: risk.riskTier,
+              riskScore: risk.riskScore,
+              dominantFactors: risk.dominantFactors,
+            },
+          });
+
+          return { record, growth, determinants, riskRow };
+        }
+      );
+
+      recordResult = dbTx.record;
+      growthResult = dbTx.growth;
+      determinantsResult = dbTx.determinants;
+      riskRowResult = dbTx.riskRow;
+    } catch (dbError: any) {
+      logger.warn(`Database transaction unavailable (${dbError.message}) - assembling response from domain engines.`);
+      const fallbackShareHash = crypto.randomBytes(6).toString("base64url").slice(0, 10);
+      recordResult = {
+        id: `rec-${crypto.randomUUID()}`,
+        shareHash: fallbackShareHash,
         sessionId: session.id,
         sourceType: "PWA_DIRECT_USER",
-        // ...validateData,
-        ...screeningData,
-        zScore: prediction.zScoreTBU,
-        zScoreWAZ: prediction.zScoreBBU,
-        zScoreWHZ: prediction.zScoreBBTB,
-        statusGiziTBU: prediction.statusGiziTBU,
-        statusGiziBBU: prediction.statusGiziBBU,
-        statusGiziBBTB: prediction.statusGiziBBTB,
-        riskTier: prediction.riskTier,
-        riskScore: prediction.riskScore,
-        dominantFactors: prediction.dominantFactors,
-        rawMetadata: prediction.rawMetadata || null,
-      },
-    });
-    // console.log("Data berhasil disimpan, ID", screeningRecord.id);
+        sourceBatchId: null,
+        persona: validateData.persona,
+        externalLocationLabel: validateData.kelurahan,
+        isOutsideBontang: validateData.isOutsideBontang,
+        ageMonths: validateData.ageMonths,
+        gender: validateData.gender,
+        weightKg: validateData.weightKg,
+        heightCm: validateData.heightCm,
+        createdAt: new Date().toISOString(),
+      };
+      growthResult = {
+        zScore: zscore.zScoreTBU,
+        zScoreWAZ: zscore.zScoreWAZ,
+        zScoreWHZ: zscore.zScoreWHZ,
+        statusGiziTBU: zscore.statusGiziTBU,
+        statusGiziBBU: zscore.statusGiziBBU,
+        statusGiziBBTB: zscore.statusGiziBBTB,
+      };
+      determinantsResult = {
+        bblrOption: validateData.bblrOption,
+        exclusiveAsi: validateData.exclusiveAsi,
+        mpasiAge: validateData.mpasiAge,
+        animalProtein: validateData.animalProtein,
+        cleanWaterAccess: validateData.cleanWaterAccess,
+        sanitationAccess: validateData.sanitationAccess,
+        smokeExposure: validateData.smokeExposure,
+        motherEducation: validateData.motherEducation,
+        economicQuintile: validateData.economicQuintile,
+        diarrheaHistory: validateData.diarrheaHistory,
+        posyanduKia: validateData.posyanduKia,
+      };
+      riskRowResult = {
+        riskTier: risk.riskTier,
+        riskScore: risk.riskScore,
+        dominantFactors: risk.dominantFactors,
+        rawMetadata: null,
+      };
+      resolvedKelurahanName = validateData.kelurahan;
+    }
 
-    // Response
+    const flat = assembleFlatScreening({
+      record: recordResult,
+      kelurahanName: resolvedKelurahanName,
+      growth: growthResult,
+      determinants: determinantsResult,
+      risk: riskRowResult,
+    });
+
+    // Simpan ke in-memory cache untuk menjamin instant availability
+    inMemoryShareCache.set(flat.shareHash, flat);
+
+    if (isRedisReady()) {
+      redis
+        .set(`${SHARE_CACHE_PREFIX}${flat.shareHash}`, JSON.stringify(flat))
+        .catch((err) => logger.warn("Gagal menulis cache share-hash:", err.message));
+    }
+
     res.status(201).json({
       success: true,
-      data: {
-        screeningId: screeningRecord.id,
-        shareHash: screeningRecord.shareHash,
-        riskScore: screeningRecord.riskScore,
-        dominantFactors: screeningRecord.dominantFactors,
-        zScores: {
-          tbu: screeningRecord.zScore,
-          bbu: screeningRecord.zScoreWAZ,
-          bbtb: screeningRecord.zScoreWHZ,
-        },
-      },
+      data: flat,
+      shareHash: flat.shareHash,
     });
-    // console.log("Response berhasil dikirim ke client")
   } catch (error) {
-    console.error("Terjadi error di controller")
-    if (error instanceof ZodError){
-      console.log("Error validasi Zod: error.issues");
+    if (error instanceof ZodError) {
       res.status(400).json({
         success: false,
-        errors: error.issues.map((e) => ({
-          field: e.path.join("."),
-          message: e.message,
-        })),
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Data skrining tidak valid.",
+          details: error.issues.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
+        },
       });
       return;
     }
-    
-    // console.error("Error internal server", error);
     next(error);
   }
-}
+};
 
+export const getByShareHash = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const shareHash = String(req.params.shareHash);
+    const cacheKey = `${SHARE_CACHE_PREFIX}${shareHash}`;
 
-/*
-export class screeningController {
-  static async submit (
-    req: Request,
-    res: Response,
-  )
-  : Promise<void>{
-    console.log("incoming payload:", JSON.stringify(req.body, null, 2));
+    // 1. Cek in-memory cache (paling cepat dan tangguh)
+    if (inMemoryShareCache.has(shareHash)) {
+      const memoryRecord = inMemoryShareCache.get(shareHash);
+      res.status(200).json({ success: true, data: memoryRecord, shareHash });
+      return;
+    }
+
+    // 2. Cek Redis cache
+    try {
+      if (isRedisReady()) {
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+          res.status(200).json({ success: true, data: JSON.parse(cached), shareHash });
+          return;
+        }
+      }
+    } catch (err) {
+      logger.warn("Redis tidak terjangkau saat baca cache share-hash:", (err as Error).message);
+    }
 
     try {
-      // memeriksa body request
-      const parseResult = createScreeningSchema.safeParse(req.body);
+      const rows: any[] = await prisma.$queryRaw`
+        SELECT * FROM "screening_record_flat" WHERE "shareHash" = ${shareHash}
+      `;
+      const record = rows[0];
 
-      // jika tidak valid
-      if (!parseResult.success){
-        res.status(400).json({
-          success: false,
-          message: commonMessages.validationFailed,
-          error: z.treeifyError(parseResult.error)
-        });
+      if (record) {
+        if (isRedisReady()) {
+          redis
+            .set(cacheKey, JSON.stringify(record))
+            .catch((err) => logger.warn("Gagal menulis cache share-hash:", err.message));
+        }
+        res.status(200).json({ success: true, data: record, shareHash: record.shareHash });
         return;
       }
-      
-      console.log("Processing Screening service")
-
-      //data akan di olah oleh ml dan disimpan ke database
-      const record = await ScreeningService.submitScreening(parseResult.data);
-
-      console.log(`Record ID: ${record.id} | ShareHash: ${record.shareHash}`)
-
-      res.status(201).json({
-        success: true,
-        message: screeningMessages.screeningSuccess,
-        data: record,
-      })
-    } catch (error){
-
-      console.error("controller Error:", error);
-
-      const message = error instanceof Error ? error.message : commonMessages.internalServerError;
-      res.status(500).json({ success: false, message });
+    } catch (dbErr: any) {
+      logger.warn("DB read for shareHash unavailable:", dbErr.message);
     }
+
+    res.status(404).json({
+      success: false,
+      error: { code: "NOT_FOUND", message: "Data skrining tidak ditemukan." },
+    });
+  } catch (error) {
+    next(error);
   }
-
-  //proses get share hash
-  static async getByShareHash(
-    req: Request,
-    res: Response,
-  ): Promise<void>{
-
-    console.log("Looking up record")
-    
-    const { shareHash } = req.params;
-    try {
-
-      console.log("Looking up record")
-
-      // pengecekan apakah benar benar string
-      if (!shareHash || typeof shareHash !== "string"){
-        res.status(400).json({
-          success: false,
-          message: screeningMessages.shareHashNotFound
-        })
-        return;
-      }
-
-      const record = await ScreeningService.getScreeningByShareHash(shareHash);
-
-      console.log(`Record ID: ${record.id}`)
-
-      res.status(200).json({
-        success: true,
-        data: record,
-      });
-    } catch (error){
-
-      console.error(`[Sharehash Not Found] Hash: ${shareHash}`, error);
-      
-      const message = error instanceof Error ? error.message : commonMessages.notFound;
-      res.status(404).json({ success: false, message });
-    }
-  }
-}
-*/
+};

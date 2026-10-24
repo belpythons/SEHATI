@@ -9,11 +9,14 @@ import {
   Loader2,
   ExternalLink,
   AlertTriangle,
+  X,
+  Trash2,
 } from 'lucide-react'
 import { useNetworkStatus } from '../../hooks/useNetworkStatus'
 import {
   getQueueCount,
   flushQueue,
+  clearAllQueuedSubmissions,
   FlushResult,
 } from '../../services/offlineQueueService'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -24,6 +27,9 @@ export const OfflineIndicator: React.FC = () => {
   const [queueCount, setQueueCount] = useState<number>(0)
   const [isFlushing, setIsFlushing] = useState<boolean>(false)
   const [flushResult, setFlushResult] = useState<FlushResult | null>(null)
+  const [isDismissed, setIsDismissed] = useState<boolean>(() => {
+    return sessionStorage.getItem('sehati_offline_banner_dismissed') === 'true'
+  })
 
   // Poll queue count periodically
   useEffect(() => {
@@ -42,6 +48,17 @@ export const OfflineIndicator: React.FC = () => {
       handleFlush()
     }
   }, [wasOffline, isOnline, queueCount])
+
+  const handleDismiss = () => {
+    setIsDismissed(true)
+    sessionStorage.setItem('sehati_offline_banner_dismissed', 'true')
+  }
+
+  const handleClearQueue = async () => {
+    await clearAllQueuedSubmissions()
+    setQueueCount(0)
+    setIsDismissed(true)
+  }
 
   const handleFlush = async () => {
     setIsFlushing(true)
@@ -66,8 +83,8 @@ export const OfflineIndicator: React.FC = () => {
     }
   }
 
-  // Nothing to show when online and no queue
-  if (isOnline && queueCount === 0 && !flushResult) return null
+  // Nothing to show when dismissed, or online and no queue
+  if ((isOnline && queueCount === 0 && !flushResult) || (isDismissed && !flushResult && isOnline)) return null
 
   return (
     <AnimatePresence>
@@ -88,17 +105,40 @@ export const OfflineIndicator: React.FC = () => {
 
         {/* Queue Pending Banner */}
         {isOnline && queueCount > 0 && !isFlushing && !flushResult && (
-          <div className="bg-blue-600 text-white px-4 py-2 flex items-center justify-center gap-3 text-xs font-semibold shadow-md">
-            <CloudOff className="w-4 h-4 shrink-0" />
-            <span>{queueCount} skrining offline menunggu sinkronisasi ke server pusat.</span>
-            <button
-              type="button"
-              onClick={handleFlush}
-              className="px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Sinkronkan Sekarang</span>
-            </button>
+          <div className="bg-slate-900/95 backdrop-blur-md border-b border-slate-700/60 text-white px-3 sm:px-4 py-2 flex items-center justify-between gap-2 sm:gap-3 text-xs font-medium shadow-md">
+            <div className="flex items-center gap-2 min-w-0">
+              <CloudOff className="w-4 h-4 text-sky-400 shrink-0" />
+              <span className="truncate">
+                <strong className="font-semibold text-white">{queueCount} skrining offline</strong> siap disinkronkan ke server.
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleFlush}
+                className="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-[11px] sm:text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                title="Kirim ke server"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Sinkronkan</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleClearQueue}
+                className="px-2 py-1 rounded-lg bg-white/10 hover:bg-red-500/80 text-slate-300 hover:text-white font-medium text-[11px] sm:text-xs transition-colors cursor-pointer"
+                title="Hapus antrean offline yang tidak valid"
+              >
+                Hapus
+              </button>
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                title="Tutup banner"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
 

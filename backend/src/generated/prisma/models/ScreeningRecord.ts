@@ -14,7 +14,13 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model ScreeningRecord
- * 
+ * Entitas INTI satu kali skrining: identitas, lokasi, dan antropometri
+ * mentah (input pengguna). Hasil hitung WHO, jawaban kuesioner determinan,
+ * dan skor risiko sengaja DIPISAH ke tabel anak 1:1 (`GrowthAssessment`,
+ * `ScreeningDeterminants`, `RiskAssessment`) supaya tabel ini tetap ramping
+ * dan gampang dibaca walau datanya nanti jadi ratusan ribu baris. Endpoint
+ * API tetap mengembalikan gabungan semua tabel ini sebagai satu objek datar
+ * (lihat VIEW `screening_record_flat`) — kontrak frontend tidak berubah.
  */
 export type ScreeningRecordModel = runtime.Types.Result.DefaultSelection<Prisma.$ScreeningRecordPayload>
 
@@ -30,42 +36,12 @@ export type ScreeningRecordAvgAggregateOutputType = {
   ageMonths: number | null
   weightKg: number | null
   heightCm: number | null
-  zScore: number | null
-  zScoreWAZ: number | null
-  zScoreWHZ: number | null
-  bblrOption: number | null
-  exclusiveAsi: number | null
-  mpasiAge: number | null
-  animalProtein: number | null
-  cleanWaterAccess: number | null
-  sanitationAccess: number | null
-  smokeExposure: number | null
-  motherEducation: number | null
-  economicQuintile: number | null
-  diarrheaHistory: number | null
-  posyanduKia: number | null
-  riskScore: number | null
 }
 
 export type ScreeningRecordSumAggregateOutputType = {
   ageMonths: number | null
   weightKg: number | null
   heightCm: number | null
-  zScore: number | null
-  zScoreWAZ: number | null
-  zScoreWHZ: number | null
-  bblrOption: number | null
-  exclusiveAsi: number | null
-  mpasiAge: number | null
-  animalProtein: number[]
-  cleanWaterAccess: number | null
-  sanitationAccess: number | null
-  smokeExposure: number | null
-  motherEducation: number | null
-  economicQuintile: number | null
-  diarrheaHistory: number | null
-  posyanduKia: number | null
-  riskScore: number | null
 }
 
 export type ScreeningRecordMinAggregateOutputType = {
@@ -75,30 +51,13 @@ export type ScreeningRecordMinAggregateOutputType = {
   sourceType: $Enums.DataSourceType | null
   sourceBatchId: string | null
   persona: string | null
-  kelurahan: string | null
+  kelurahanId: string | null
+  externalLocationLabel: string | null
+  isOutsideBontang: boolean | null
   ageMonths: number | null
   gender: string | null
   weightKg: number | null
   heightCm: number | null
-  isOutsideBontang: boolean | null
-  zScore: number | null
-  zScoreWAZ: number | null
-  zScoreWHZ: number | null
-  statusGiziTBU: string | null
-  statusGiziBBU: string | null
-  statusGiziBBTB: string | null
-  bblrOption: number | null
-  exclusiveAsi: number | null
-  mpasiAge: number | null
-  cleanWaterAccess: number | null
-  sanitationAccess: number | null
-  smokeExposure: number | null
-  motherEducation: number | null
-  economicQuintile: number | null
-  diarrheaHistory: number | null
-  posyanduKia: number | null
-  riskTier: string | null
-  riskScore: number | null
   createdAt: Date | null
 }
 
@@ -109,30 +68,13 @@ export type ScreeningRecordMaxAggregateOutputType = {
   sourceType: $Enums.DataSourceType | null
   sourceBatchId: string | null
   persona: string | null
-  kelurahan: string | null
+  kelurahanId: string | null
+  externalLocationLabel: string | null
+  isOutsideBontang: boolean | null
   ageMonths: number | null
   gender: string | null
   weightKg: number | null
   heightCm: number | null
-  isOutsideBontang: boolean | null
-  zScore: number | null
-  zScoreWAZ: number | null
-  zScoreWHZ: number | null
-  statusGiziTBU: string | null
-  statusGiziBBU: string | null
-  statusGiziBBTB: string | null
-  bblrOption: number | null
-  exclusiveAsi: number | null
-  mpasiAge: number | null
-  cleanWaterAccess: number | null
-  sanitationAccess: number | null
-  smokeExposure: number | null
-  motherEducation: number | null
-  economicQuintile: number | null
-  diarrheaHistory: number | null
-  posyanduKia: number | null
-  riskTier: string | null
-  riskScore: number | null
   createdAt: Date | null
 }
 
@@ -143,33 +85,13 @@ export type ScreeningRecordCountAggregateOutputType = {
   sourceType: number
   sourceBatchId: number
   persona: number
-  kelurahan: number
+  kelurahanId: number
+  externalLocationLabel: number
+  isOutsideBontang: number
   ageMonths: number
   gender: number
   weightKg: number
   heightCm: number
-  isOutsideBontang: number
-  zScore: number
-  zScoreWAZ: number
-  zScoreWHZ: number
-  statusGiziTBU: number
-  statusGiziBBU: number
-  statusGiziBBTB: number
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein: number
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: number
-  riskScore: number
-  dominantFactors: number
-  rawMetadata: number
   createdAt: number
   _all: number
 }
@@ -179,42 +101,12 @@ export type ScreeningRecordAvgAggregateInputType = {
   ageMonths?: true
   weightKg?: true
   heightCm?: true
-  zScore?: true
-  zScoreWAZ?: true
-  zScoreWHZ?: true
-  bblrOption?: true
-  exclusiveAsi?: true
-  mpasiAge?: true
-  animalProtein?: true
-  cleanWaterAccess?: true
-  sanitationAccess?: true
-  smokeExposure?: true
-  motherEducation?: true
-  economicQuintile?: true
-  diarrheaHistory?: true
-  posyanduKia?: true
-  riskScore?: true
 }
 
 export type ScreeningRecordSumAggregateInputType = {
   ageMonths?: true
   weightKg?: true
   heightCm?: true
-  zScore?: true
-  zScoreWAZ?: true
-  zScoreWHZ?: true
-  bblrOption?: true
-  exclusiveAsi?: true
-  mpasiAge?: true
-  animalProtein?: true
-  cleanWaterAccess?: true
-  sanitationAccess?: true
-  smokeExposure?: true
-  motherEducation?: true
-  economicQuintile?: true
-  diarrheaHistory?: true
-  posyanduKia?: true
-  riskScore?: true
 }
 
 export type ScreeningRecordMinAggregateInputType = {
@@ -224,30 +116,13 @@ export type ScreeningRecordMinAggregateInputType = {
   sourceType?: true
   sourceBatchId?: true
   persona?: true
-  kelurahan?: true
+  kelurahanId?: true
+  externalLocationLabel?: true
+  isOutsideBontang?: true
   ageMonths?: true
   gender?: true
   weightKg?: true
   heightCm?: true
-  isOutsideBontang?: true
-  zScore?: true
-  zScoreWAZ?: true
-  zScoreWHZ?: true
-  statusGiziTBU?: true
-  statusGiziBBU?: true
-  statusGiziBBTB?: true
-  bblrOption?: true
-  exclusiveAsi?: true
-  mpasiAge?: true
-  cleanWaterAccess?: true
-  sanitationAccess?: true
-  smokeExposure?: true
-  motherEducation?: true
-  economicQuintile?: true
-  diarrheaHistory?: true
-  posyanduKia?: true
-  riskTier?: true
-  riskScore?: true
   createdAt?: true
 }
 
@@ -258,30 +133,13 @@ export type ScreeningRecordMaxAggregateInputType = {
   sourceType?: true
   sourceBatchId?: true
   persona?: true
-  kelurahan?: true
+  kelurahanId?: true
+  externalLocationLabel?: true
+  isOutsideBontang?: true
   ageMonths?: true
   gender?: true
   weightKg?: true
   heightCm?: true
-  isOutsideBontang?: true
-  zScore?: true
-  zScoreWAZ?: true
-  zScoreWHZ?: true
-  statusGiziTBU?: true
-  statusGiziBBU?: true
-  statusGiziBBTB?: true
-  bblrOption?: true
-  exclusiveAsi?: true
-  mpasiAge?: true
-  cleanWaterAccess?: true
-  sanitationAccess?: true
-  smokeExposure?: true
-  motherEducation?: true
-  economicQuintile?: true
-  diarrheaHistory?: true
-  posyanduKia?: true
-  riskTier?: true
-  riskScore?: true
   createdAt?: true
 }
 
@@ -292,33 +150,13 @@ export type ScreeningRecordCountAggregateInputType = {
   sourceType?: true
   sourceBatchId?: true
   persona?: true
-  kelurahan?: true
+  kelurahanId?: true
+  externalLocationLabel?: true
+  isOutsideBontang?: true
   ageMonths?: true
   gender?: true
   weightKg?: true
   heightCm?: true
-  isOutsideBontang?: true
-  zScore?: true
-  zScoreWAZ?: true
-  zScoreWHZ?: true
-  statusGiziTBU?: true
-  statusGiziBBU?: true
-  statusGiziBBTB?: true
-  bblrOption?: true
-  exclusiveAsi?: true
-  mpasiAge?: true
-  animalProtein?: true
-  cleanWaterAccess?: true
-  sanitationAccess?: true
-  smokeExposure?: true
-  motherEducation?: true
-  economicQuintile?: true
-  diarrheaHistory?: true
-  posyanduKia?: true
-  riskTier?: true
-  riskScore?: true
-  dominantFactors?: true
-  rawMetadata?: true
   createdAt?: true
   _all?: true
 }
@@ -416,33 +254,13 @@ export type ScreeningRecordGroupByOutputType = {
   sourceType: $Enums.DataSourceType
   sourceBatchId: string | null
   persona: string
-  kelurahan: string
+  kelurahanId: string | null
+  externalLocationLabel: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ: number | null
-  zScoreWHZ: number | null
-  statusGiziTBU: string | null
-  statusGiziBBU: string | null
-  statusGiziBBTB: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein: number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors: string[]
-  rawMetadata: runtime.JsonValue | null
   createdAt: Date
   _count: ScreeningRecordCountAggregateOutputType | null
   _avg: ScreeningRecordAvgAggregateOutputType | null
@@ -476,35 +294,20 @@ export type ScreeningRecordWhereInput = {
   sourceType?: Prisma.EnumDataSourceTypeFilter<"ScreeningRecord"> | $Enums.DataSourceType
   sourceBatchId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
   persona?: Prisma.StringFilter<"ScreeningRecord"> | string
-  kelurahan?: Prisma.StringFilter<"ScreeningRecord"> | string
+  kelurahanId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  externalLocationLabel?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
   ageMonths?: Prisma.IntFilter<"ScreeningRecord"> | number
   gender?: Prisma.StringFilter<"ScreeningRecord"> | string
   weightKg?: Prisma.FloatFilter<"ScreeningRecord"> | number
   heightCm?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
-  zScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  zScoreWAZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  zScoreWHZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  statusGiziTBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBTB?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  bblrOption?: Prisma.IntFilter<"ScreeningRecord"> | number
-  exclusiveAsi?: Prisma.IntFilter<"ScreeningRecord"> | number
-  mpasiAge?: Prisma.IntFilter<"ScreeningRecord"> | number
-  animalProtein?: Prisma.IntNullableListFilter<"ScreeningRecord">
-  cleanWaterAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  sanitationAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  smokeExposure?: Prisma.IntFilter<"ScreeningRecord"> | number
-  motherEducation?: Prisma.IntFilter<"ScreeningRecord"> | number
-  economicQuintile?: Prisma.IntFilter<"ScreeningRecord"> | number
-  diarrheaHistory?: Prisma.IntFilter<"ScreeningRecord"> | number
-  posyanduKia?: Prisma.IntFilter<"ScreeningRecord"> | number
-  riskTier?: Prisma.StringFilter<"ScreeningRecord"> | string
-  riskScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  dominantFactors?: Prisma.StringNullableListFilter<"ScreeningRecord">
-  rawMetadata?: Prisma.JsonNullableFilter<"ScreeningRecord">
   createdAt?: Prisma.DateTimeFilter<"ScreeningRecord"> | Date | string
   session?: Prisma.XOR<Prisma.AnonymousSessionScalarRelationFilter, Prisma.AnonymousSessionWhereInput>
+  batch?: Prisma.XOR<Prisma.IngestionBatchLogNullableScalarRelationFilter, Prisma.IngestionBatchLogWhereInput> | null
+  kelurahan?: Prisma.XOR<Prisma.KelurahanNullableScalarRelationFilter, Prisma.KelurahanWhereInput> | null
+  growth?: Prisma.XOR<Prisma.GrowthAssessmentNullableScalarRelationFilter, Prisma.GrowthAssessmentWhereInput> | null
+  determinants?: Prisma.XOR<Prisma.ScreeningDeterminantsNullableScalarRelationFilter, Prisma.ScreeningDeterminantsWhereInput> | null
+  risk?: Prisma.XOR<Prisma.RiskAssessmentNullableScalarRelationFilter, Prisma.RiskAssessmentWhereInput> | null
 }
 
 export type ScreeningRecordOrderByWithRelationInput = {
@@ -514,35 +317,20 @@ export type ScreeningRecordOrderByWithRelationInput = {
   sourceType?: Prisma.SortOrder
   sourceBatchId?: Prisma.SortOrderInput | Prisma.SortOrder
   persona?: Prisma.SortOrder
-  kelurahan?: Prisma.SortOrder
+  kelurahanId?: Prisma.SortOrderInput | Prisma.SortOrder
+  externalLocationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOutsideBontang?: Prisma.SortOrder
   ageMonths?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  isOutsideBontang?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrderInput | Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziTBU?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziBBU?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziBBTB?: Prisma.SortOrderInput | Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  animalProtein?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskTier?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
-  dominantFactors?: Prisma.SortOrder
-  rawMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   session?: Prisma.AnonymousSessionOrderByWithRelationInput
+  batch?: Prisma.IngestionBatchLogOrderByWithRelationInput
+  kelurahan?: Prisma.KelurahanOrderByWithRelationInput
+  growth?: Prisma.GrowthAssessmentOrderByWithRelationInput
+  determinants?: Prisma.ScreeningDeterminantsOrderByWithRelationInput
+  risk?: Prisma.RiskAssessmentOrderByWithRelationInput
 }
 
 export type ScreeningRecordWhereUniqueInput = Prisma.AtLeast<{
@@ -555,35 +343,20 @@ export type ScreeningRecordWhereUniqueInput = Prisma.AtLeast<{
   sourceType?: Prisma.EnumDataSourceTypeFilter<"ScreeningRecord"> | $Enums.DataSourceType
   sourceBatchId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
   persona?: Prisma.StringFilter<"ScreeningRecord"> | string
-  kelurahan?: Prisma.StringFilter<"ScreeningRecord"> | string
+  kelurahanId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  externalLocationLabel?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
   ageMonths?: Prisma.IntFilter<"ScreeningRecord"> | number
   gender?: Prisma.StringFilter<"ScreeningRecord"> | string
   weightKg?: Prisma.FloatFilter<"ScreeningRecord"> | number
   heightCm?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
-  zScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  zScoreWAZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  zScoreWHZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  statusGiziTBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBTB?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  bblrOption?: Prisma.IntFilter<"ScreeningRecord"> | number
-  exclusiveAsi?: Prisma.IntFilter<"ScreeningRecord"> | number
-  mpasiAge?: Prisma.IntFilter<"ScreeningRecord"> | number
-  animalProtein?: Prisma.IntNullableListFilter<"ScreeningRecord">
-  cleanWaterAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  sanitationAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  smokeExposure?: Prisma.IntFilter<"ScreeningRecord"> | number
-  motherEducation?: Prisma.IntFilter<"ScreeningRecord"> | number
-  economicQuintile?: Prisma.IntFilter<"ScreeningRecord"> | number
-  diarrheaHistory?: Prisma.IntFilter<"ScreeningRecord"> | number
-  posyanduKia?: Prisma.IntFilter<"ScreeningRecord"> | number
-  riskTier?: Prisma.StringFilter<"ScreeningRecord"> | string
-  riskScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  dominantFactors?: Prisma.StringNullableListFilter<"ScreeningRecord">
-  rawMetadata?: Prisma.JsonNullableFilter<"ScreeningRecord">
   createdAt?: Prisma.DateTimeFilter<"ScreeningRecord"> | Date | string
   session?: Prisma.XOR<Prisma.AnonymousSessionScalarRelationFilter, Prisma.AnonymousSessionWhereInput>
+  batch?: Prisma.XOR<Prisma.IngestionBatchLogNullableScalarRelationFilter, Prisma.IngestionBatchLogWhereInput> | null
+  kelurahan?: Prisma.XOR<Prisma.KelurahanNullableScalarRelationFilter, Prisma.KelurahanWhereInput> | null
+  growth?: Prisma.XOR<Prisma.GrowthAssessmentNullableScalarRelationFilter, Prisma.GrowthAssessmentWhereInput> | null
+  determinants?: Prisma.XOR<Prisma.ScreeningDeterminantsNullableScalarRelationFilter, Prisma.ScreeningDeterminantsWhereInput> | null
+  risk?: Prisma.XOR<Prisma.RiskAssessmentNullableScalarRelationFilter, Prisma.RiskAssessmentWhereInput> | null
 }, "id" | "shareHash">
 
 export type ScreeningRecordOrderByWithAggregationInput = {
@@ -593,33 +366,13 @@ export type ScreeningRecordOrderByWithAggregationInput = {
   sourceType?: Prisma.SortOrder
   sourceBatchId?: Prisma.SortOrderInput | Prisma.SortOrder
   persona?: Prisma.SortOrder
-  kelurahan?: Prisma.SortOrder
+  kelurahanId?: Prisma.SortOrderInput | Prisma.SortOrder
+  externalLocationLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOutsideBontang?: Prisma.SortOrder
   ageMonths?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  isOutsideBontang?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrderInput | Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziTBU?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziBBU?: Prisma.SortOrderInput | Prisma.SortOrder
-  statusGiziBBTB?: Prisma.SortOrderInput | Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  animalProtein?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskTier?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
-  dominantFactors?: Prisma.SortOrder
-  rawMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ScreeningRecordCountOrderByAggregateInput
   _avg?: Prisma.ScreeningRecordAvgOrderByAggregateInput
@@ -638,33 +391,13 @@ export type ScreeningRecordScalarWhereWithAggregatesInput = {
   sourceType?: Prisma.EnumDataSourceTypeWithAggregatesFilter<"ScreeningRecord"> | $Enums.DataSourceType
   sourceBatchId?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
   persona?: Prisma.StringWithAggregatesFilter<"ScreeningRecord"> | string
-  kelurahan?: Prisma.StringWithAggregatesFilter<"ScreeningRecord"> | string
+  kelurahanId?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
+  externalLocationLabel?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
+  isOutsideBontang?: Prisma.BoolWithAggregatesFilter<"ScreeningRecord"> | boolean
   ageMonths?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
   gender?: Prisma.StringWithAggregatesFilter<"ScreeningRecord"> | string
   weightKg?: Prisma.FloatWithAggregatesFilter<"ScreeningRecord"> | number
   heightCm?: Prisma.FloatWithAggregatesFilter<"ScreeningRecord"> | number
-  isOutsideBontang?: Prisma.BoolWithAggregatesFilter<"ScreeningRecord"> | boolean
-  zScore?: Prisma.FloatWithAggregatesFilter<"ScreeningRecord"> | number
-  zScoreWAZ?: Prisma.FloatNullableWithAggregatesFilter<"ScreeningRecord"> | number | null
-  zScoreWHZ?: Prisma.FloatNullableWithAggregatesFilter<"ScreeningRecord"> | number | null
-  statusGiziTBU?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
-  statusGiziBBU?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
-  statusGiziBBTB?: Prisma.StringNullableWithAggregatesFilter<"ScreeningRecord"> | string | null
-  bblrOption?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  exclusiveAsi?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  mpasiAge?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  animalProtein?: Prisma.IntNullableListFilter<"ScreeningRecord">
-  cleanWaterAccess?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  sanitationAccess?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  smokeExposure?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  motherEducation?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  economicQuintile?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  diarrheaHistory?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  posyanduKia?: Prisma.IntWithAggregatesFilter<"ScreeningRecord"> | number
-  riskTier?: Prisma.StringWithAggregatesFilter<"ScreeningRecord"> | string
-  riskScore?: Prisma.FloatWithAggregatesFilter<"ScreeningRecord"> | number
-  dominantFactors?: Prisma.StringNullableListFilter<"ScreeningRecord">
-  rawMetadata?: Prisma.JsonNullableWithAggregatesFilter<"ScreeningRecord">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ScreeningRecord"> | Date | string
 }
 
@@ -672,37 +405,20 @@ export type ScreeningRecordCreateInput = {
   id?: string
   shareHash?: string
   sourceType?: $Enums.DataSourceType
-  sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
 }
 
 export type ScreeningRecordUncheckedCreateInput = {
@@ -712,71 +428,37 @@ export type ScreeningRecordUncheckedCreateInput = {
   sourceType?: $Enums.DataSourceType
   sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
 }
 
 export type ScreeningRecordUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   shareHash?: Prisma.StringFieldUpdateOperationsInput | string
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
-  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
 }
 
 export type ScreeningRecordUncheckedUpdateInput = {
@@ -786,34 +468,17 @@ export type ScreeningRecordUncheckedUpdateInput = {
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
   sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
 }
 
 export type ScreeningRecordCreateManyInput = {
@@ -823,33 +488,13 @@ export type ScreeningRecordCreateManyInput = {
   sourceType?: $Enums.DataSourceType
   sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -857,35 +502,13 @@ export type ScreeningRecordUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   shareHash?: Prisma.StringFieldUpdateOperationsInput | string
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
-  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -896,33 +519,13 @@ export type ScreeningRecordUncheckedUpdateManyInput = {
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
   sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -936,22 +539,6 @@ export type ScreeningRecordOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type IntNullableListFilter<$PrismaModel = never> = {
-  equals?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
-  has?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
-  hasEvery?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
-  hasSome?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
-export type StringNullableListFilter<$PrismaModel = never> = {
-  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
-  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
-  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
 export type ScreeningRecordCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   shareHash?: Prisma.SortOrder
@@ -959,33 +546,13 @@ export type ScreeningRecordCountOrderByAggregateInput = {
   sourceType?: Prisma.SortOrder
   sourceBatchId?: Prisma.SortOrder
   persona?: Prisma.SortOrder
-  kelurahan?: Prisma.SortOrder
+  kelurahanId?: Prisma.SortOrder
+  externalLocationLabel?: Prisma.SortOrder
+  isOutsideBontang?: Prisma.SortOrder
   ageMonths?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  isOutsideBontang?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrder
-  statusGiziTBU?: Prisma.SortOrder
-  statusGiziBBU?: Prisma.SortOrder
-  statusGiziBBTB?: Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  animalProtein?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskTier?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
-  dominantFactors?: Prisma.SortOrder
-  rawMetadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -993,21 +560,6 @@ export type ScreeningRecordAvgOrderByAggregateInput = {
   ageMonths?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  animalProtein?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
 }
 
 export type ScreeningRecordMaxOrderByAggregateInput = {
@@ -1017,30 +569,13 @@ export type ScreeningRecordMaxOrderByAggregateInput = {
   sourceType?: Prisma.SortOrder
   sourceBatchId?: Prisma.SortOrder
   persona?: Prisma.SortOrder
-  kelurahan?: Prisma.SortOrder
+  kelurahanId?: Prisma.SortOrder
+  externalLocationLabel?: Prisma.SortOrder
+  isOutsideBontang?: Prisma.SortOrder
   ageMonths?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  isOutsideBontang?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrder
-  statusGiziTBU?: Prisma.SortOrder
-  statusGiziBBU?: Prisma.SortOrder
-  statusGiziBBTB?: Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskTier?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -1051,30 +586,13 @@ export type ScreeningRecordMinOrderByAggregateInput = {
   sourceType?: Prisma.SortOrder
   sourceBatchId?: Prisma.SortOrder
   persona?: Prisma.SortOrder
-  kelurahan?: Prisma.SortOrder
+  kelurahanId?: Prisma.SortOrder
+  externalLocationLabel?: Prisma.SortOrder
+  isOutsideBontang?: Prisma.SortOrder
   ageMonths?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  isOutsideBontang?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrder
-  statusGiziTBU?: Prisma.SortOrder
-  statusGiziBBU?: Prisma.SortOrder
-  statusGiziBBTB?: Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskTier?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -1082,21 +600,53 @@ export type ScreeningRecordSumOrderByAggregateInput = {
   ageMonths?: Prisma.SortOrder
   weightKg?: Prisma.SortOrder
   heightCm?: Prisma.SortOrder
-  zScore?: Prisma.SortOrder
-  zScoreWAZ?: Prisma.SortOrder
-  zScoreWHZ?: Prisma.SortOrder
-  bblrOption?: Prisma.SortOrder
-  exclusiveAsi?: Prisma.SortOrder
-  mpasiAge?: Prisma.SortOrder
-  animalProtein?: Prisma.SortOrder
-  cleanWaterAccess?: Prisma.SortOrder
-  sanitationAccess?: Prisma.SortOrder
-  smokeExposure?: Prisma.SortOrder
-  motherEducation?: Prisma.SortOrder
-  economicQuintile?: Prisma.SortOrder
-  diarrheaHistory?: Prisma.SortOrder
-  posyanduKia?: Prisma.SortOrder
-  riskScore?: Prisma.SortOrder
+}
+
+export type ScreeningRecordScalarRelationFilter = {
+  is?: Prisma.ScreeningRecordWhereInput
+  isNot?: Prisma.ScreeningRecordWhereInput
+}
+
+export type ScreeningRecordCreateNestedManyWithoutKelurahanInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput> | Prisma.ScreeningRecordCreateWithoutKelurahanInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput | Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyKelurahanInputEnvelope
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+}
+
+export type ScreeningRecordUncheckedCreateNestedManyWithoutKelurahanInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput> | Prisma.ScreeningRecordCreateWithoutKelurahanInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput | Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyKelurahanInputEnvelope
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+}
+
+export type ScreeningRecordUpdateManyWithoutKelurahanNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput> | Prisma.ScreeningRecordCreateWithoutKelurahanInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput | Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput[]
+  upsert?: Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutKelurahanInput | Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutKelurahanInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyKelurahanInputEnvelope
+  set?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  disconnect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  delete?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  update?: Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutKelurahanInput | Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutKelurahanInput[]
+  updateMany?: Prisma.ScreeningRecordUpdateManyWithWhereWithoutKelurahanInput | Prisma.ScreeningRecordUpdateManyWithWhereWithoutKelurahanInput[]
+  deleteMany?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
+}
+
+export type ScreeningRecordUncheckedUpdateManyWithoutKelurahanNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput> | Prisma.ScreeningRecordCreateWithoutKelurahanInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput | Prisma.ScreeningRecordCreateOrConnectWithoutKelurahanInput[]
+  upsert?: Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutKelurahanInput | Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutKelurahanInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyKelurahanInputEnvelope
+  set?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  disconnect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  delete?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  update?: Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutKelurahanInput | Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutKelurahanInput[]
+  updateMany?: Prisma.ScreeningRecordUpdateManyWithWhereWithoutKelurahanInput | Prisma.ScreeningRecordUpdateManyWithWhereWithoutKelurahanInput[]
+  deleteMany?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
 }
 
 export type ScreeningRecordCreateNestedManyWithoutSessionInput = {
@@ -1141,28 +691,54 @@ export type ScreeningRecordUncheckedUpdateManyWithoutSessionNestedInput = {
   deleteMany?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
 }
 
-export type ScreeningRecordCreateanimalProteinInput = {
-  set: number[]
+export type ScreeningRecordCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput> | Prisma.ScreeningRecordCreateWithoutBatchInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput | Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyBatchInputEnvelope
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
 }
 
-export type ScreeningRecordCreatedominantFactorsInput = {
-  set: string[]
+export type ScreeningRecordUncheckedCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput> | Prisma.ScreeningRecordCreateWithoutBatchInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput | Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyBatchInputEnvelope
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
 }
 
-export type EnumDataSourceTypeFieldUpdateOperationsInput = {
-  set?: $Enums.DataSourceType
+export type ScreeningRecordUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput> | Prisma.ScreeningRecordCreateWithoutBatchInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput | Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutBatchInput | Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyBatchInputEnvelope
+  set?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  disconnect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  delete?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  update?: Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutBatchInput | Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.ScreeningRecordUpdateManyWithWhereWithoutBatchInput | Prisma.ScreeningRecordUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
+}
+
+export type ScreeningRecordUncheckedUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput> | Prisma.ScreeningRecordCreateWithoutBatchInput[] | Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput | Prisma.ScreeningRecordCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutBatchInput | Prisma.ScreeningRecordUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.ScreeningRecordCreateManyBatchInputEnvelope
+  set?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  disconnect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  delete?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  connect?: Prisma.ScreeningRecordWhereUniqueInput | Prisma.ScreeningRecordWhereUniqueInput[]
+  update?: Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutBatchInput | Prisma.ScreeningRecordUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.ScreeningRecordUpdateManyWithWhereWithoutBatchInput | Prisma.ScreeningRecordUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type FloatFieldUpdateOperationsInput = {
@@ -1173,62 +749,149 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type ScreeningRecordCreateNestedOneWithoutGrowthInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedCreateWithoutGrowthInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutGrowthInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type ScreeningRecordUpdateOneRequiredWithoutGrowthNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedCreateWithoutGrowthInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutGrowthInput
+  upsert?: Prisma.ScreeningRecordUpsertWithoutGrowthInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScreeningRecordUpdateToOneWithWhereWithoutGrowthInput, Prisma.ScreeningRecordUpdateWithoutGrowthInput>, Prisma.ScreeningRecordUncheckedUpdateWithoutGrowthInput>
 }
 
-export type ScreeningRecordUpdateanimalProteinInput = {
-  set?: number[]
-  push?: number | number[]
+export type ScreeningRecordCreateNestedOneWithoutDeterminantsInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedCreateWithoutDeterminantsInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutDeterminantsInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
 }
 
-export type ScreeningRecordUpdatedominantFactorsInput = {
-  set?: string[]
-  push?: string | string[]
+export type ScreeningRecordUpdateOneRequiredWithoutDeterminantsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedCreateWithoutDeterminantsInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutDeterminantsInput
+  upsert?: Prisma.ScreeningRecordUpsertWithoutDeterminantsInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScreeningRecordUpdateToOneWithWhereWithoutDeterminantsInput, Prisma.ScreeningRecordUpdateWithoutDeterminantsInput>, Prisma.ScreeningRecordUncheckedUpdateWithoutDeterminantsInput>
+}
+
+export type ScreeningRecordCreateNestedOneWithoutRiskInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutRiskInput, Prisma.ScreeningRecordUncheckedCreateWithoutRiskInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutRiskInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
+}
+
+export type ScreeningRecordUpdateOneRequiredWithoutRiskNestedInput = {
+  create?: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutRiskInput, Prisma.ScreeningRecordUncheckedCreateWithoutRiskInput>
+  connectOrCreate?: Prisma.ScreeningRecordCreateOrConnectWithoutRiskInput
+  upsert?: Prisma.ScreeningRecordUpsertWithoutRiskInput
+  connect?: Prisma.ScreeningRecordWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScreeningRecordUpdateToOneWithWhereWithoutRiskInput, Prisma.ScreeningRecordUpdateWithoutRiskInput>, Prisma.ScreeningRecordUncheckedUpdateWithoutRiskInput>
+}
+
+export type ScreeningRecordCreateWithoutKelurahanInput = {
+  id?: string
+  shareHash?: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordUncheckedCreateWithoutKelurahanInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  sourceBatchId?: string | null
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordCreateOrConnectWithoutKelurahanInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput>
+}
+
+export type ScreeningRecordCreateManyKelurahanInputEnvelope = {
+  data: Prisma.ScreeningRecordCreateManyKelurahanInput | Prisma.ScreeningRecordCreateManyKelurahanInput[]
+  skipDuplicates?: boolean
+}
+
+export type ScreeningRecordUpsertWithWhereUniqueWithoutKelurahanInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  update: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedUpdateWithoutKelurahanInput>
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedCreateWithoutKelurahanInput>
+}
+
+export type ScreeningRecordUpdateWithWhereUniqueWithoutKelurahanInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutKelurahanInput, Prisma.ScreeningRecordUncheckedUpdateWithoutKelurahanInput>
+}
+
+export type ScreeningRecordUpdateManyWithWhereWithoutKelurahanInput = {
+  where: Prisma.ScreeningRecordScalarWhereInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateManyMutationInput, Prisma.ScreeningRecordUncheckedUpdateManyWithoutKelurahanInput>
+}
+
+export type ScreeningRecordScalarWhereInput = {
+  AND?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
+  OR?: Prisma.ScreeningRecordScalarWhereInput[]
+  NOT?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
+  id?: Prisma.StringFilter<"ScreeningRecord"> | string
+  shareHash?: Prisma.StringFilter<"ScreeningRecord"> | string
+  sessionId?: Prisma.StringFilter<"ScreeningRecord"> | string
+  sourceType?: Prisma.EnumDataSourceTypeFilter<"ScreeningRecord"> | $Enums.DataSourceType
+  sourceBatchId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  persona?: Prisma.StringFilter<"ScreeningRecord"> | string
+  kelurahanId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  externalLocationLabel?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
+  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
+  ageMonths?: Prisma.IntFilter<"ScreeningRecord"> | number
+  gender?: Prisma.StringFilter<"ScreeningRecord"> | string
+  weightKg?: Prisma.FloatFilter<"ScreeningRecord"> | number
+  heightCm?: Prisma.FloatFilter<"ScreeningRecord"> | number
+  createdAt?: Prisma.DateTimeFilter<"ScreeningRecord"> | Date | string
 }
 
 export type ScreeningRecordCreateWithoutSessionInput = {
   id?: string
   shareHash?: string
   sourceType?: $Enums.DataSourceType
-  sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
 }
 
 export type ScreeningRecordUncheckedCreateWithoutSessionInput = {
@@ -1237,34 +900,17 @@ export type ScreeningRecordUncheckedCreateWithoutSessionInput = {
   sourceType?: $Enums.DataSourceType
   sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
 }
 
 export type ScreeningRecordCreateOrConnectWithoutSessionInput = {
@@ -1293,44 +939,414 @@ export type ScreeningRecordUpdateManyWithWhereWithoutSessionInput = {
   data: Prisma.XOR<Prisma.ScreeningRecordUpdateManyMutationInput, Prisma.ScreeningRecordUncheckedUpdateManyWithoutSessionInput>
 }
 
-export type ScreeningRecordScalarWhereInput = {
-  AND?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
-  OR?: Prisma.ScreeningRecordScalarWhereInput[]
-  NOT?: Prisma.ScreeningRecordScalarWhereInput | Prisma.ScreeningRecordScalarWhereInput[]
-  id?: Prisma.StringFilter<"ScreeningRecord"> | string
-  shareHash?: Prisma.StringFilter<"ScreeningRecord"> | string
-  sessionId?: Prisma.StringFilter<"ScreeningRecord"> | string
-  sourceType?: Prisma.EnumDataSourceTypeFilter<"ScreeningRecord"> | $Enums.DataSourceType
-  sourceBatchId?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  persona?: Prisma.StringFilter<"ScreeningRecord"> | string
-  kelurahan?: Prisma.StringFilter<"ScreeningRecord"> | string
-  ageMonths?: Prisma.IntFilter<"ScreeningRecord"> | number
-  gender?: Prisma.StringFilter<"ScreeningRecord"> | string
-  weightKg?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  heightCm?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  isOutsideBontang?: Prisma.BoolFilter<"ScreeningRecord"> | boolean
-  zScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  zScoreWAZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  zScoreWHZ?: Prisma.FloatNullableFilter<"ScreeningRecord"> | number | null
-  statusGiziTBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBU?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  statusGiziBBTB?: Prisma.StringNullableFilter<"ScreeningRecord"> | string | null
-  bblrOption?: Prisma.IntFilter<"ScreeningRecord"> | number
-  exclusiveAsi?: Prisma.IntFilter<"ScreeningRecord"> | number
-  mpasiAge?: Prisma.IntFilter<"ScreeningRecord"> | number
-  animalProtein?: Prisma.IntNullableListFilter<"ScreeningRecord">
-  cleanWaterAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  sanitationAccess?: Prisma.IntFilter<"ScreeningRecord"> | number
-  smokeExposure?: Prisma.IntFilter<"ScreeningRecord"> | number
-  motherEducation?: Prisma.IntFilter<"ScreeningRecord"> | number
-  economicQuintile?: Prisma.IntFilter<"ScreeningRecord"> | number
-  diarrheaHistory?: Prisma.IntFilter<"ScreeningRecord"> | number
-  posyanduKia?: Prisma.IntFilter<"ScreeningRecord"> | number
-  riskTier?: Prisma.StringFilter<"ScreeningRecord"> | string
-  riskScore?: Prisma.FloatFilter<"ScreeningRecord"> | number
-  dominantFactors?: Prisma.StringNullableListFilter<"ScreeningRecord">
-  rawMetadata?: Prisma.JsonNullableFilter<"ScreeningRecord">
-  createdAt?: Prisma.DateTimeFilter<"ScreeningRecord"> | Date | string
+export type ScreeningRecordCreateWithoutBatchInput = {
+  id?: string
+  shareHash?: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordUncheckedCreateWithoutBatchInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordCreateOrConnectWithoutBatchInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput>
+}
+
+export type ScreeningRecordCreateManyBatchInputEnvelope = {
+  data: Prisma.ScreeningRecordCreateManyBatchInput | Prisma.ScreeningRecordCreateManyBatchInput[]
+  skipDuplicates?: boolean
+}
+
+export type ScreeningRecordUpsertWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  update: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutBatchInput, Prisma.ScreeningRecordUncheckedUpdateWithoutBatchInput>
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutBatchInput, Prisma.ScreeningRecordUncheckedCreateWithoutBatchInput>
+}
+
+export type ScreeningRecordUpdateWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutBatchInput, Prisma.ScreeningRecordUncheckedUpdateWithoutBatchInput>
+}
+
+export type ScreeningRecordUpdateManyWithWhereWithoutBatchInput = {
+  where: Prisma.ScreeningRecordScalarWhereInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateManyMutationInput, Prisma.ScreeningRecordUncheckedUpdateManyWithoutBatchInput>
+}
+
+export type ScreeningRecordCreateWithoutGrowthInput = {
+  id?: string
+  shareHash?: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordUncheckedCreateWithoutGrowthInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  sourceBatchId?: string | null
+  persona: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordCreateOrConnectWithoutGrowthInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedCreateWithoutGrowthInput>
+}
+
+export type ScreeningRecordUpsertWithoutGrowthInput = {
+  update: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedUpdateWithoutGrowthInput>
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedCreateWithoutGrowthInput>
+  where?: Prisma.ScreeningRecordWhereInput
+}
+
+export type ScreeningRecordUpdateToOneWithWhereWithoutGrowthInput = {
+  where?: Prisma.ScreeningRecordWhereInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutGrowthInput, Prisma.ScreeningRecordUncheckedUpdateWithoutGrowthInput>
+}
+
+export type ScreeningRecordUpdateWithoutGrowthInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateWithoutGrowthInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordCreateWithoutDeterminantsInput = {
+  id?: string
+  shareHash?: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordUncheckedCreateWithoutDeterminantsInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  sourceBatchId?: string | null
+  persona: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  risk?: Prisma.RiskAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordCreateOrConnectWithoutDeterminantsInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedCreateWithoutDeterminantsInput>
+}
+
+export type ScreeningRecordUpsertWithoutDeterminantsInput = {
+  update: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedUpdateWithoutDeterminantsInput>
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedCreateWithoutDeterminantsInput>
+  where?: Prisma.ScreeningRecordWhereInput
+}
+
+export type ScreeningRecordUpdateToOneWithWhereWithoutDeterminantsInput = {
+  where?: Prisma.ScreeningRecordWhereInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutDeterminantsInput, Prisma.ScreeningRecordUncheckedUpdateWithoutDeterminantsInput>
+}
+
+export type ScreeningRecordUpdateWithoutDeterminantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateWithoutDeterminantsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordCreateWithoutRiskInput = {
+  id?: string
+  shareHash?: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  session: Prisma.AnonymousSessionCreateNestedOneWithoutScreeningsInput
+  batch?: Prisma.IngestionBatchLogCreateNestedOneWithoutScreeningsInput
+  kelurahan?: Prisma.KelurahanCreateNestedOneWithoutScreeningsInput
+  growth?: Prisma.GrowthAssessmentCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordUncheckedCreateWithoutRiskInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  sourceBatchId?: string | null
+  persona: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedCreateNestedOneWithoutScreeningInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedCreateNestedOneWithoutScreeningInput
+}
+
+export type ScreeningRecordCreateOrConnectWithoutRiskInput = {
+  where: Prisma.ScreeningRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutRiskInput, Prisma.ScreeningRecordUncheckedCreateWithoutRiskInput>
+}
+
+export type ScreeningRecordUpsertWithoutRiskInput = {
+  update: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutRiskInput, Prisma.ScreeningRecordUncheckedUpdateWithoutRiskInput>
+  create: Prisma.XOR<Prisma.ScreeningRecordCreateWithoutRiskInput, Prisma.ScreeningRecordUncheckedCreateWithoutRiskInput>
+  where?: Prisma.ScreeningRecordWhereInput
+}
+
+export type ScreeningRecordUpdateToOneWithWhereWithoutRiskInput = {
+  where?: Prisma.ScreeningRecordWhereInput
+  data: Prisma.XOR<Prisma.ScreeningRecordUpdateWithoutRiskInput, Prisma.ScreeningRecordUncheckedUpdateWithoutRiskInput>
+}
+
+export type ScreeningRecordUpdateWithoutRiskInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateWithoutRiskInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordCreateManyKelurahanInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  sourceBatchId?: string | null
+  persona: string
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+}
+
+export type ScreeningRecordUpdateWithoutKelurahanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateWithoutKelurahanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateManyWithoutKelurahanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ScreeningRecordCreateManySessionInput = {
@@ -1339,33 +1355,13 @@ export type ScreeningRecordCreateManySessionInput = {
   sourceType?: $Enums.DataSourceType
   sourceBatchId?: string | null
   persona: string
-  kelurahan: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
   ageMonths: number
   gender: string
   weightKg: number
   heightCm: number
-  isOutsideBontang: boolean
-  zScore: number
-  zScoreWAZ?: number | null
-  zScoreWHZ?: number | null
-  statusGiziTBU?: string | null
-  statusGiziBBU?: string | null
-  statusGiziBBTB?: string | null
-  bblrOption: number
-  exclusiveAsi: number
-  mpasiAge: number
-  animalProtein?: Prisma.ScreeningRecordCreateanimalProteinInput | number[]
-  cleanWaterAccess: number
-  sanitationAccess: number
-  smokeExposure: number
-  motherEducation: number
-  economicQuintile: number
-  diarrheaHistory: number
-  posyanduKia: number
-  riskTier: string
-  riskScore: number
-  dominantFactors?: Prisma.ScreeningRecordCreatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
@@ -1373,36 +1369,19 @@ export type ScreeningRecordUpdateWithoutSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   shareHash?: Prisma.StringFieldUpdateOperationsInput | string
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
-  sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batch?: Prisma.IngestionBatchLogUpdateOneWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
 }
 
 export type ScreeningRecordUncheckedUpdateWithoutSessionInput = {
@@ -1411,34 +1390,17 @@ export type ScreeningRecordUncheckedUpdateWithoutSessionInput = {
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
   sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
-  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
 }
 
 export type ScreeningRecordUncheckedUpdateManyWithoutSessionInput = {
@@ -1447,33 +1409,83 @@ export type ScreeningRecordUncheckedUpdateManyWithoutSessionInput = {
   sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
   sourceBatchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   persona?: Prisma.StringFieldUpdateOperationsInput | string
-  kelurahan?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
   gender?: Prisma.StringFieldUpdateOperationsInput | string
   weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
   heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScreeningRecordCreateManyBatchInput = {
+  id?: string
+  shareHash?: string
+  sessionId: string
+  sourceType?: $Enums.DataSourceType
+  persona: string
+  kelurahanId?: string | null
+  externalLocationLabel?: string | null
+  isOutsideBontang: boolean
+  ageMonths: number
+  gender: string
+  weightKg: number
+  heightCm: number
+  createdAt?: Date | string
+}
+
+export type ScreeningRecordUpdateWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  zScoreWAZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  zScoreWHZ?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  statusGiziTBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBU?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusGiziBBTB?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bblrOption?: Prisma.IntFieldUpdateOperationsInput | number
-  exclusiveAsi?: Prisma.IntFieldUpdateOperationsInput | number
-  mpasiAge?: Prisma.IntFieldUpdateOperationsInput | number
-  animalProtein?: Prisma.ScreeningRecordUpdateanimalProteinInput | number[]
-  cleanWaterAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  sanitationAccess?: Prisma.IntFieldUpdateOperationsInput | number
-  smokeExposure?: Prisma.IntFieldUpdateOperationsInput | number
-  motherEducation?: Prisma.IntFieldUpdateOperationsInput | number
-  economicQuintile?: Prisma.IntFieldUpdateOperationsInput | number
-  diarrheaHistory?: Prisma.IntFieldUpdateOperationsInput | number
-  posyanduKia?: Prisma.IntFieldUpdateOperationsInput | number
-  riskTier?: Prisma.StringFieldUpdateOperationsInput | string
-  riskScore?: Prisma.FloatFieldUpdateOperationsInput | number
-  dominantFactors?: Prisma.ScreeningRecordUpdatedominantFactorsInput | string[]
-  rawMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  session?: Prisma.AnonymousSessionUpdateOneRequiredWithoutScreeningsNestedInput
+  kelurahan?: Prisma.KelurahanUpdateOneWithoutScreeningsNestedInput
+  growth?: Prisma.GrowthAssessmentUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  growth?: Prisma.GrowthAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+  determinants?: Prisma.ScreeningDeterminantsUncheckedUpdateOneWithoutScreeningNestedInput
+  risk?: Prisma.RiskAssessmentUncheckedUpdateOneWithoutScreeningNestedInput
+}
+
+export type ScreeningRecordUncheckedUpdateManyWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  shareHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceType?: Prisma.EnumDataSourceTypeFieldUpdateOperationsInput | $Enums.DataSourceType
+  persona?: Prisma.StringFieldUpdateOperationsInput | string
+  kelurahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalLocationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOutsideBontang?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ageMonths?: Prisma.IntFieldUpdateOperationsInput | number
+  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  weightKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  heightCm?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1486,35 +1498,20 @@ export type ScreeningRecordSelect<ExtArgs extends runtime.Types.Extensions.Inter
   sourceType?: boolean
   sourceBatchId?: boolean
   persona?: boolean
-  kelurahan?: boolean
+  kelurahanId?: boolean
+  externalLocationLabel?: boolean
+  isOutsideBontang?: boolean
   ageMonths?: boolean
   gender?: boolean
   weightKg?: boolean
   heightCm?: boolean
-  isOutsideBontang?: boolean
-  zScore?: boolean
-  zScoreWAZ?: boolean
-  zScoreWHZ?: boolean
-  statusGiziTBU?: boolean
-  statusGiziBBU?: boolean
-  statusGiziBBTB?: boolean
-  bblrOption?: boolean
-  exclusiveAsi?: boolean
-  mpasiAge?: boolean
-  animalProtein?: boolean
-  cleanWaterAccess?: boolean
-  sanitationAccess?: boolean
-  smokeExposure?: boolean
-  motherEducation?: boolean
-  economicQuintile?: boolean
-  diarrheaHistory?: boolean
-  posyanduKia?: boolean
-  riskTier?: boolean
-  riskScore?: boolean
-  dominantFactors?: boolean
-  rawMetadata?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
+  growth?: boolean | Prisma.ScreeningRecord$growthArgs<ExtArgs>
+  determinants?: boolean | Prisma.ScreeningRecord$determinantsArgs<ExtArgs>
+  risk?: boolean | Prisma.ScreeningRecord$riskArgs<ExtArgs>
 }, ExtArgs["result"]["screeningRecord"]>
 
 export type ScreeningRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1524,35 +1521,17 @@ export type ScreeningRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   sourceType?: boolean
   sourceBatchId?: boolean
   persona?: boolean
-  kelurahan?: boolean
+  kelurahanId?: boolean
+  externalLocationLabel?: boolean
+  isOutsideBontang?: boolean
   ageMonths?: boolean
   gender?: boolean
   weightKg?: boolean
   heightCm?: boolean
-  isOutsideBontang?: boolean
-  zScore?: boolean
-  zScoreWAZ?: boolean
-  zScoreWHZ?: boolean
-  statusGiziTBU?: boolean
-  statusGiziBBU?: boolean
-  statusGiziBBTB?: boolean
-  bblrOption?: boolean
-  exclusiveAsi?: boolean
-  mpasiAge?: boolean
-  animalProtein?: boolean
-  cleanWaterAccess?: boolean
-  sanitationAccess?: boolean
-  smokeExposure?: boolean
-  motherEducation?: boolean
-  economicQuintile?: boolean
-  diarrheaHistory?: boolean
-  posyanduKia?: boolean
-  riskTier?: boolean
-  riskScore?: boolean
-  dominantFactors?: boolean
-  rawMetadata?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
 }, ExtArgs["result"]["screeningRecord"]>
 
 export type ScreeningRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1562,35 +1541,17 @@ export type ScreeningRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   sourceType?: boolean
   sourceBatchId?: boolean
   persona?: boolean
-  kelurahan?: boolean
+  kelurahanId?: boolean
+  externalLocationLabel?: boolean
+  isOutsideBontang?: boolean
   ageMonths?: boolean
   gender?: boolean
   weightKg?: boolean
   heightCm?: boolean
-  isOutsideBontang?: boolean
-  zScore?: boolean
-  zScoreWAZ?: boolean
-  zScoreWHZ?: boolean
-  statusGiziTBU?: boolean
-  statusGiziBBU?: boolean
-  statusGiziBBTB?: boolean
-  bblrOption?: boolean
-  exclusiveAsi?: boolean
-  mpasiAge?: boolean
-  animalProtein?: boolean
-  cleanWaterAccess?: boolean
-  sanitationAccess?: boolean
-  smokeExposure?: boolean
-  motherEducation?: boolean
-  economicQuintile?: boolean
-  diarrheaHistory?: boolean
-  posyanduKia?: boolean
-  riskTier?: boolean
-  riskScore?: boolean
-  dominantFactors?: boolean
-  rawMetadata?: boolean
   createdAt?: boolean
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
 }, ExtArgs["result"]["screeningRecord"]>
 
 export type ScreeningRecordSelectScalar = {
@@ -1600,51 +1561,45 @@ export type ScreeningRecordSelectScalar = {
   sourceType?: boolean
   sourceBatchId?: boolean
   persona?: boolean
-  kelurahan?: boolean
+  kelurahanId?: boolean
+  externalLocationLabel?: boolean
+  isOutsideBontang?: boolean
   ageMonths?: boolean
   gender?: boolean
   weightKg?: boolean
   heightCm?: boolean
-  isOutsideBontang?: boolean
-  zScore?: boolean
-  zScoreWAZ?: boolean
-  zScoreWHZ?: boolean
-  statusGiziTBU?: boolean
-  statusGiziBBU?: boolean
-  statusGiziBBTB?: boolean
-  bblrOption?: boolean
-  exclusiveAsi?: boolean
-  mpasiAge?: boolean
-  animalProtein?: boolean
-  cleanWaterAccess?: boolean
-  sanitationAccess?: boolean
-  smokeExposure?: boolean
-  motherEducation?: boolean
-  economicQuintile?: boolean
-  diarrheaHistory?: boolean
-  posyanduKia?: boolean
-  riskTier?: boolean
-  riskScore?: boolean
-  dominantFactors?: boolean
-  rawMetadata?: boolean
   createdAt?: boolean
 }
 
-export type ScreeningRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shareHash" | "sessionId" | "sourceType" | "sourceBatchId" | "persona" | "kelurahan" | "ageMonths" | "gender" | "weightKg" | "heightCm" | "isOutsideBontang" | "zScore" | "zScoreWAZ" | "zScoreWHZ" | "statusGiziTBU" | "statusGiziBBU" | "statusGiziBBTB" | "bblrOption" | "exclusiveAsi" | "mpasiAge" | "animalProtein" | "cleanWaterAccess" | "sanitationAccess" | "smokeExposure" | "motherEducation" | "economicQuintile" | "diarrheaHistory" | "posyanduKia" | "riskTier" | "riskScore" | "dominantFactors" | "rawMetadata" | "createdAt", ExtArgs["result"]["screeningRecord"]>
+export type ScreeningRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shareHash" | "sessionId" | "sourceType" | "sourceBatchId" | "persona" | "kelurahanId" | "externalLocationLabel" | "isOutsideBontang" | "ageMonths" | "gender" | "weightKg" | "heightCm" | "createdAt", ExtArgs["result"]["screeningRecord"]>
 export type ScreeningRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
+  growth?: boolean | Prisma.ScreeningRecord$growthArgs<ExtArgs>
+  determinants?: boolean | Prisma.ScreeningRecord$determinantsArgs<ExtArgs>
+  risk?: boolean | Prisma.ScreeningRecord$riskArgs<ExtArgs>
 }
 export type ScreeningRecordIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
 }
 export type ScreeningRecordIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   session?: boolean | Prisma.AnonymousSessionDefaultArgs<ExtArgs>
+  batch?: boolean | Prisma.ScreeningRecord$batchArgs<ExtArgs>
+  kelurahan?: boolean | Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>
 }
 
 export type $ScreeningRecordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ScreeningRecord"
   objects: {
     session: Prisma.$AnonymousSessionPayload<ExtArgs>
+    batch: Prisma.$IngestionBatchLogPayload<ExtArgs> | null
+    kelurahan: Prisma.$KelurahanPayload<ExtArgs> | null
+    growth: Prisma.$GrowthAssessmentPayload<ExtArgs> | null
+    determinants: Prisma.$ScreeningDeterminantsPayload<ExtArgs> | null
+    risk: Prisma.$RiskAssessmentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1652,34 +1607,26 @@ export type $ScreeningRecordPayload<ExtArgs extends runtime.Types.Extensions.Int
     sessionId: string
     sourceType: $Enums.DataSourceType
     sourceBatchId: string | null
+    /**
+     * Peran pengisi PADA SAAT submission ini (lihat catatan di AnonymousSession
+     * soal kenapa ini tidak selalu sama dengan AnonymousSession.persona).
+     * Dikunci CHECK constraint di level DB (lihat migration) ke 4 nilai resmi.
+     */
     persona: string
-    kelurahan: string
+    kelurahanId: string | null
+    /**
+     * Dipakai saat isOutsideBontang=true ATAU data eksternal (mis. Riskesdas
+     * nasional) — kelurahanId dibiarkan null, label bebas disimpan di sini.
+     */
+    externalLocationLabel: string | null
+    isOutsideBontang: boolean
     ageMonths: number
+    /**
+     * Dikunci CHECK constraint ke 'Laki-Laki' | 'Perempuan' (lihat migration).
+     */
     gender: string
     weightKg: number
     heightCm: number
-    isOutsideBontang: boolean
-    zScore: number
-    zScoreWAZ: number | null
-    zScoreWHZ: number | null
-    statusGiziTBU: string | null
-    statusGiziBBU: string | null
-    statusGiziBBTB: string | null
-    bblrOption: number
-    exclusiveAsi: number
-    mpasiAge: number
-    animalProtein: number[]
-    cleanWaterAccess: number
-    sanitationAccess: number
-    smokeExposure: number
-    motherEducation: number
-    economicQuintile: number
-    diarrheaHistory: number
-    posyanduKia: number
-    riskTier: string
-    riskScore: number
-    dominantFactors: string[]
-    rawMetadata: runtime.JsonValue | null
     createdAt: Date
   }, ExtArgs["result"]["screeningRecord"]>
   composites: {}
@@ -2076,6 +2023,11 @@ readonly fields: ScreeningRecordFieldRefs;
 export interface Prisma__ScreeningRecordClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   session<T extends Prisma.AnonymousSessionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnonymousSessionDefaultArgs<ExtArgs>>): Prisma.Prisma__AnonymousSessionClient<runtime.Types.Result.GetResult<Prisma.$AnonymousSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  batch<T extends Prisma.ScreeningRecord$batchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScreeningRecord$batchArgs<ExtArgs>>): Prisma.Prisma__IngestionBatchLogClient<runtime.Types.Result.GetResult<Prisma.$IngestionBatchLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  kelurahan<T extends Prisma.ScreeningRecord$kelurahanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScreeningRecord$kelurahanArgs<ExtArgs>>): Prisma.Prisma__KelurahanClient<runtime.Types.Result.GetResult<Prisma.$KelurahanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  growth<T extends Prisma.ScreeningRecord$growthArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScreeningRecord$growthArgs<ExtArgs>>): Prisma.Prisma__GrowthAssessmentClient<runtime.Types.Result.GetResult<Prisma.$GrowthAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  determinants<T extends Prisma.ScreeningRecord$determinantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScreeningRecord$determinantsArgs<ExtArgs>>): Prisma.Prisma__ScreeningDeterminantsClient<runtime.Types.Result.GetResult<Prisma.$ScreeningDeterminantsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  risk<T extends Prisma.ScreeningRecord$riskArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScreeningRecord$riskArgs<ExtArgs>>): Prisma.Prisma__RiskAssessmentClient<runtime.Types.Result.GetResult<Prisma.$RiskAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2111,33 +2063,13 @@ export interface ScreeningRecordFieldRefs {
   readonly sourceType: Prisma.FieldRef<"ScreeningRecord", 'DataSourceType'>
   readonly sourceBatchId: Prisma.FieldRef<"ScreeningRecord", 'String'>
   readonly persona: Prisma.FieldRef<"ScreeningRecord", 'String'>
-  readonly kelurahan: Prisma.FieldRef<"ScreeningRecord", 'String'>
+  readonly kelurahanId: Prisma.FieldRef<"ScreeningRecord", 'String'>
+  readonly externalLocationLabel: Prisma.FieldRef<"ScreeningRecord", 'String'>
+  readonly isOutsideBontang: Prisma.FieldRef<"ScreeningRecord", 'Boolean'>
   readonly ageMonths: Prisma.FieldRef<"ScreeningRecord", 'Int'>
   readonly gender: Prisma.FieldRef<"ScreeningRecord", 'String'>
   readonly weightKg: Prisma.FieldRef<"ScreeningRecord", 'Float'>
   readonly heightCm: Prisma.FieldRef<"ScreeningRecord", 'Float'>
-  readonly isOutsideBontang: Prisma.FieldRef<"ScreeningRecord", 'Boolean'>
-  readonly zScore: Prisma.FieldRef<"ScreeningRecord", 'Float'>
-  readonly zScoreWAZ: Prisma.FieldRef<"ScreeningRecord", 'Float'>
-  readonly zScoreWHZ: Prisma.FieldRef<"ScreeningRecord", 'Float'>
-  readonly statusGiziTBU: Prisma.FieldRef<"ScreeningRecord", 'String'>
-  readonly statusGiziBBU: Prisma.FieldRef<"ScreeningRecord", 'String'>
-  readonly statusGiziBBTB: Prisma.FieldRef<"ScreeningRecord", 'String'>
-  readonly bblrOption: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly exclusiveAsi: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly mpasiAge: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly animalProtein: Prisma.FieldRef<"ScreeningRecord", 'Int[]'>
-  readonly cleanWaterAccess: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly sanitationAccess: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly smokeExposure: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly motherEducation: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly economicQuintile: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly diarrheaHistory: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly posyanduKia: Prisma.FieldRef<"ScreeningRecord", 'Int'>
-  readonly riskTier: Prisma.FieldRef<"ScreeningRecord", 'String'>
-  readonly riskScore: Prisma.FieldRef<"ScreeningRecord", 'Float'>
-  readonly dominantFactors: Prisma.FieldRef<"ScreeningRecord", 'String[]'>
-  readonly rawMetadata: Prisma.FieldRef<"ScreeningRecord", 'Json'>
   readonly createdAt: Prisma.FieldRef<"ScreeningRecord", 'DateTime'>
 }
     
@@ -2537,6 +2469,101 @@ export type ScreeningRecordDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many ScreeningRecords to delete.
    */
   limit?: number
+}
+
+/**
+ * ScreeningRecord.batch
+ */
+export type ScreeningRecord$batchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IngestionBatchLog
+   */
+  select?: Prisma.IngestionBatchLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IngestionBatchLog
+   */
+  omit?: Prisma.IngestionBatchLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IngestionBatchLogInclude<ExtArgs> | null
+  where?: Prisma.IngestionBatchLogWhereInput
+}
+
+/**
+ * ScreeningRecord.kelurahan
+ */
+export type ScreeningRecord$kelurahanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kelurahan
+   */
+  select?: Prisma.KelurahanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kelurahan
+   */
+  omit?: Prisma.KelurahanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KelurahanInclude<ExtArgs> | null
+  where?: Prisma.KelurahanWhereInput
+}
+
+/**
+ * ScreeningRecord.growth
+ */
+export type ScreeningRecord$growthArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GrowthAssessment
+   */
+  select?: Prisma.GrowthAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GrowthAssessment
+   */
+  omit?: Prisma.GrowthAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GrowthAssessmentInclude<ExtArgs> | null
+  where?: Prisma.GrowthAssessmentWhereInput
+}
+
+/**
+ * ScreeningRecord.determinants
+ */
+export type ScreeningRecord$determinantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScreeningDeterminants
+   */
+  select?: Prisma.ScreeningDeterminantsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScreeningDeterminants
+   */
+  omit?: Prisma.ScreeningDeterminantsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScreeningDeterminantsInclude<ExtArgs> | null
+  where?: Prisma.ScreeningDeterminantsWhereInput
+}
+
+/**
+ * ScreeningRecord.risk
+ */
+export type ScreeningRecord$riskArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RiskAssessment
+   */
+  select?: Prisma.RiskAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RiskAssessment
+   */
+  omit?: Prisma.RiskAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RiskAssessmentInclude<ExtArgs> | null
+  where?: Prisma.RiskAssessmentWhereInput
 }
 
 /**

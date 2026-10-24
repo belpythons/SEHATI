@@ -5,8 +5,8 @@ import {
   ScreeningRecord,
 } from '../types/screening'
 
-// Base URL configured from Vite environment or default to local backend gateway (port 5001 to avoid macOS AirPlay port 5000 conflict)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+// Base URL configured from Vite environment or default to local backend gateway
+const API_BASE_URL = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : 'http://localhost:5001'
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -27,6 +27,24 @@ apiClient.interceptors.response.use(
 )
 
 /**
+ * Session API matching backend /api/v1/session routes
+ */
+export const sessionApi = {
+  /**
+   * Create or retrieve anonymous session based on clientToken
+   */
+  async createOrGet(clientToken: string, persona?: string): Promise<{
+    success: boolean
+    sessionId: string
+    clientToken: string
+    persona: string
+  }> {
+    const response = await apiClient.post('/api/v1/session', { clientToken, persona })
+    return response.data
+  },
+}
+
+/**
  * Real backend API methods matching Backend API Gateway FDD & Prisma schema
  */
 export const screeningApi = {
@@ -43,11 +61,9 @@ export const screeningApi = {
   },
 
   /**
-   * [PLACEHOLDER / FUTURE ENDPOINT]
-   * NOTE: Backend routes currently only expose POST /api/v1/screening/submit.
-   * Endpoint GET /api/v1/screening/share/:shareHash is not yet implemented on the backend.
-   * This method is prepared for future backend support; during development,
-   * screeningService routes shareHash lookups to the local mock/cache layer.
+   * Fetch screening result by shareHash from GET /api/v1/screening/share/:shareHash
+   * (Active in backend/src/routes/screening.routes.ts — cache-aside via Redis,
+   * falls back to the `screening_record_flat` DB view on cache miss.)
    */
   async getByShareHash(shareHash: string): Promise<ScreeningSubmitResponse> {
     const response = await apiClient.get<ScreeningSubmitResponse>(

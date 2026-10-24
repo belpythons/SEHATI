@@ -1,0 +1,21 @@
+# ==============================================================================
+# DOMCloud Deployment Recipe for SEHATI
+# ==============================================================================
+# Docs: https://domcloud.co/docs/features/recipes
+# Architecture: Single-Domain Deployment (Express API + Vite Static Web App)
+# ==============================================================================
+
+features:
+  - node 20
+  - ssl
+
+nginx:
+  root: public_html/frontend/dist
+  passenger:
+    enabled: "on"
+    app_root: public_html/backend
+    app_start_command: env PORT=$PORT npx tsx src/server.ts
+
+commands:
+  - cd backend && npm install && npx prisma generate
+  - cd frontend && npm install && npm run build

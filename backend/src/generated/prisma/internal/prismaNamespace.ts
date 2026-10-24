@@ -397,10 +397,14 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  Kelurahan: 'Kelurahan',
   AnonymousSession: 'AnonymousSession',
+  IngestionBatchLog: 'IngestionBatchLog',
   ScreeningRecord: 'ScreeningRecord',
-  HealthKnowledgeBase: 'HealthKnowledgeBase',
-  IngestionBatchLog: 'IngestionBatchLog'
+  GrowthAssessment: 'GrowthAssessment',
+  ScreeningDeterminants: 'ScreeningDeterminants',
+  RiskAssessment: 'RiskAssessment',
+  HealthKnowledgeBase: 'HealthKnowledgeBase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,10 +420,84 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "anonymousSession" | "screeningRecord" | "healthKnowledgeBase" | "ingestionBatchLog"
+    modelProps: "kelurahan" | "anonymousSession" | "ingestionBatchLog" | "screeningRecord" | "growthAssessment" | "screeningDeterminants" | "riskAssessment" | "healthKnowledgeBase"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    Kelurahan: {
+      payload: Prisma.$KelurahanPayload<ExtArgs>
+      fields: Prisma.KelurahanFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KelurahanFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KelurahanFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        findFirst: {
+          args: Prisma.KelurahanFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KelurahanFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        findMany: {
+          args: Prisma.KelurahanFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>[]
+        }
+        create: {
+          args: Prisma.KelurahanCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        createMany: {
+          args: Prisma.KelurahanCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KelurahanCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>[]
+        }
+        delete: {
+          args: Prisma.KelurahanDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        update: {
+          args: Prisma.KelurahanUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        deleteMany: {
+          args: Prisma.KelurahanDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KelurahanUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KelurahanUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>[]
+        }
+        upsert: {
+          args: Prisma.KelurahanUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KelurahanPayload>
+        }
+        aggregate: {
+          args: Prisma.KelurahanAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKelurahan>
+        }
+        groupBy: {
+          args: Prisma.KelurahanGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KelurahanGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KelurahanCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KelurahanCountAggregateOutputType> | number
+        }
+      }
+    }
     AnonymousSession: {
       payload: Prisma.$AnonymousSessionPayload<ExtArgs>
       fields: Prisma.AnonymousSessionFieldRefs
@@ -491,154 +569,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AnonymousSessionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AnonymousSessionCountAggregateOutputType> | number
-        }
-      }
-    }
-    ScreeningRecord: {
-      payload: Prisma.$ScreeningRecordPayload<ExtArgs>
-      fields: Prisma.ScreeningRecordFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ScreeningRecordFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ScreeningRecordFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        findFirst: {
-          args: Prisma.ScreeningRecordFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ScreeningRecordFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        findMany: {
-          args: Prisma.ScreeningRecordFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
-        }
-        create: {
-          args: Prisma.ScreeningRecordCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        createMany: {
-          args: Prisma.ScreeningRecordCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.ScreeningRecordCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
-        }
-        delete: {
-          args: Prisma.ScreeningRecordDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        update: {
-          args: Prisma.ScreeningRecordUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        deleteMany: {
-          args: Prisma.ScreeningRecordDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ScreeningRecordUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.ScreeningRecordUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
-        }
-        upsert: {
-          args: Prisma.ScreeningRecordUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
-        }
-        aggregate: {
-          args: Prisma.ScreeningRecordAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateScreeningRecord>
-        }
-        groupBy: {
-          args: Prisma.ScreeningRecordGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ScreeningRecordGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ScreeningRecordCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ScreeningRecordCountAggregateOutputType> | number
-        }
-      }
-    }
-    HealthKnowledgeBase: {
-      payload: Prisma.$HealthKnowledgeBasePayload<ExtArgs>
-      fields: Prisma.HealthKnowledgeBaseFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.HealthKnowledgeBaseFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.HealthKnowledgeBaseFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        findFirst: {
-          args: Prisma.HealthKnowledgeBaseFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.HealthKnowledgeBaseFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        findMany: {
-          args: Prisma.HealthKnowledgeBaseFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
-        }
-        create: {
-          args: Prisma.HealthKnowledgeBaseCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        createMany: {
-          args: Prisma.HealthKnowledgeBaseCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.HealthKnowledgeBaseCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
-        }
-        delete: {
-          args: Prisma.HealthKnowledgeBaseDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        update: {
-          args: Prisma.HealthKnowledgeBaseUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        deleteMany: {
-          args: Prisma.HealthKnowledgeBaseDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.HealthKnowledgeBaseUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.HealthKnowledgeBaseUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
-        }
-        upsert: {
-          args: Prisma.HealthKnowledgeBaseUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
-        }
-        aggregate: {
-          args: Prisma.HealthKnowledgeBaseAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateHealthKnowledgeBase>
-        }
-        groupBy: {
-          args: Prisma.HealthKnowledgeBaseGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.HealthKnowledgeBaseGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.HealthKnowledgeBaseCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.HealthKnowledgeBaseCountAggregateOutputType> | number
         }
       }
     }
@@ -716,6 +646,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ScreeningRecord: {
+      payload: Prisma.$ScreeningRecordPayload<ExtArgs>
+      fields: Prisma.ScreeningRecordFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScreeningRecordFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScreeningRecordFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        findFirst: {
+          args: Prisma.ScreeningRecordFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScreeningRecordFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        findMany: {
+          args: Prisma.ScreeningRecordFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
+        }
+        create: {
+          args: Prisma.ScreeningRecordCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        createMany: {
+          args: Prisma.ScreeningRecordCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScreeningRecordCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
+        }
+        delete: {
+          args: Prisma.ScreeningRecordDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        update: {
+          args: Prisma.ScreeningRecordUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScreeningRecordDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScreeningRecordUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScreeningRecordUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScreeningRecordUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningRecordPayload>
+        }
+        aggregate: {
+          args: Prisma.ScreeningRecordAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScreeningRecord>
+        }
+        groupBy: {
+          args: Prisma.ScreeningRecordGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScreeningRecordGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScreeningRecordCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScreeningRecordCountAggregateOutputType> | number
+        }
+      }
+    }
+    GrowthAssessment: {
+      payload: Prisma.$GrowthAssessmentPayload<ExtArgs>
+      fields: Prisma.GrowthAssessmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GrowthAssessmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GrowthAssessmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        findFirst: {
+          args: Prisma.GrowthAssessmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GrowthAssessmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        findMany: {
+          args: Prisma.GrowthAssessmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>[]
+        }
+        create: {
+          args: Prisma.GrowthAssessmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        createMany: {
+          args: Prisma.GrowthAssessmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GrowthAssessmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>[]
+        }
+        delete: {
+          args: Prisma.GrowthAssessmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        update: {
+          args: Prisma.GrowthAssessmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.GrowthAssessmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GrowthAssessmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GrowthAssessmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.GrowthAssessmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GrowthAssessmentPayload>
+        }
+        aggregate: {
+          args: Prisma.GrowthAssessmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGrowthAssessment>
+        }
+        groupBy: {
+          args: Prisma.GrowthAssessmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GrowthAssessmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GrowthAssessmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GrowthAssessmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    ScreeningDeterminants: {
+      payload: Prisma.$ScreeningDeterminantsPayload<ExtArgs>
+      fields: Prisma.ScreeningDeterminantsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScreeningDeterminantsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScreeningDeterminantsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        findFirst: {
+          args: Prisma.ScreeningDeterminantsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScreeningDeterminantsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        findMany: {
+          args: Prisma.ScreeningDeterminantsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>[]
+        }
+        create: {
+          args: Prisma.ScreeningDeterminantsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        createMany: {
+          args: Prisma.ScreeningDeterminantsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScreeningDeterminantsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>[]
+        }
+        delete: {
+          args: Prisma.ScreeningDeterminantsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        update: {
+          args: Prisma.ScreeningDeterminantsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScreeningDeterminantsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScreeningDeterminantsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScreeningDeterminantsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScreeningDeterminantsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScreeningDeterminantsPayload>
+        }
+        aggregate: {
+          args: Prisma.ScreeningDeterminantsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScreeningDeterminants>
+        }
+        groupBy: {
+          args: Prisma.ScreeningDeterminantsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScreeningDeterminantsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScreeningDeterminantsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScreeningDeterminantsCountAggregateOutputType> | number
+        }
+      }
+    }
+    RiskAssessment: {
+      payload: Prisma.$RiskAssessmentPayload<ExtArgs>
+      fields: Prisma.RiskAssessmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiskAssessmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiskAssessmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        findFirst: {
+          args: Prisma.RiskAssessmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiskAssessmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        findMany: {
+          args: Prisma.RiskAssessmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>[]
+        }
+        create: {
+          args: Prisma.RiskAssessmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        createMany: {
+          args: Prisma.RiskAssessmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiskAssessmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>[]
+        }
+        delete: {
+          args: Prisma.RiskAssessmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        update: {
+          args: Prisma.RiskAssessmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiskAssessmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiskAssessmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiskAssessmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiskAssessmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskAssessmentPayload>
+        }
+        aggregate: {
+          args: Prisma.RiskAssessmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiskAssessment>
+        }
+        groupBy: {
+          args: Prisma.RiskAssessmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskAssessmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiskAssessmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskAssessmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    HealthKnowledgeBase: {
+      payload: Prisma.$HealthKnowledgeBasePayload<ExtArgs>
+      fields: Prisma.HealthKnowledgeBaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HealthKnowledgeBaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HealthKnowledgeBaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        findFirst: {
+          args: Prisma.HealthKnowledgeBaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HealthKnowledgeBaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        findMany: {
+          args: Prisma.HealthKnowledgeBaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
+        }
+        create: {
+          args: Prisma.HealthKnowledgeBaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        createMany: {
+          args: Prisma.HealthKnowledgeBaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HealthKnowledgeBaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
+        }
+        delete: {
+          args: Prisma.HealthKnowledgeBaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        update: {
+          args: Prisma.HealthKnowledgeBaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        deleteMany: {
+          args: Prisma.HealthKnowledgeBaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HealthKnowledgeBaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HealthKnowledgeBaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>[]
+        }
+        upsert: {
+          args: Prisma.HealthKnowledgeBaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HealthKnowledgeBasePayload>
+        }
+        aggregate: {
+          args: Prisma.HealthKnowledgeBaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHealthKnowledgeBase>
+        }
+        groupBy: {
+          args: Prisma.HealthKnowledgeBaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HealthKnowledgeBaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HealthKnowledgeBaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HealthKnowledgeBaseCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -755,6 +1055,16 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const KelurahanScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  district: 'district',
+  createdAt: 'createdAt'
+} as const
+
+export type KelurahanScalarFieldEnum = (typeof KelurahanScalarFieldEnum)[keyof typeof KelurahanScalarFieldEnum]
+
+
 export const AnonymousSessionScalarFieldEnum = {
   id: 'id',
   clientToken: 'clientToken',
@@ -766,6 +1076,19 @@ export const AnonymousSessionScalarFieldEnum = {
 export type AnonymousSessionScalarFieldEnum = (typeof AnonymousSessionScalarFieldEnum)[keyof typeof AnonymousSessionScalarFieldEnum]
 
 
+export const IngestionBatchLogScalarFieldEnum = {
+  id: 'id',
+  sourceName: 'sourceName',
+  sourceType: 'sourceType',
+  totalRecords: 'totalRecords',
+  successCount: 'successCount',
+  failedCount: 'failedCount',
+  importedAt: 'importedAt'
+} as const
+
+export type IngestionBatchLogScalarFieldEnum = (typeof IngestionBatchLogScalarFieldEnum)[keyof typeof IngestionBatchLogScalarFieldEnum]
+
+
 export const ScreeningRecordScalarFieldEnum = {
   id: 'id',
   shareHash: 'shareHash',
@@ -773,18 +1096,34 @@ export const ScreeningRecordScalarFieldEnum = {
   sourceType: 'sourceType',
   sourceBatchId: 'sourceBatchId',
   persona: 'persona',
-  kelurahan: 'kelurahan',
+  kelurahanId: 'kelurahanId',
+  externalLocationLabel: 'externalLocationLabel',
+  isOutsideBontang: 'isOutsideBontang',
   ageMonths: 'ageMonths',
   gender: 'gender',
   weightKg: 'weightKg',
   heightCm: 'heightCm',
-  isOutsideBontang: 'isOutsideBontang',
+  createdAt: 'createdAt'
+} as const
+
+export type ScreeningRecordScalarFieldEnum = (typeof ScreeningRecordScalarFieldEnum)[keyof typeof ScreeningRecordScalarFieldEnum]
+
+
+export const GrowthAssessmentScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   zScore: 'zScore',
   zScoreWAZ: 'zScoreWAZ',
   zScoreWHZ: 'zScoreWHZ',
   statusGiziTBU: 'statusGiziTBU',
   statusGiziBBU: 'statusGiziBBU',
-  statusGiziBBTB: 'statusGiziBBTB',
+  statusGiziBBTB: 'statusGiziBBTB'
+} as const
+
+export type GrowthAssessmentScalarFieldEnum = (typeof GrowthAssessmentScalarFieldEnum)[keyof typeof GrowthAssessmentScalarFieldEnum]
+
+
+export const ScreeningDeterminantsScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   bblrOption: 'bblrOption',
   exclusiveAsi: 'exclusiveAsi',
   mpasiAge: 'mpasiAge',
@@ -795,15 +1134,22 @@ export const ScreeningRecordScalarFieldEnum = {
   motherEducation: 'motherEducation',
   economicQuintile: 'economicQuintile',
   diarrheaHistory: 'diarrheaHistory',
-  posyanduKia: 'posyanduKia',
+  posyanduKia: 'posyanduKia'
+} as const
+
+export type ScreeningDeterminantsScalarFieldEnum = (typeof ScreeningDeterminantsScalarFieldEnum)[keyof typeof ScreeningDeterminantsScalarFieldEnum]
+
+
+export const RiskAssessmentScalarFieldEnum = {
+  screeningRecordId: 'screeningRecordId',
   riskTier: 'riskTier',
   riskScore: 'riskScore',
   dominantFactors: 'dominantFactors',
   rawMetadata: 'rawMetadata',
-  createdAt: 'createdAt'
+  engineVersion: 'engineVersion'
 } as const
 
-export type ScreeningRecordScalarFieldEnum = (typeof ScreeningRecordScalarFieldEnum)[keyof typeof ScreeningRecordScalarFieldEnum]
+export type RiskAssessmentScalarFieldEnum = (typeof RiskAssessmentScalarFieldEnum)[keyof typeof RiskAssessmentScalarFieldEnum]
 
 
 export const HealthKnowledgeBaseScalarFieldEnum = {
@@ -821,19 +1167,6 @@ export const HealthKnowledgeBaseScalarFieldEnum = {
 } as const
 
 export type HealthKnowledgeBaseScalarFieldEnum = (typeof HealthKnowledgeBaseScalarFieldEnum)[keyof typeof HealthKnowledgeBaseScalarFieldEnum]
-
-
-export const IngestionBatchLogScalarFieldEnum = {
-  id: 'id',
-  sourceName: 'sourceName',
-  sourceType: 'sourceType',
-  totalRecords: 'totalRecords',
-  successCount: 'successCount',
-  failedCount: 'failedCount',
-  importedAt: 'importedAt'
-} as const
-
-export type IngestionBatchLogScalarFieldEnum = (typeof IngestionBatchLogScalarFieldEnum)[keyof typeof IngestionBatchLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -860,6 +1193,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -867,14 +1208,6 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -940,6 +1273,13 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -950,13 +1290,6 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -1124,10 +1457,14 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
  */
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
+  kelurahan?: Prisma.KelurahanOmit
   anonymousSession?: Prisma.AnonymousSessionOmit
-  screeningRecord?: Prisma.ScreeningRecordOmit
-  healthKnowledgeBase?: Prisma.HealthKnowledgeBaseOmit
   ingestionBatchLog?: Prisma.IngestionBatchLogOmit
+  screeningRecord?: Prisma.ScreeningRecordOmit
+  growthAssessment?: Prisma.GrowthAssessmentOmit
+  screeningDeterminants?: Prisma.ScreeningDeterminantsOmit
+  riskAssessment?: Prisma.RiskAssessmentOmit
+  healthKnowledgeBase?: Prisma.HealthKnowledgeBaseOmit
 }
 
 /* Types for Logging */

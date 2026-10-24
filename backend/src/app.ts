@@ -4,6 +4,8 @@ import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
 import { prisma } from "./utils/prisma";
+import path from "path";
+import fs from "fs";
 import { logger } from "./utils/logger";
 import sessionRoutes from "./routes/session.routes";
 import screeningRoutes from "./routes/screening.routes";
@@ -28,10 +30,25 @@ app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/ingest", ingestRoutes);
 app.use("/api/v1/session", sessionRoutes);
 
+// Sajikan build frontend (SPA) jika tersedia (Production / Unified Hosting)
+const frontendDist = path.resolve(__dirname, "../../frontend/dist");
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get("*", (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
+
 app.use(
-  (err: Error, req: Request, res: Response, next: NextFunction) => {
+  (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     logger.error(err.message, err.stack);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Terjadi kesalahan pada server." },
+    });
   }
 );
 

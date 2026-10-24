@@ -2,8 +2,46 @@ import "dotenv/config";
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
 import { logger } from "../utils/logger";
+import { redis, isRedisReady } from "../config/redis";
 import { geminiService } from "../services/gemini.service";
 import { chatMessages } from "../constants/messages";
+
+const KB_CACHE_TTL_SECONDS = 60 * 60; // 1 jam — konten edukasi jarang berubah (lihat FDD §7)
+
+async function findGuidelines(riskTier: string, ageMonths: number): Promise<any[]> {
+  const cacheKey = `kb:${riskTier}:${ageMonths}`;
+
+  try {
+    if (isRedisReady()) {
+      const cached = await redis.get(cacheKey);
+      if (cached) return JSON.parse(cached);
+    }
+  } catch (err) {
+    logger.warn("Redis tidak terjangkau saat baca cache HealthKnowledgeBase:", (err as Error).message);
+  }
+
+  try {
+    const guidelines = await prisma.healthKnowledgeBase.findMany({
+      where: {
+        targetAgeGroupMinMonths: { lte: ageMonths },
+        targetAgeGroupMaxMonths: { gte: ageMonths },
+        OR: [{ targetRiskTier: riskTier }, { targetRiskTier: "ALL" }],
+      },
+      take: 5,
+    });
+
+    if (isRedisReady()) {
+      redis
+        .set(cacheKey, JSON.stringify(guidelines), "EX", KB_CACHE_TTL_SECONDS)
+        .catch((err) => logger.warn("Gagal menulis cache HealthKnowledgeBase:", err.message));
+    }
+
+    return guidelines;
+  } catch (dbErr: any) {
+    logger.warn("HealthKnowledgeBase query unavailable:", dbErr.message);
+    return [];
+  }
+}
 
 /**
  * Helper to build rich System Instruction for Gemini based on screening & knowledge base
@@ -61,7 +99,7 @@ DATA REKAM MEDIS & HASIL SKRINING BALITA:
 - Z-Score TB/U (Tinggi menurut Usia): ${zScore} SD (${statusGiziTBU})
 - Z-Score BB/U (Berat menurut Usia): ${zScoreWAZ} SD (${screening.statusGiziBBU ?? "Normal"})
 - Z-Score BB/TB (Berat menurut Tinggi): ${zScoreWHZ} SD (${screening.statusGiziBBTB ?? "Normal"})
-- Kategori Risiko Stunting (Naïve Bayes): ${riskTier} (Skor Kerentanan: ${riskScore})
+- Kategori Risiko Stunting: ${riskTier} (Skor Kerentanan: ${riskScore})
 - Determinan Risiko Dominan: ${dominantFactors}
 - Pola Asuh & Sanitasi:
   * Riwayat ASI: ${screening.exclusiveAsi === 1 ? "ASI Eksklusif" : "Tidak Eksklusif / Formula"}
@@ -137,11 +175,15 @@ export const chatController = {
       // If in personal mode and no record passed yet, fetch screening context from database
       if (!screeningRecord && mode !== "umum" && sessionId) {
         try {
-          const screenings = await prisma.screeningRecord.findMany({
-            where: { sessionId },
-            orderBy: { createdAt: "desc" },
-            take: 1,
-          });
+          // Baca dari view screening_record_flat (bukan tabel ScreeningRecord
+          // mentah) — sejak normalisasi skema, Z-Score/determinan/risiko ada
+          // di tabel anak terpisah; view merekonstruksinya jadi satu baris.
+          const screenings: any[] = await prisma.$queryRaw`
+            SELECT * FROM "screening_record_flat"
+            WHERE "sessionId" = ${sessionId}
+            ORDER BY "createdAt" DESC
+            LIMIT 1
+          `;
 
           screeningRecord = screenings[0] || null;
         } catch (dbError) {
@@ -154,17 +196,7 @@ export const chatController = {
         const ageMonths = Number(screeningRecord.ageMonths) || 0;
 
         try {
-          guidelines = await prisma.healthKnowledgeBase.findMany({
-            where: {
-              targetAgeGroupMinMonths: { lte: ageMonths },
-              targetAgeGroupMaxMonths: { gte: ageMonths },
-              OR: [
-                { targetRiskTier: riskTier },
-                { targetRiskTier: "ALL" },
-              ],
-            },
-            take: 5,
-          });
+          guidelines = await findGuidelines(riskTier, ageMonths);
         } catch {
           // If knowledge base DB is not seeded or offline, continue with core rules
         }

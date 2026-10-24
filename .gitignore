@@ -7,6 +7,9 @@ Thumbs.db
 .idea/
 *.swp
 
+# Local tooling / AI metadata
+.claude/
+
 # Backend
 backend/node_modules/
 backend/dist/

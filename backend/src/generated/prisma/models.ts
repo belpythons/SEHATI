@@ -8,8 +8,12 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Kelurahan'
 export type * from './models/AnonymousSession'
-export type * from './models/ScreeningRecord'
-export type * from './models/HealthKnowledgeBase'
 export type * from './models/IngestionBatchLog'
+export type * from './models/ScreeningRecord'
+export type * from './models/GrowthAssessment'
+export type * from './models/ScreeningDeterminants'
+export type * from './models/RiskAssessment'
+export type * from './models/HealthKnowledgeBase'
 export type * from './commonInputTypes'

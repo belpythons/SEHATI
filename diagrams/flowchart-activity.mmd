@@ -1,0 +1,101 @@
+flowchart TD
+    %% =====================================================================
+    %% SEHATI: Flowchart & Activity Diagram (End-to-End Business Logic)
+    %% =====================================================================
+
+    startNode([Pengguna Mengakses Aplikasi<br/>sehati.domcloud.dev]) --> checkNetwork{Periksa Koneksi Internet}
+
+    %% Mode Offline / Online Detection
+    checkNetwork -->|Offline| offlinePWA[Muat PWA Shell via Service Worker Cache]
+    checkNetwork -->|Online| onlinePWA[Muat Halaman Langsung dari Edge Server]
+
+    offlinePWA --> landingPage[Halaman Landing Page<br/>Statistik Stunting Bontang 27.4%]
+    onlinePWA --> landingPage
+
+    landingPage --> clickStart[Klik Tombol Mulai Skrining<br/>Zero-Login Friction]
+    clickStart --> formStep1[Step 1: Seleksi Persona dan Wilayah<br/>Pilih Persona dan Kelurahan di Kota Bontang]
+
+    formStep1 --> formStep2[Step 2: Antropometri Balita<br/>Jenis Kelamin, Usia 0-59 Bln, Berat kg, Tinggi cm]
+    formStep2 --> formStep3[Step 3: Determinan Lingkungan dan Pola Asuh<br/>ASI, MPASI, Sanitasi, Air Bersih, Asap Rokok, Diare]
+
+    formStep3 --> submitDecision{Apakah Perangkat Sedang Online}
+
+    %% Jalur Offline Buffering
+    submitDecision -->|Offline| saveIndexedDB[Simpan Payload ke Antrean IndexedDB<br/>idb-keyval Local Buffer]
+    saveIndexedDB --> notifyOffline[Notifikasi: Data Tersimpan Lokal Secara Aman<br/>Status Pending Sync]
+    notifyOffline --> waitOnline[Tunggu Event online Window Browser]
+    waitOnline --> autoSync[Otomatis Trigger Sinkronisasi Antrean ke Gateway]
+    autoSync --> submitPayload
+
+    %% Jalur Online Submission
+    submitDecision -->|Online| submitPayload[Kirim HTTP POST /api/v1/screening/submit<br/>Payload JSON + UUID clientToken]
+
+    %% Gateway & Validation
+    submitPayload --> valGate{Validasi Schema Zod di Backend}
+    valGate -->|Invalid| errVal[Return 400 Bad Request<br/>Tampilkan Pesan Validasi Error ke User]
+    errVal --> formStep2
+
+    valGate -->|Valid| sessionHandling[Cek atau Buat AnonymousSession<br/>Lookup clientToken di Supabase]
+    sessionHandling --> callML[Panggil FastAPI ML Microservice<br/>POST /api/v1/predict]
+
+    %% ML Microservice Processing
+    subgraph ML_Microservice["Eksekusi di Microservice ML (FastAPI)"]
+        direction TB
+        calcLMS[Komputasi Box-Cox LMS WHO 2006<br/>Hitung Z-Score TB/U, BB/U, BB/TB]
+        calcNB[Inferensi Model Naive Bayes<br/>Hitung Probabilitas Posterior Risiko Stunting]
+        classifyStatus[Klasifikasi Status Gizi dan Risk Tier<br/>LOW, MODERATE, HIGH plus Ekstraksi Faktor Dominan]
+
+        calcLMS --> calcNB --> classifyStatus
+    end
+
+    callML --> ML_Microservice
+    classifyStatus --> returnMLResult[Kembalikan Hasil Prediksi Lengkap ke Gateway]
+
+    %% Persistence & Hash
+    returnMLResult --> saveDB[Simpan Record ke Tabel ScreeningRecord<br/>Relasi ke AnonymousSession]
+    saveDB --> genHash[Generate nanoid Unique shareHash<br/>10 Karakter Acak Unik]
+    genHash --> returnClient[Respon 201 Created ke Frontend PWA<br/>Data Rekam Medis plus shareHash]
+
+    %% Frontend Analytics Rendering
+    returnClient --> renderDashboard[Tampilkan Dashboard Analitik Interaktif<br/>URL: /analytics/:shareHash]
+    renderDashboard --> widgetCurves[Widget 1: Kurva Baku Pertumbuhan WHO 2006<br/>Plotting Z-Score TB/U, BB/U, BB/TB]
+    renderDashboard --> widgetGauge[Widget 2: Risk Gauge Meter Kerentanan]
+    renderDashboard --> widgetRadar[Widget 3: Radar Chart Faktor Pemicu Risiko]
+    renderDashboard --> widgetFood[Widget 4: Rekomendasi Pangan Lokal Bontang<br/>Ikan Bawis, Bandeng, Telur, Daun Kelor]
+    renderDashboard --> widgetShare[Widget 5: Salin Link Publik Hasil Skrining]
+
+    %% AI Consultation Drawer Flow
+    renderDashboard --> openChat[Pengguna Membuka Drawer Chat HATI Assistant]
+    openChat --> sendChatQuery[Kirim Pertanyaan Edukasi Gizi Balita]
+    sendChatQuery --> chatGateway[Request ke /api/v1/chat/stream<br/>sessionId + query + history]
+
+    subgraph ChatGrounding["AI Direct-DB Grounding dan SSE Streaming"]
+        direction TB
+        fetchChildData[Ambil Rekam Medis Balita dari ScreeningRecord]
+        fetchKB[Ambil Panduan Intervensi dari HealthKnowledgeBase]
+        injectPrompt[Inject Data Balita ke System Instruction Gemini]
+        callGemini[Panggil Google Gemini 3.6-flash Model]
+        streamTokens[Alirkan Token Kata per Kata via SSE<br/>Content-Type: text/event-stream]
+
+        fetchChildData --> injectPrompt
+        fetchKB --> injectPrompt
+        injectPrompt --> callGemini
+        callGemini --> streamTokens
+    end
+
+    chatGateway --> ChatGrounding
+    streamTokens --> displayChat[Teks Muncul Real-Time di Chat Drawer Pengguna]
+    displayChat --> endNode([Selesai: Pengguna Menerima Wawasan Terarah])
+
+    classDef startEnd fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#ffffff;
+    classDef stepStyle fill:#ffffff,stroke:#64748b,stroke-width:1.5px,color:#1e293b;
+    classDef decisionStyle fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e;
+    classDef mlStyle fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#15803d;
+    classDef aiStyle fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef offlineStyle fill:#ffedd5,stroke:#ea580c,stroke-width:1.5px,color:#9a3412;
+
+    class startNode,endNode startEnd;
+    class checkNetwork,submitDecision,valGate decisionStyle;
+    class ML_Microservice,calcLMS,calcNB,classifyStatus mlStyle;
+    class ChatGrounding,fetchChildData,fetchKB,injectPrompt,callGemini,streamTokens aiStyle;
+    class offlinePWA,saveIndexedDB,notifyOffline,waitOnline,autoSync offlineStyle;

@@ -139,7 +139,7 @@ export const UserGuidePage: React.FC = () => {
                     <ul className="space-y-3 mb-8">
                       {step.details.map((detail, i) => (
                         <li key={i} className="text-sm text-slate-600 font-light flex gap-3 items-start">
-                          <span className={`text-${step.color} font-mono text-xs mt-0.5`}>✓</span>
+                          <span className={`${accent[step.color].text} font-mono text-xs mt-0.5`}>✓</span>
                           {detail}
                         </li>
                       ))}

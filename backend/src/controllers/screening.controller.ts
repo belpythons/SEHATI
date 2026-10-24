@@ -9,9 +9,9 @@ import { findOrCreateSession } from "../services/session.service";
 import { mlClient } from "../services/mlClient.service";
 import { prisma } from "../utils/prisma";
 import { ZodError } from "zod";
-import { createScreeningSchema } from "../validators/screening.validator";
-import { commonMessages, screeningMessages } from "../constants/messages";
-import { ScreeningService } from "../services/screening.service";
+// import { createScreeningSchema } from "../validators/screening.validator";
+// import { commonMessages, screeningMessages } from "../constants/messages";
+// import { ScreeningService } from "../services/screening.service";
 import z from "zod";
 
 
@@ -178,6 +178,7 @@ export const submitScreening = async (
 }
 
 
+/*
 export class screeningController {
   static async submit (
     req: Request,
@@ -260,3 +261,4 @@ export class screeningController {
     }
   }
 }
+*/

@@ -1,0 +1,96 @@
+graph TB
+    %% =====================================================================
+    %% SEHATI: Deployment & Cloud Infrastructure Diagram
+    %% =====================================================================
+
+    subgraph UserTier["👥 END-USER CLIENT DEVICES"]
+        direction LR
+        Mobile["📱 Smartphone PWA<br/><i>Android / iOS Browser</i>"]
+        Desktop["💻 Laptop / PC POS<br/><i>Kader Posyandu & Puskesmas</i>"]
+        Surveyor["📋 Surveyor Tablet<br/><i>Petugas Lapangan Kemenkes</i>"]
+    end
+
+    subgraph CloudEdge["☁️ DOMCLOUD PUBLIC HOSTING EDGE (sehati.domcloud.dev)"]
+        direction TB
+        DNS["🌐 DNS & SSL Management<br/><i>Let's Encrypt Automated TLS 1.3</i>"]
+        Nginx["🛡️ Nginx Reverse Proxy & Static Server<br/><i>HTTP/2, Brotli/Gzip Compression, Cache-Control</i>"]
+        StaticPWA["📦 PWA Static App Shell<br/><i>Vite Build Bundle (/dist)</i>"]
+        
+        DNS --> Nginx
+        Nginx --> StaticPWA
+    end
+
+    subgraph AppServer["⚙️ PRODUCTION BACKEND APPLICATION SERVER"]
+        direction TB
+        PM2["🔄 Node.js Runtime Engine<br/><i>Express.js v5 REST & SSE Gateway (Port 5001)</i>"]
+        SecEnv["🔒 Environment Variables (.env)<br/><i>DATABASE_URL, GEMINI_API_KEY, GATEWAY_API_KEY</i>"]
+        PrismaAdapter["💎 Prisma ORM Client<br/><i>@prisma/adapter-pg (Connection Pool)</i>"]
+
+        PM2 --- SecEnv
+        PM2 --> PrismaAdapter
+    end
+
+    subgraph MLContainer["🧠 COMPUTE & MACHINE LEARNING SERVICE"]
+        direction TB
+        Uvicorn["⚡ Python 3.11 Uvicorn ASGI Server<br/><i>FastAPI Microservice (Internal Port 8000)</i>"]
+        MemoryTables["📊 In-Memory WHO Reference Tables<br/><i>Box-Cox LMS Values (Stateless & High-Speed)</i>"]
+        TrainedModel["🎯 Preloaded Naïve Bayes Classifier<br/><i>Scikit-Learn Serialized Pipeline</i>"]
+
+        Uvicorn --> MemoryTables
+        Uvicorn --> TrainedModel
+    end
+
+    subgraph CloudDB["🗄️ SUPABASE MANAGED POSTGRESQL (AWS Cloud)"]
+        direction TB
+        PgBouncer["🔄 PgBouncer Connection Pooler<br/><i>Port 6543 (Session Pooling for Express Gateway)</i>"]
+        DirectPostgres["🐘 Direct PostgreSQL Instance<br/><i>Port 5432 (Prisma Migrations & Admin)</i>"]
+        EncryptedStorage["💾 Cloud Storage Volume<br/><i>Encrypted At Rest (AES-256) & Daily Backups</i>"]
+
+        PgBouncer --> EncryptedStorage
+        DirectPostgres --> EncryptedStorage
+    end
+
+    subgraph GoogleAICloud["✨ GOOGLE CLOUD AI INFRASTRUCTURE"]
+        direction TB
+        GeminiAPI["🤖 Google Gemini API Endpoint<br/><i>Model: gemini-3.6-flash</i>"]
+        StreamPipeline["🌊 High-Throughput Token Streaming<br/><i>Low-Latency SSE Delivery</i>"]
+
+        GeminiAPI --> StreamPipeline
+    end
+
+    subgraph AutomationOps["⏱️ DEVOPS, CI/CD & HEALTH AUTOMATION"]
+        direction TB
+        GH_Repo["🐙 GitHub Repository<br/><i>Branch: main (CI/CD Pipeline)</i>"]
+        GH_Actions["⏰ GitHub Actions Cron Keep-Alive<br/><i>Pings GET /api/v1/health every 24 Hours</i>"]
+        PreventSleep["🛡️ Anti-Inactivity Shield<br/><i>Prevents Supabase Free-Tier Auto-Pause</i>"]
+
+        GH_Repo --> GH_Actions
+        GH_Actions --> PreventSleep
+    end
+
+    %% Network Connections
+    UserTier ==>|"HTTPS (Port 443)"| DNS
+    Nginx -->|"Proxy Pass /api/v1/*"| PM2
+    PM2 -->|"HTTP Internal Loopback :8000"| Uvicorn
+    PrismaAdapter ==>|"TLS Connection :6543"| PgBouncer
+    PM2 ==>|"HTTPS REST Stream"| GeminiAPI
+    StreamPipeline -.->|"SSE Tokens"| PM2
+    Nginx -.->|"SSE Stream Forward"| UserTier
+
+    PreventSleep ==>|"HTTP Health Ping (SELECT 1)"| PM2
+
+    classDef userStyle fill:#f8fafc,stroke:#94a3b8,stroke-width:1.5px,color:#0f172a;
+    classDef edgeStyle fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef serverStyle fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e;
+    classDef mlStyle fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#15803d;
+    classDef dbStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b;
+    classDef aiStyle fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef opsStyle fill:#f1f5f9,stroke:#64748b,stroke-width:1.5px,color:#334155;
+
+    class UserTier,Mobile,Desktop,Surveyor userStyle;
+    class CloudEdge,DNS,Nginx,StaticPWA edgeStyle;
+    class AppServer,PM2,SecEnv,PrismaAdapter serverStyle;
+    class MLContainer,Uvicorn,MemoryTables,TrainedModel mlStyle;
+    class CloudDB,PgBouncer,DirectPostgres,EncryptedStorage dbStyle;
+    class GoogleAICloud,GeminiAPI,StreamPipeline aiStyle;
+    class AutomationOps,GH_Repo,GH_Actions,PreventSleep opsStyle;

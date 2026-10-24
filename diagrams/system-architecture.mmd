@@ -1,0 +1,123 @@
+graph TB
+    %% =====================================================================
+    %% SEHATI: High-Level System Architecture Diagram
+    %% =====================================================================
+
+    subgraph ClientLayer["CLIENT LAYER - Frontend PWA (React 19 + TypeScript)"]
+        direction TB
+        PWA["PWA Client - sehati.domcloud.dev<br/>Vite + React 19 + TailwindCSS v4"]
+        SW["Service Worker<br/>vite-plugin-pwa (Cache-First Shell)"]
+        IDB[("IndexedDB Storage<br/>idb-keyval (Offline Drafts & Queue)")]
+        UI_Q["Multi-Step Questionnaire<br/>Framer Motion (Antropometri & Determinan)"]
+        UI_Dash["Analytics Dashboard<br/>@dnd-kit (Draggable Grid Widgets)"]
+        UI_Chart["Growth Curves & Gauges<br/>Chart.js + Recharts + Gauge Component"]
+        UI_Chat["AI Chat Assistant Drawer<br/>@microsoft/fetch-event-source (SSE Client)"]
+
+        PWA --> SW
+        PWA --> IDB
+        PWA --> UI_Q
+        PWA --> UI_Dash
+        UI_Dash --> UI_Chart
+        UI_Dash --> UI_Chat
+    end
+
+    subgraph GatewayLayer["API GATEWAY LAYER - Node.js + Express.js"]
+        direction TB
+        GW["Express.js API Gateway (:5001)<br/>Helmet, CORS, Rate-Limiter, Morgan"]
+        ZodVal["Schema Validator<br/>Zod (Antropometri & Determinan)"]
+        SessMgr["Anonymous Session Manager<br/>UUID Client Token Handler"]
+        ScreeningCtrl["Screening Controller<br/>POST /api/v1/screening/submit"]
+        ChatCtrl["SSE Stream Controller<br/>POST/GET /api/v1/chat/stream"]
+        IngestAdapter["Batch Ingestion Adapter<br/>POST /api/v1/ingest/upload/:sourceType"]
+        HealthCtrl["Health Check Ping<br/>GET /api/v1/health"]
+
+        GW --> ZodVal
+        ZodVal --> SessMgr
+        SessMgr --> ScreeningCtrl
+        GW --> ChatCtrl
+        GW --> IngestAdapter
+        GW --> HealthCtrl
+    end
+
+    subgraph MLLayer["MACHINE LEARNING SERVICE LAYER - Python 3.11 + FastAPI"]
+        direction TB
+        FastAPIApp["FastAPI Microservice (:8000)<br/>Uvicorn ASGI Engine"]
+        LMS_Engine["Triple-Index WHO Z-Score Engine<br/>Box-Cox LMS Method (TB/U, BB/U, BB/TB)"]
+        NB_Classifier["Categorical Naive Bayes Classifier<br/>Scikit-Learn (98.4% Akurasi, 3 Tiers)"]
+        Factor_Extract["Dominant Risk Factor Extractor<br/>Posterior Probability Impact Analysis"]
+
+        FastAPIApp --> LMS_Engine
+        FastAPIApp --> NB_Classifier
+        NB_Classifier --> Factor_Extract
+    end
+
+    subgraph CloudAILayer["GENERATIVE AI & GROUNDING LAYER"]
+        direction TB
+        GeminiSDK["Google Gen AI SDK (@google/genai)<br/>gemini-3.6-flash"]
+        PromptEngine["Contextual Prompt Builder<br/>Child Metrics + Knowledge Grounding"]
+        SSEStreamer["Token-by-Token SSE Streamer<br/>AsyncGenerator Pipeline"]
+
+        PromptEngine --> GeminiSDK
+        GeminiSDK --> SSEStreamer
+    end
+
+    subgraph DataLayer["PERSISTENCE LAYER - Supabase Managed PostgreSQL"]
+        direction TB
+        PrismaClient["Prisma ORM Client v7.x<br/>@prisma/client + @prisma/adapter-pg"]
+        Pooler["Connection Pooler<br/>PgBouncer Session Mode (:6543)"]
+        DirectDB["Direct PostgreSQL (:5432)<br/>Schema Migrations"]
+        
+        T_Session["Table: AnonymousSession"]
+        T_Screening["Table: ScreeningRecord"]
+        T_KB["Table: HealthKnowledgeBase"]
+        T_Ingest["Table: IngestionBatchLog"]
+
+        PrismaClient --> Pooler
+        Pooler --> T_Session
+        Pooler --> T_Screening
+        Pooler --> T_KB
+        Pooler --> T_Ingest
+        DirectDB --> T_Screening
+    end
+
+    subgraph ExternalSources["EXTERNAL DATA SOURCES & AUTOMATION"]
+        direction TB
+        Kemenkes["Kemenkes RI / SSGI<br/>Riskesdas & Survey Datasets (CSV)"]
+        GHActions["GitHub Actions Cron<br/>Keep-Alive Pinger (24h Interval)"]
+        DomcloudHost["Domcloud Hosting<br/>Public Production Edge (PWA)"]
+    end
+
+    %% Network & Data Flow Connections
+    PWA -.->|"HTTP/HTTPS REST"| GW
+    UI_Q -->|"POST /screening/submit"| GW
+    UI_Chat -->|"SSE Request"| ChatCtrl
+    IDB -.->|"Auto-Sync Drafts"| GW
+
+    ScreeningCtrl -->|"HTTP POST /api/v1/predict"| FastAPIApp
+    FastAPIApp -->|"Z-Scores, Tiers, Factors"| ScreeningCtrl
+
+    ChatCtrl -->|"Direct-DB Query"| PrismaClient
+    ChatCtrl -->|"Inject Rekam Medis"| PromptEngine
+    SSEStreamer -->|"Token Stream (text/event-stream)"| UI_Chat
+
+    ScreeningCtrl -->|"Create Record"| PrismaClient
+    IngestAdapter -->|"Batch Insert"| PrismaClient
+    Kemenkes -->|"CSV / Riskesdas Data"| IngestAdapter
+
+    GHActions -->|"Keep-Alive Ping (GET /api/v1/health)"| HealthCtrl
+    HealthCtrl -->|"SELECT 1 Ping"| PrismaClient
+    DomcloudHost --- PWA
+
+    classDef clientStyle fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef gatewayStyle fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e;
+    classDef mlStyle fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#15803d;
+    classDef aiStyle fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef dataStyle fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b;
+    classDef extStyle fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#334155;
+
+    class ClientLayer,PWA,SW,IDB,UI_Q,UI_Dash,UI_Chart,UI_Chat clientStyle;
+    class GatewayLayer,GW,ZodVal,SessMgr,ScreeningCtrl,ChatCtrl,IngestAdapter,HealthCtrl gatewayStyle;
+    class MLLayer,FastAPIApp,LMS_Engine,NB_Classifier,Factor_Extract mlStyle;
+    class CloudAILayer,GeminiSDK,PromptEngine,SSEStreamer aiStyle;
+    class DataLayer,PrismaClient,Pooler,DirectDB,T_Session,T_Screening,T_KB,T_Ingest dataStyle;
+    class ExternalSources,Kemenkes,GHActions,DomcloudHost extStyle;

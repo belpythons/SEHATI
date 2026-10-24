@@ -1,0 +1,78 @@
+erDiagram
+    %% =====================================================================
+    %% SEHATI (Sistem Edukasi Holistik dan Deteksi Stunting Terintegrasi)
+    %% Entity Relationship Diagram (ERD) - PostgreSQL / Prisma ORM
+    %% =====================================================================
+
+    AnonymousSession ||--o{ ScreeningRecord : "generates"
+    IngestionBatchLog ||--o{ ScreeningRecord : "imports batch"
+    ScreeningRecord }o..o{ HealthKnowledgeBase : "references guidelines"
+
+    AnonymousSession {
+        string id PK "UUID Primary Key"
+        string clientToken UK "UUID Client Token"
+        string persona "ORANG_TUA, KADER_POSYANDU, SURVEYOR"
+        datetime createdAt "Timestamp Sesi Dibuat"
+        datetime updatedAt "Timestamp Sesi Diperbarui"
+    }
+
+    ScreeningRecord {
+        string id PK "UUID Primary Key"
+        string shareHash UK "Nanoid 10 Karakter Tautan Publik"
+        string sessionId FK "Foreign Key ke AnonymousSession"
+        string sourceType "PWA_DIRECT_USER, RISKESDAS, SURVEY_CSV"
+        string sourceBatchId FK "Nullable FK ke IngestionBatchLog"
+        string persona "Persona Pengisi Saat Skrining"
+        string kelurahan "15 Kelurahan di Kota Bontang"
+        int ageMonths "Usia Balita 0 sampai 59 Bulan"
+        string gender "Laki-laki atau Perempuan"
+        float weightKg "Berat Badan dalam Kilogram"
+        float heightCm "Panjang atau Tinggi Badan dalam Sentimeter"
+        boolean isOutsideBontang "Flag Domisili Luar Bontang"
+        float zScore "Z-Score TB/U Indikator Stunting"
+        float zScoreWAZ "Z-Score BB/U Indikator Underweight"
+        float zScoreWHZ "Z-Score BB/TB Indikator Wasting"
+        string statusGiziTBU "Severely Stunted, Stunted, Normal, Tinggi"
+        string statusGiziBBU "Severely Underweight, Underweight, Normal"
+        string statusGiziBBTB "Severely Wasted, Wasted, Normal, Overweight"
+        int bblrOption "1 Normal, 2 BBLR, 3 Tidak Tahu"
+        int exclusiveAsi "1 ASI Eksklusif, 2 Formula, 3 Belum 6 Bln"
+        int mpasiAge "1 Dini, 2 Tepat 6 Bln, 3 Terlambat, 4 Belum"
+        string animalProtein "Pilihan Protein Hewani Array"
+        int cleanWaterAccess "1 Kemasan, 2 PDAM, 3 Sumur, 4 Lainnya"
+        int sanitationAccess "1 Jamban Sehat Sendiri, 2 Komunal, 3 Tidak Ada"
+        int smokeExposure "1 Bebas Rokok, 2 Terpapar Asap Rokok"
+        int motherEducation "1 SD, 2 SMP, 3 SMA/SMK, 4 Sarjana"
+        int economicQuintile "1 Kuintil Terbawah sampai 5 Tertinggi"
+        int diarrheaHistory "1 Tidak Pernah/1x, 2 Berulang"
+        int posyanduKia "1 Rutin plus KIA, 2 Kadang, 3 Tidak Pernah"
+        string riskTier "LOW, MODERATE, HIGH (Naive Bayes)"
+        float riskScore "Skor Probabilitas Risiko 0.0 sampai 1.0"
+        string dominantFactors "Faktor Dominan Anomali Risiko"
+        json rawMetadata "Metadata Tambahan dan Debugging"
+        datetime createdAt "Waktu Skrining Tercatat"
+    }
+
+    HealthKnowledgeBase {
+        string id PK "UUID Primary Key"
+        string topicTitle "Judul Topik Intervensi Gizi dan Pola Asuh"
+        string category "GIZI_LOKAL, SANITASI, MPASI, 1000_HPK"
+        int targetAgeGroupMinMonths "Umur Minimum Balita"
+        int targetAgeGroupMaxMonths "Umur Maksimum Balita"
+        string targetRiskTier "Target Risiko LOW, MODERATE, HIGH"
+        string tags "Tag Topik Pangan Lokal"
+        text guidelineContent "Konten Panduan Klinis dan Intervensi"
+        string actionableSteps "Langkah Aksi Praktis untuk Pengasuh"
+        string sourceReference "Referensi Dokumen WHO dan Kemenkes RI"
+        datetime createdAt "Waktu Pengetahuan Ditambahkan"
+    }
+
+    IngestionBatchLog {
+        string id PK "UUID Primary Key"
+        string sourceName "Nama File atau Batch Sumber"
+        string sourceType "Tipe Sumber Impor Data"
+        int totalRecords "Total Baris Data Diproses"
+        int successCount "Jumlah Baris Berhasil Diimpor"
+        int failedCount "Jumlah Baris Gagal Validasi"
+        datetime importedAt "Waktu Impor Selesai"
+    }

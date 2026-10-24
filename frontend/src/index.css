@@ -73,12 +73,21 @@
 }
 .hl--teal { --hl: oklch(65% 0.08 170 / 0.4); }
 .hl--sage { --hl: oklch(75% 0.06 140 / 0.4); }
-/* Reduced motion: collapses CSS-driven motion (animate-pulse/ping, transitions).
+/* Reduced motion: collapses CSS-driven motion (transitions, decorative loops).
    Framer Motion runs on WAAPI and ignores this -- guard those with useReducedMotion(). */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 150ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 150ms !important;
+  }
+
+  /* Functional motion keeps looping -- a spinner frozen after one turn reads
+     as a hung request. Skeletons pulse opacity only, no vestibular risk.
+     animate-ping is decorative and scales, so it stays stopped. */
+  .animate-spin,
+  .animate-pulse {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
   }
 }

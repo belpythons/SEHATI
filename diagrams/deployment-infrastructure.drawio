@@ -1,0 +1,37 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="24.0.0" type="device">
+  <diagram name="Deployment SEHATI" id="sehati-deploy-02">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="800" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title4" value="Diagram Topologi Deployment &amp; Infrastruktur Produksi SEHATI" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="40" y="0" width="700" height="30" as="geometry"/></mxCell>
+
+        <mxCell id="user2" value="Pengguna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="1"><mxGeometry x="420" y="50" width="160" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="github" value="GitHub Repository (Public)&lt;br&gt;&lt;small&gt;github.com/belpythons/SEHATI&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="240" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="domcloud2" value="DOMCloud Production Host (sehati.domcloud.dev)" style="swimlane;startSize=24;fillColor=#dae8fc;strokeColor=#6c8ebf;html=1;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="340" y="150" width="380" height="260" as="geometry"/></mxCell>
+        <mxCell id="nginx" value="Nginx Reverse Proxy + Phusion Passenger (Node.js 20)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="domcloud2"><mxGeometry x="30" y="40" width="320" height="50" as="geometry"/></mxCell>
+        <mxCell id="frontend2" value="Frontend&lt;br&gt;&lt;small&gt;Static Build (Vite)&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="domcloud2"><mxGeometry x="30" y="120" width="150" height="80" as="geometry"/></mxCell>
+        <mxCell id="backend2" value="Backend&lt;br&gt;&lt;small&gt;Express Process (:PORT)&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="domcloud2"><mxGeometry x="200" y="120" width="150" height="80" as="geometry"/></mxCell>
+        <mxCell id="e_nginx_fe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;defaultLabelBackgroundColor=gap;" edge="1" source="nginx" target="frontend2" parent="domcloud2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_nginx_be" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;defaultLabelBackgroundColor=gap;" edge="1" source="nginx" target="backend2" parent="domcloud2"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="mlproc" value="ML Service Process&lt;br&gt;&lt;small&gt;FastAPI (Uvicorn :8000)&lt;br&gt;host via env ML_SERVICE_URL&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="780" y="240" width="240" height="90" as="geometry"/></mxCell>
+
+        <mxCell id="db2" value="Supabase PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="380" y="490" width="160" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="gemini2" value="Google Gemini API&lt;br&gt;&lt;small&gt;HTTPS SSE Streaming&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" vertex="1" parent="1"><mxGeometry x="780" y="490" width="240" height="80" as="geometry"/></mxCell>
+
+        <mxCell id="e_user_nginx" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="user2" target="nginx" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_gh_dom" value="git push &#8594; deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;defaultLabelBackgroundColor=gap;verticalAlign=bottom;" edge="1" source="github" target="domcloud2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_ml2" value="HTTP POST /predict" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="backend2" target="mlproc" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_db_pool" value="Runtime Queries&#xa;Pooler :6543 (PgBouncer)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;defaultLabelBackgroundColor=gap;exitX=0.25;exitY=1;entryX=0.25;entryY=0;labelPlacement=auto;" edge="1" source="backend2" target="db2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_db_direct" value="Prisma Migrate&#xa;Direct :5432" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;defaultLabelBackgroundColor=gap;exitX=0.75;exitY=1;entryX=0.75;entryY=0;labelPlacement=auto;" edge="1" source="backend2" target="db2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_gem2" value="SSE Streaming" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="backend2" target="gemini2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="note2" value="Catatan: tidak ditemukan berkas .domcloud.yml ter-commit di repositori. Topologi ini merepresentasikan konfigurasi environment variable (ML_SERVICE_URL, DATABASE_URL, DIRECT_URL) yang benar-benar dipakai aplikasi saat runtime." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacing=6;" vertex="1" parent="1"><mxGeometry x="40" y="620" width="500" height="90" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

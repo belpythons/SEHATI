@@ -6,7 +6,8 @@
   "scripts": {
     "test": "tsx --test \"src/**/*.test.ts\"",
     "dev": "tsx watch src/server.ts",
-    "build": "tsx",
+    "start": "tsx src/server.ts",
+    "build": "prisma generate",
     "selfcheck:zscore": "tsx scripts/selfcheck-zscore.ts",
     "selfcheck:risk": "tsx scripts/selfcheck-risk.ts",
     "selfcheck:riskesdas-mapper": "tsx scripts/selfcheck-riskesdas-mapper.ts",

@@ -1,0 +1,24 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="24.0.0" type="device">
+  <diagram name="Arsitektur Sistem SEHATI" id="sehati-arch-01">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Diagram Arsitektur Sistem SEHATI v2.0.0" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="40" y="10" width="600" height="30" as="geometry"/></mxCell>
+        <mxCell id="actor" value="Pengguna&lt;br&gt;&lt;small&gt;Orang Tua / Kader / Nakes&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="1"><mxGeometry x="40" y="90" width="160" height="70" as="geometry"/></mxCell>
+        <mxCell id="domcloud" value="DOMCloud Production Host (sehati.domcloud.dev)" style="swimlane;startSize=24;fillColor=#dae8fc;strokeColor=#6c8ebf;html=1;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="280" y="60" width="300" height="300" as="geometry"/></mxCell>
+        <mxCell id="frontend" value="Frontend PWA&lt;br&gt;&lt;small&gt;React 19 + Vite + Tailwind&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="domcloud"><mxGeometry x="30" y="40" width="240" height="80" as="geometry"/></mxCell>
+        <mxCell id="backend" value="Backend API Gateway&lt;br&gt;&lt;small&gt;Express 5 + Prisma ORM&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="domcloud"><mxGeometry x="30" y="170" width="240" height="80" as="geometry"/></mxCell>
+        <mxCell id="e_fe_be" value="REST /api/v1/*" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="frontend" target="backend" parent="domcloud"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="mlservice" value="ML Service&lt;br&gt;&lt;small&gt;Python FastAPI (Uvicorn :8000)&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1"><mxGeometry x="660" y="170" width="220" height="80" as="geometry"/></mxCell>
+        <mxCell id="db" value="PostgreSQL&lt;br&gt;&lt;small&gt;Supabase&lt;/small&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;boundedLbl=1;" vertex="1" parent="1"><mxGeometry x="320" y="420" width="140" height="90" as="geometry"/></mxCell>
+        <mxCell id="gemini" value="Google Gemini API&lt;br&gt;&lt;small&gt;Model via env GEMINI_MODEL, SSE&lt;/small&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" vertex="1" parent="1"><mxGeometry x="660" y="420" width="220" height="80" as="geometry"/></mxCell>
+        <mxCell id="e_user_fe" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="actor" target="frontend" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_ml" value="HTTP POST /predict" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="backend" target="mlservice" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_db" value="Prisma ORM" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="backend" target="db" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_be_gem" value="SSE Streaming" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;fontSize=12;defaultLabelBackgroundColor=gap;labelPlacement=auto;" edge="1" source="backend" target="gemini" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="note1" value="Catatan: Backend memanggil ML Service melalui HTTP (proses terpisah, bukan in-process engine). Garis putus-putus = komunikasi streaming/asinkron." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=left;spacing=6;" vertex="1" parent="1"><mxGeometry x="40" y="420" width="200" height="110" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
